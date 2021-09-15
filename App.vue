@@ -14,4 +14,12 @@
 
 <style>
 	/*每个页面公共css */
+	page {
+		height: 100%;
+		width:100%;
+		box-sizing: border-box;
+		overflow-x: hidden;
+		overflow-y: auto;
+		background-color: #efeef3;
+	}
 </style>
