@@ -26,18 +26,34 @@
 				});
 			},
 			getInfo() {
+				// uni.request({
+				// 	url:'https://test.suezp.cn/api',
+				// 	method: 'GET',
+				// 	header: {
+				// 		'content-type':'application/json'
+				// 	},
+				// 	data: {},
+				// 	success(res) {
+				// 		console.log('请求返回参数',res.data)
+				// 	}
+				// })
 				uni.request({
-					url:'https://test.suezp.cn/api',
+					url:'https://aip.baidubce.com/oauth/2.0/token',
 					method: 'GET',
 					header: {
 						'content-type':'application/json'
 					},
-					data: {},
+					data: {
+						grant_type: 'client_credentials',
+						client_id: '5vZrXRzZh99FGDZDF6lGkHce',
+						client_secret: 'GCdORqyohGfS9jzyq6X4lnRXs8mo6RNd'
+					},
 					success(res) {
 						console.log('请求返回参数',res.data)
+						console.log('access_token'.res.data.access_token)
 					}
 				})
-			}
+			},
 		}
 	}
 </script>
