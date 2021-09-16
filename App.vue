@@ -22,4 +22,8 @@
 		overflow-y: auto;
 		/* background-color: #e4e9fc; */
 	}
+	.uni-file-picker__header  .file-title{
+		font-size: 15px!important;
+		margin-right: 55px!important;
+	}
 </style>

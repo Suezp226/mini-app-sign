@@ -13,6 +13,20 @@
 				"navigationBarTitleText": "个人中心",
 				"disableScroll": true
 			}
+		},
+		{
+			"path": "pages/sendOrder/sendOrder",
+			"style": {
+				"navigationBarTitleText": "发送订货单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/sendShipments/sendShipments",
+			"style": {
+				"navigationBarTitleText": "发送发货单",
+				"disableScroll": true
+			}
 		}
 	],
 	"globalStyle": {
@@ -20,6 +34,9 @@
 		"navigationBarTitleText": "",
 		"navigationBarBackgroundColor": "#3fa89a",
 		"backgroundColor": "#f5f7fb"
+	},
+	"usingComponents": {
+		"mp-uploader": "weui-miniprogram/uploader/uploader"
 	},
 	"tabBar": {
 		"color": "#000",

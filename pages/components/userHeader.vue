@@ -1,9 +1,9 @@
 <template>
 	<view class="outBox">
 		<view class="infoBox">
-			<view class="leftBox">
+			<!-- <view class="leftBox">
 				<image src="../../static/logo.png" mode="aspectFit"></image>
-			</view>
+			</view> -->
 			<view class="rightBox">
 				<view class="name">{{userInfo.name}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
@@ -52,9 +52,9 @@
 		background-size: cover;
 		background-position-x: center;
 		border-radius: 5px;
-		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+		box-shadow: 0 0px 7px 1px rgba(0, 0, 0, 0.16);
 		display: flex;
-		padding: 25px 0 25px 10px;
+		padding: 15px 0 25px 10px;
 		box-sizing: border-box;
 
 		view {
@@ -84,7 +84,7 @@
 				display: block;
 				font-size: 20px;
 				font-weight: bold;
-				height: 30px;
+				height: 40px;
 			}
 
 			.phone {
@@ -97,7 +97,7 @@
 				color: #fff;
 				right: 20px;
 				font-size: 14px;
-				top: 6px;
+				top: 0px;
 				border-radius: 5px;
 				background-color: rgb(136, 119, 163);
 				text-align: center;

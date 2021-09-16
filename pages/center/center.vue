@@ -15,10 +15,10 @@
 					</view>
 					<view class="liBox">个人信息</view>
 				</li>
-				<!-- <li>3</li>
+				<li>3</li>
 				<li>4</li>
 				<li>5</li>
-				<li>6</li> -->
+				<li>6</li>
 			</ul>
 		</view>
 	</view>
@@ -74,11 +74,12 @@
 					flex-direction: column;
 					align-items: center;
 					min-width: 135px;
-					width: 44%;
+					width: 40%;
 					margin: 10px;
 					padding: 20px 5px;
 					border-radius: 5px;
 					box-shadow: 0 0px 7px 1px rgba(0, 0, 0, 0.16);
+					height: 116px;
 					image {
 						height: 51px;
 						width: 40px;
