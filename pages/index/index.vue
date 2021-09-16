@@ -1,10 +1,10 @@
 <template>
 	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<text>{{title}}</text>
-		<button type="primary" @click="goNextPage">跳转第二页</button>
+		<view class="topBox" ></view>
 		
-		<button type="default" @click="getInfo" style="margin-top:20px;">获取信息</button>
+		<button type="default" @click="goNextPage">跳转第二页</button>
+		
+		<!-- <button type="default" @click="getInfo" style="margin-top:20px;">获取信息</button> -->
 	</view>
 </template>
 
@@ -61,6 +61,17 @@
 <style scoped lang="less">
 	.content {
 		// height: 900px;
+		text-align: center;
+			
+		.topBox {
+			height: 170px;
+			background-image: url(../../static/bg1.png);
+			background-size: cover;
+			background-position-x: center;
+		}
+	}
+	button {
+		margin-top: 20px;
 	}
 
 	.logo {

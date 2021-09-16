@@ -20,6 +20,6 @@
 		box-sizing: border-box;
 		overflow-x: hidden;
 		overflow-y: auto;
-		background-color: #efeef3;
+		/* background-color: #e4e9fc; */
 	}
 </style>
