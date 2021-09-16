@@ -3,37 +3,39 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "网签小程序",
+				"disableScroll": true
 			}
 		},
 		{
-			"path": "pages/index/second",
+			"path": "pages/center/center",
 			"style": {
-				"navigationBarTitleText": "第二页"
+				"navigationBarTitleText": "个人中心",
+				"disableScroll": true
 			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "",
-		"navigationBarBackgroundColor": "#63a4ff",
-		"backgroundColor": "#F5F5F5"
+		"navigationBarBackgroundColor": "#3fa89a",
+		"backgroundColor": "#f5f7fb"
 	},
 	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#3cc51f",
+		"color": "#000",
+		"selectedColor": "#3fa89a",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
 			"pagePath": "pages/index/index",
-			"iconPath": "static/logo.png",
-			"selectedIconPath": "static/logo.png",
+			"iconPath": "static/home1.png",
+			"selectedIconPath": "static/home2.png",
 			"text": "首页"
 		}, {
-			"pagePath": "pages/index/second",
-			"iconPath": "static/logo.png",
-			"selectedIconPath": "static/logo.png",
-			"text": "第二页"
+			"pagePath": "pages/center/center",
+			"iconPath": "static/center1.png",
+			"selectedIconPath": "static/center2.png",
+			"text": "我的"
 		}]
 	}
 }
