@@ -8,7 +8,7 @@
 		</view>
 
 		<view class="formBox">
-			<view class="form-item">
+			<!-- <view class="form-item">
 				<view class="title">
 					<image src="../../static/name.png" mode="aspectFit"></image>
 				</view>
@@ -19,7 +19,7 @@
 					<image src="../../static/idcard.png" mode="aspectFit"></image>
 				</view>
 				<input class="input" name="input" placeholder="请输入身份证" />
-			</view>
+			</view> -->
 		</view>
 		<view class="btnBox">
 			<button type="primary" @click="next">下一步</button>
