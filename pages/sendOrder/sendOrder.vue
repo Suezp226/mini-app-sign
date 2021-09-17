@@ -80,10 +80,20 @@
 				})
 			},
 			sendOrder() {
-				console.log('发送');
-				uni.navigateBack({
-				    delta: 1
-				});
+				wx.showModal({
+				  title: '提示',
+				  content: '确认发送订货单？',
+				  success (res) {
+				    if (res.confirm) {
+				      console.log('用户点击确定')
+					  uni.navigateBack({
+					      delta: 1
+					  });
+				    } else if (res.cancel) {
+				      console.log('用户点击取消')
+				    }
+				  }
+				})
 			}
 		},
 	}

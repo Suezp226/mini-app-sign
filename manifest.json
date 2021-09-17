@@ -1,6 +1,6 @@
 {
     "name" : "mini-app-sign",
-    "appid" : "",
+    "appid" : "__UNI__CB43C05",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wxab32f37f2a22160c",
+        "appid" : "",
         "setting" : {
             "urlCheck" : false
         },
@@ -69,5 +69,20 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2"
+    "vueVersion" : "2",
+    "h5" : {
+        "devServer" : {
+            "port" : "1114",
+            "https" : false,
+            "historyApiFallback" : true,
+            "host" : "0.0.0.0",
+            "disableHostCheck" : true,
+            "noInfo" : true
+        },
+        "domain" : "https:test.suezp.cn",
+        "router" : {
+            "base" : "/",
+            "mode" : "hash"
+        }
+    }
 }

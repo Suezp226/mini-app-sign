@@ -1,11 +1,12 @@
 <template>
-	<view class="outBox">
+	<view class="outBox" @click="goLogin">
 		<view class="infoBox">
 			<!-- <view class="leftBox">
 				<image src="../../static/logo.png" mode="aspectFit"></image>
 			</view> -->
 			<view class="rightBox">
-				<view class="name">{{userInfo.name}}</view>
+				<view class="name" @click.stop="goNextPage()">{{userInfo.name}}</view>
+				<view v-if="isWxOpen">微信内部打开</view>
 				<view class="phone">{{userInfo.phone}}</view>
 				<view class="tag">{{userInfo.position}}</view>
 			</view>
@@ -21,7 +22,8 @@
 					name: 'Suezp',
 					phone: '132959329210',
 					position: '销售内勤'
-				}
+				},
+				isWxOpen: false
 			}
 		},
 		onLoad() {
@@ -30,17 +32,40 @@
 		methods: {
 			goNextPage() {
 				console.log('执行跳转')
-				uni.navigateTo({
-					url: '/pages/index/center?id=1&name=uniapp'
-				});
+				// uni.getSystemInfo({
+				//     success: function (res) {
+				//         console.log(res.model);
+				//         console.log(res.pixelRatio);
+				//         console.log(res.windowWidth);
+				//         console.log(res.windowHeight);
+				//         console.log(res.language);
+				//         console.log(res.version);
+				//         console.log(res.platform);
+				//     }
+				// });
+				// 判断微信内部打开
+				if(window.navigator.userAgent.toLocaleLowerCase().match(/microMessenger/i)) {
+					this.isWxOpen = true;
+					console.log('微信内部打开')
+				} else {
+					console.log('非微信内部打开')
+				}
+				// uni.navigateTo({
+				// 	url: '/pages/index/center?id=1&name=uniapp'
+				// });
 			},
+			goLogin() {
+				uni.navigateTo({
+					url: '/pages/login/login'
+				});
+			}
 		}
 	}
 </script>
 
 <style scoped lang="less">
 	.outBox {
-		padding-top: 20px;
+		// padding-top: 20px;
 		background-image: linear-gradient(#3fa89a, #fff);
 	}
 	.infoBox {
