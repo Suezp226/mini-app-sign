@@ -1,12 +1,11 @@
 <template>
 	<view class="outBox" @click="goLogin">
 		<view class="infoBox">
-			<!-- <view class="leftBox">
-				<image src="../../static/logo.png" mode="aspectFit"></image>
-			</view> -->
+			<view class="leftBox">
+				<image src="../../static/user.png" mode="aspectFit"></image>
+			</view>
 			<view class="rightBox">
-				<view class="name" @click.stop="goNextPage()">{{userInfo.name}}</view>
-				<view v-if="isWxOpen">微信内部打开</view>
+				<view class="name">{{userInfo.name}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
 				<view class="tag">{{userInfo.position}}</view>
 			</view>
@@ -94,8 +93,8 @@
 			border: 2px solid #ffffff;
 
 			image {
-				height: 60px;
-				width: 60px;
+				height: 40px;
+				width: 40px;
 			}
 		}
 

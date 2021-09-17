@@ -19,7 +19,10 @@
 					<image src="../../static/change.png" mode="aspectFit"></image>
 					<view class="liBox">切换身份</view>
 				</li>
-				<li style="opacity:0;" ></li>
+				<li @click="logout">
+					<image src="../../static/exit.png" mode="aspectFit"></image>
+					<view class="liBox">退出登入</view>
+				</li>
 				<!-- <li>5</li>
 				<li>6</li> -->
 			</ul>
@@ -44,6 +47,11 @@
 		methods: {
 			sayHi() {
 				console.log('sayHi!', this.msg)
+			},
+			logout() {
+				uni.reLaunch({
+				    url: "/pages/login/login?type=logout"
+				});
 			}
 		},
 	}

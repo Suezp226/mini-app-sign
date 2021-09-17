@@ -7,19 +7,19 @@
 			 </view> -->
 			<view class="form-item">
 			    <view  class="title">客户姓名</view>
-			    <input class="input" name="input" placeholder="请输入..." />
+			    <input class="input" name="input" v-model="formInfo.name" placeholder="请输入..." />
 			 </view>
 			<view class="form-item">
 			    <view  class="title">手机号</view>
-			    <input class="input" name="input" placeholder="请输入..." />
+			    <input class="input" name="input" v-model="formInfo.phone" placeholder="请输入..." />
 			 </view>
 			<view class="form-item">
 			    <view  class="title">订单号</view>
-			    <input class="input" name="input" placeholder="请输入..." />
+			    <input class="input" name="input" v-model="formInfo.orderNum" placeholder="请输入..." />
 			 </view>
 			 <view class="form-item">
 				 <uni-group title="只选择图片">
-				 	<uni-file-picker limit="3" title="请上传订货单图片" :value="fileLists" :imageStyles="imageStyles" file-mediatype="image"></uni-file-picker>
+				 	<uni-file-picker limit="3" title="请上传发货单图片" :value="fileLists" :imageStyles="imageStyles" file-mediatype="image"></uni-file-picker>
 				 </uni-group>
 			 </view>
 		</view>
@@ -33,8 +33,11 @@
 	export default {
 		data() {
 			return {
-				files: [],
-				value4:"",
+				formInfo: {
+					name: '',
+					phone: '',
+					orderNum: ''
+				},
 				imageStyles:{
 					width: 100,
 					height: 100,
@@ -67,23 +70,22 @@
 
 		},
 		methods: {
-			chooseImage(e) {
-				let that = this;
-				wx.chooseImage({
-					sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-					sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-					success: function(res) {
-						// 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
-						that.files = that.files.concat(res.tempFilePaths);
-						console.log(that.files, '选择图片')
-					}
-				})
-			},
 			sendOrder() {
-				console.log('发送');
-				uni.navigateBack({
-				    delta: 1
-				});
+				let that = this;
+				wx.showModal({
+				  title: '提示',
+				  content: '确认发送订货单？',
+				  success (res) {
+				    if (res.confirm) {
+				      console.log('用户点击确定',that.fileLists,that.formInfo)
+					  uni.navigateBack({
+					      delta: 1
+					  });
+				    } else if (res.cancel) {
+				      console.log('用户点击取消')
+				    }
+				  }
+				})
 			}
 		},
 	}
@@ -99,7 +101,7 @@
 		background-color: #f5f7fb;
 		.formBox {
 			flex: 1;
-			margin: 20px 10px 10px;
+			margin: 0px 10px 10px;
 			background-color: #FFFFFF;
 			overflow-x: hidden;
 			overflow-y: auto;
@@ -110,17 +112,13 @@
 				border-bottom: 1rpx solid #b1b1b1;
 				padding: 10px;
 				display: flex;
+				font-size: 14px;
 				.title {
 					width: 80px;
 					color: #333;
-					font-size: 16px;
 				}
 				.input {
 					flex: 1;
-					font-size: 16px!important;
-				}
-				input {
-					font-size: 16px!important;
 				}
 			}
 			.header {

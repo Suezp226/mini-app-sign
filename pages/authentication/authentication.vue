@@ -2,32 +2,27 @@
 	<view class="content">
 		<view class="bgView">
 			<view class="userLogo">
-				<image src="../../static/user.png" mode="aspectFit"></image>
+				<image src="../../static/check.png" mode="aspectFit"></image>
 			</view>
-			<view class="desc">请登入</view>
 			<image class="fixBottom" src="../../static/curveNegative.svg" mode="aspectFit"></image>
 		</view>
 
 		<view class="formBox">
 			<view class="form-item">
 				<view class="title">
-					<image src="../../static/phone.png" mode="aspectFit"></image>
+					<image src="../../static/name.png" mode="aspectFit"></image>
 				</view>
-				<input class="input" name="input" placeholder="请输入手机号" />
+				<input class="input" name="input" placeholder="请输入姓名" />
 			</view>
 			<view class="form-item">
 				<view class="title">
-					<image src="../../static/lock.png" mode="aspectFit"></image>
+					<image src="../../static/idcard.png" mode="aspectFit"></image>
 				</view>
-				<input class="input" name="input" placeholder="请输入验证码" />
-				<view class="getNumBtn" @click="getPhoneCheckNum">
-					<button type="primary" v-if="timer == null">获取验证码</button>
-					<button type="primary" v-else class="counting">{{count}}秒后可重新获取</button>
-				</view>
+				<input class="input" name="input" placeholder="请输入身份证" />
 			</view>
 		</view>
 		<view class="btnBox">
-			<button type="primary" @click="login">登入</button>
+			<button type="primary" @click="next">下一步</button>
 		</view>
 	</view>
 </template>
@@ -36,49 +31,19 @@
 	export default {
 		data() {
 			return {
-				timer: null,
-				count: 0
+				files: [],
 			}
 		},
-		onLoad(options) {
-			console.log(options.type)
-		},
-		onUnload() {
-			if(this.timer) {
-				clearInterval(this.timer);
-			}
+		onLoad() {
+
 		},
 		methods: {
-			login() {
-				console.log('登入');
+			next() {
+				console.log('下一步身份认证');
 				// wx.navigateBack({
 				// 	delta: 1
 				// })
-				if(this.timer) {
-					clearInterval(this.timer);
-				}
-				uni.navigateTo({
-					url: '/pages/authentication/authentication'
-				});
 			},
-			getPhoneCheckNum() {
-				if (this.timer == null) {
-					uni.showToast({
-						title: '发送成功',
-						icon: 'success',
-						duration: 2000
-					})
-					setTimeout(() => {
-						clearInterval(this.timer);
-						this.timer = null;
-					}, 60000)
-					this.count = 60;
-					this.timer = setInterval(() => {
-						console.log('执行', this.count)
-						this.count--;
-					}, 1000)
-				}
-			}
 		},
 	}
 </script>
@@ -109,10 +74,10 @@
 				margin-top: 20px;
 
 				image {
-					height: 60px;
-					width: 60px;
+					height: 65px;
+					width: 65px;
 					background-color: #fff;
-					border-radius: 30px;
+					border-radius: 2px;
 				}
 			}
 
@@ -160,31 +125,6 @@
 
 				.input {
 					flex: 1;
-				}
-
-				.getNumBtn {
-					position: absolute;
-					z-index: 5;
-					right: 0px;
-					overflow: hidden;
-
-					button {
-						background-color: #fff;
-						border: 1px solid #2e62cd;
-						color: #2e62cd;
-						border-radius: 15px;
-						font-size: 14px;
-						line-height: 20px;
-						padding: 5px 10px;
-						margin: 0;
-					}
-
-					.counting {
-						width: 125px;
-						border: 1px solid #646464;
-						font-size: 12px;
-						color: #646464;
-					}
 				}
 			}
 
