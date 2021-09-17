@@ -64,7 +64,7 @@
 
 <style scoped lang="less">
 	.outBox {
-		// padding-top: 20px;
+		padding-top: 20px;
 		background-image: linear-gradient(#3fa89a, #fff);
 	}
 	.infoBox {

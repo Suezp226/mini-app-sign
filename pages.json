@@ -47,8 +47,8 @@
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "",
 		"navigationBarBackgroundColor": "#3fa89a",
-		"backgroundColor": "#f5f7fb"
-		// "navigationStyle":"custom"
+		"backgroundColor": "#f5f7fb",
+		"navigationStyle":"custom"
 	},
 	"usingComponents": {
 		"mp-uploader": "weui-miniprogram/uploader/uploader"

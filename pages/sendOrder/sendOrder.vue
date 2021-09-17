@@ -101,7 +101,7 @@
 		background-color: #f5f7fb;
 		.formBox {
 			flex: 1;
-			margin: 0px 10px 10px;
+			margin: 20px 10px 10px;
 			background-color: #FFFFFF;
 			overflow-x: hidden;
 			overflow-y: auto;
