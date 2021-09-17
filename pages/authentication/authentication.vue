@@ -40,9 +40,26 @@
 		methods: {
 			next() {
 				console.log('下一步身份认证');
-				// wx.navigateBack({
-				// 	delta: 1
+				let gourl = encodeURIComponent("https://ai.baidu.com");
+				// uni.request({
+				// 	url: 'https://brain.baidu.com/solution/faceprint/idcard/submit',
+				// 	method: 'GET',
+				// 	header: {
+				// 		'content-type': 'application/json'
+				// 	},
+				// 	data: {
+				// 		"verify_token": 'grGwjnptevHWTJ7ps7i2iTfZ',
+				// 		"id_name": "苏智鹏",
+				// 		"id_no": "35032219970226711X",
+				// 		"certificate_type": 0  
+				// 	},
+				// 	success(res) {
+				// 		console.log('请求返回参数', res.data)
+				// 		console.log('access_token'.res.data.access_token)
+				// 	}
 				// })
+				window.location.href = 'https://brain.baidu.com/face/print/?token=' + 'myYSvFgFJLmlOyz5if2xUYj2' +'&successUrl='+ gourl +'&failedUrl=' + gourl;
+				// 'https://brain.baidu.com/face/print/?token=' + 'grGwjnptevHWTJ7ps7i2iTfZ' +'&successUrl='+ gourl +'&failedUrl=' + gourl
 			},
 		},
 	}
