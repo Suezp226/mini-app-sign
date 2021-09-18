@@ -7,7 +7,7 @@
 					<view class="liBox">
 						<image src="../../static/history.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">历史收货</view>
+					<view class="liBox">历史订单</view>
 				</li>
 				<li>
 					<view class="liBox">

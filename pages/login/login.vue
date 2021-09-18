@@ -57,9 +57,6 @@
 				if(this.timer) {
 					clearInterval(this.timer);
 				}
-				uni.navigateTo({
-					url: '/pages/authentication/authentication'
-				});
 			},
 			getPhoneCheckNum() {
 				if (this.timer == null) {

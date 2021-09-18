@@ -12,7 +12,7 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	/*每个页面公共css */
 	page {
 		height: 100%;
@@ -26,4 +26,5 @@
 		font-size: 15px!important;
 		margin-right: 55px!important;
 	}
+	@import "uview-ui/index.scss";
 </style>

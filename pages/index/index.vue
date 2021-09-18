@@ -15,7 +15,7 @@
 					</view>
 					<view class="liBox">发送发货单</view>
 				</li>
-				<li @click="goNextPage('/pages/sendShipments/sendShipments')">
+				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')">
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/confirm.png" mode="aspectFit"></image>
 					</view>
@@ -186,6 +186,7 @@
 						height: 50px;
 						width: 50px;
 						border-radius: 25px;
+						box-sizing: content-box;
 
 						image {
 							height: 51px;

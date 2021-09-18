@@ -127,7 +127,7 @@
 			}
 		}
 		.btnBox {
-			height: 70px;
+			// height: 70px;
 			background-color: #fff;
 			button {
 				background: #3fa89a;
