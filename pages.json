@@ -10,7 +10,7 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "收货网签小程序",
+				"navigationBarTitleText": "收货网签程序",
 				"disableScroll": true
 			}
 		},
@@ -53,6 +53,27 @@
 			"path": "pages/confirmOrder/confirmOrder",
 			"style": {
 				"navigationBarTitleText": "确认订单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/historyOrderList/historyOrderList",
+			"style": {
+				"navigationBarTitleText": "历史订单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/signIn/signIn",
+			"style": {
+				"navigationBarTitleText": "货物签收",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/startRunning/startRunning",
+			"style": {
+				"navigationBarTitleText": "启运货物",
 				"disableScroll": true
 			}
 		}

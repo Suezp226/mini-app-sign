@@ -3,31 +3,31 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li @click="goNextPage('/pages/sendOrder/sendOrder')">
+				<li @click="goNextPage('/pages/sendOrder/sendOrder')" v-if="[0,2].includes(userPosition)">
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/order.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">发送订单</view>
 				</li>
-				<li @click="goNextPage('/pages/sendShipments/sendShipments')">
-					<view class="liBox imgBox bgcolor2">
-						<image src="../../static/sendOrder.png" mode="aspectFit"></image>
-					</view>
-					<view class="liBox">发送发货单</view>
-				</li>
-				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')">
+				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="[0,3].includes(userPosition)">
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/confirm.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">确认订单</view>
 				</li>
-				<li @click="goNextPage('/pages/sendShipments/sendShipments')">
+				<li @click="goNextPage('/pages/sendShipments/sendShipments')" v-if="[0,2].includes(userPosition)">
+					<view class="liBox imgBox bgcolor2">
+						<image src="../../static/sendOrder.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">发送发货单</view>
+				</li>
+				<li @click="goNextPage('/pages/startRunning/startRunning')" v-if="[0,4].includes(userPosition)">
 					<view class="liBox imgBox bgcolor4">
 						<image src="../../static/car.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">确认启运</view>
+					<view class="liBox">启运货物</view>
 				</li>
-				<li @click="goNextPage('/pages/sendShipments/sendShipments')">
+				<li @click="goNextPage('/pages/signIn/signIn')" v-if="[0,5].includes(userPosition)">
 					<view class="liBox imgBox bgcolor5">
 						<image src="../../static/orderDone.png" mode="aspectFit"></image>
 					</view>
@@ -81,11 +81,13 @@
 		data() {
 			return {
 				title: 'Hello',
-				files: []
+				files: [],
+				userPosition: null,
 			}
 		},
 		onLoad() {
-
+			this.userPosition = this.$store.state.userPosition;
+			console.log('当前用户身份',this.$store.state.userPosition)
 		},
 		methods: {
 			goNextPage(url) {

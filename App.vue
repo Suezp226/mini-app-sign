@@ -23,8 +23,11 @@
 		/* background-color: #e4e9fc; */
 	}
 	.uni-file-picker__header  .file-title{
-		font-size: 15px!important;
+		font-size: 14px!important;
 		margin-right: 55px!important;
+	}
+	.u-card__head {
+		padding: 10px!important;
 	}
 	@import "uview-ui/index.scss";
 </style>

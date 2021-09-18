@@ -9,7 +9,7 @@
 						<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
 						XH2021080114
 					</view>
-					<u-tag type="info" text="待确认" mode="dark" :closeable="false" />
+					<u-tag type="primary" style="background-color: #ffa502;" text="待启运" mode="dark" :closeable="false" />
 					<!-- <u-tag type="primary" text="运输中" mode="dark" :closeable="false" />
 					<u-tag type="success" text="已签收" mode="dark" :closeable="false" /> -->
 				</view>
@@ -23,11 +23,11 @@
 						<view class="input">2021-09-18 15:25</view>
 					</view>
 					<view class="form-item">
-						<view class="title">订货单</view>
+						<view class="title">发货单</view>
 						<view class="input">
 							<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 								:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
-							<button type="primary">去确认</button>
+							<button type="primary">确认启运</button>
 						</view>
 					</view>
 				</view>
@@ -116,6 +116,10 @@
 						right: 0;
 						bottom: 0;
 						font-size: 14px;
+					}
+					.changePeople {
+						right: 80px;
+						background-color: #e74c3c;
 					}
 				}
 			}

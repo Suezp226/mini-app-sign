@@ -3,7 +3,7 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li>
+				<li @click="goHistory">
 					<view class="liBox">
 						<image src="../../static/history.png" mode="aspectFit"></image>
 					</view>
@@ -15,7 +15,7 @@
 					</view>
 					<view class="liBox">个人信息</view>
 				</li>
-				<li>
+				<li @click="changePosition">
 					<image src="../../static/change.png" mode="aspectFit"></image>
 					<view class="liBox">切换身份</view>
 				</li>
@@ -26,6 +26,16 @@
 				<!-- <li>5</li>
 				<li>6</li> -->
 			</ul>
+			<u-popup v-model="showChangeModel" mode="center" border-radius="10" width="90%" closeable>
+				<view class="popupBox">
+					<u-radio-group v-model="value" @change="radioGroupChange" :wrap="true" size="20px">
+						<u-radio @change="radioChange" v-for="(item, index) in list" :key="index" :name="item.name" style="margin-bottom: 20px;"
+							:disabled="item.disabled">
+							{{item.name}}
+						</u-radio>
+					</u-radio-group>
+				</view>
+			</u-popup>
 		</view>
 	</view>
 </template>
@@ -39,6 +49,22 @@
 		data() {
 			return {
 				msg: '没错就是我',
+				showChangeModel: false,
+				list: [{
+						name: 'apple',
+						disabled: false
+					},
+					{
+						name: 'banner',
+						disabled: false
+					},
+					{
+						name: 'orange',
+						disabled: false
+					}
+				],
+				// u-radio-group的v-model绑定的值如果设置为某个radio的name，就会被默认选中
+				value: 'orange',
 			}
 		},
 		onLoad(options) {
@@ -50,8 +76,25 @@
 			},
 			logout() {
 				uni.reLaunch({
-				    url: "/pages/login/login?type=logout"
+					url: "/pages/login/login?type=logout"
 				});
+			},
+			goHistory() {
+				uni.navigateTo({
+					url: '/pages/historyOrderList/historyOrderList'
+				})
+			},
+			changePosition() {
+				this.showChangeModel = true;
+				// this.$store.commit('changePosition',2);
+			},
+			// 选中某个单选框时，由radio时触发
+			radioChange(e) {
+				// console.log(e);
+			},
+			// 选中任一radio时，由radio-group触发
+			radioGroupChange(e) {
+				// console.log(e);
 			}
 		},
 	}
@@ -103,6 +146,10 @@
 					}
 				}
 			}
+		}
+
+		.popupBox {
+			padding: 40px 20px 10px 60px;
 		}
 
 		@media screen and (max-width: 350px) {

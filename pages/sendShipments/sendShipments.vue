@@ -1,31 +1,38 @@
 <template>
 	<view class="content">
-		<view class="bgView"></view>
-		<view class="formBox" >
-			<!-- <view class="form-item header" >
-			    <view style="width:100%;text-align:center;"></view>
-			 </view> -->
-			<view class="form-item">
-			    <view  class="title">客户姓名</view>
-			    <input class="input" name="input" v-model="formInfo.name" placeholder="请输入..." />
-			 </view>
-			<view class="form-item">
-			    <view  class="title">手机号</view>
-			    <input class="input" name="input" v-model="formInfo.phone" placeholder="请输入..." />
-			 </view>
-			<view class="form-item">
-			    <view  class="title">订单号</view>
-			    <input class="input" name="input" v-model="formInfo.orderNum" placeholder="请输入..." />
-			 </view>
-			 <view class="form-item">
-				 <uni-group title="只选择图片">
-				 	<uni-file-picker limit="3" title="请上传发货单图片" :value="fileLists" :imageStyles="imageStyles" file-mediatype="image"></uni-file-picker>
-				 </uni-group>
-			 </view>
-		</view>
-		<view class="btnBox" >
-			<button type="primary" @click="sendOrder">确认发送</button>
-		</view>
+		<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-threshold="90"
+			:refresher-triggered="refreshTrigger" refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh"
+			@scrolltolower="onreachBottom">
+			<u-card margin="10px 5px 20px 5px" class="ucard">
+				<view slot="head" class="head">
+					<view class="headTips">
+						<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
+						XH2021080114
+					</view>
+					<u-tag type="primary" style="background-color: #08cddc;" text="已确认" mode="dark" :closeable="false" />
+					<!-- <u-tag type="primary" text="运输中" mode="dark" :closeable="false" />
+					<u-tag type="success" text="已签收" mode="dark" :closeable="false" /> -->
+				</view>
+				<view slot="body" class="body">
+					<view class="form-item">
+						<view class="title">客户:</view>
+						<view class="input">普定县向荣矿业有限公司</view>
+					</view>
+					<view class="form-item">
+						<view class="title">时间:</view>
+						<view class="input">2021-09-18 15:25</view>
+					</view>
+					<view class="form-item">
+						<view class="title">订货单</view>
+						<view class="input">
+							<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
+								:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+							<button type="primary">发送发货单</button>
+						</view>
+					</view>
+				</view>
+			</u-card>
+		</scroll-view>
 	</view>
 </template>
 
@@ -33,34 +40,9 @@
 	export default {
 		data() {
 			return {
-				formInfo: {
-					name: '',
-					phone: '',
-					orderNum: ''
-				},
-				imageStyles:{
-					width: 100,
-					height: 100,
-					margin: '10px',
-					border: {
-						radius: '5px'
-					}
-				},
-				listStyles:{
-					// 是否显示边框
-					border: true,
-					// 是否显示分隔线
-					dividline: true,
-					// 线条样式
-					borderStyle: {
-						width:1,
-						color:'blue',
-						style:'dashed',
-						radius:2
-					}
-				},
+				refreshTrigger: false,
 				fileLists:[{
-					url:'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/b7c7f970-517d-11eb-97b7-0dc4655d6e68.jpg',
+					url:'../../static/orderImg.png',
 					extname:'png',
 					name:'shuijiao.png'
 				}]
@@ -70,78 +52,85 @@
 
 		},
 		methods: {
-			sendOrder() {
-				let that = this;
-				wx.showModal({
-				  title: '提示',
-				  content: '确认发送订货单？',
-				  success (res) {
-				    if (res.confirm) {
-				      console.log('用户点击确定',that.fileLists,that.formInfo)
-					  uni.navigateBack({
-					      delta: 1
-					  });
-				    } else if (res.cancel) {
-				      console.log('用户点击取消')
-				    }
-				  }
-				})
+			// scroll-view到底部加载更多
+			onreachBottom() {
+				console.log('到底了')
+			},
+			refresherrefresh() {
+				console.log('下拉刷新')
+				this.refreshTrigger = true;
+				setTimeout(() => {
+					this.refreshTrigger = false;
+				}, 500)
 			}
-		},
+		}
 	}
 </script>
 
-<style scoped lang="less">
+<style lang="less" scoped>
 	.content {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		overflow: hidden;
-		box-sizing: border-box;
 		background-color: #f5f7fb;
-		.formBox {
-			flex: 1;
-			margin: 20px 10px 10px;
-			background-color: #FFFFFF;
-			overflow-x: hidden;
-			overflow-y: auto;
-			border-radius: 5px;
-			box-shadow: 0 0px 7px 1px rgba(0, 0, 0, 0.16);
-			z-index: 2;
-			.form-item {
-				border-bottom: 1rpx solid #b1b1b1;
-				padding: 10px;
+
+		.ucard {
+			margin-bottom: 20px;
+			background-color: #fff;
+			box-shadow: 0 0px 2px 1px rgba(0, 0, 0, 0.16) !important;
+			color: #000;
+
+			.head {
 				display: flex;
-				font-size: 14px;
+
+				.headTips {
+					flex: 1;
+					display: inline-block;
+					font-size: 15px;
+				}
+			}
+
+			.form-item {
+				display: flex;
+				font-size: 15px;
+				margin-bottom: 2px;
+
 				.title {
-					width: 80px;
+					font-size: 15px;
+					width: 55px;
 					color: #333;
 				}
+
 				.input {
+					font-size: 15px;
 					flex: 1;
+					position: relative;
+
+					image {
+						height: 70px;
+						width: 70px;
+					}
+					
+					button {
+						position: absolute;
+						right: 0;
+						bottom: 0;
+						font-size: 14px;
+					}
+					.changePeople {
+						right: 80px;
+						background-color: #e74c3c;
+					}
 				}
 			}
-			.header {
-				background-color: #55e2d0;
-				color: #fff;
-			}
-		}
-		.btnBox {
-			// height: 70px;
-			background-color: #fff;
-			button {
-				background: #3fa89a;
-			}
 		}
 	}
-	.bgView {
-		position: absolute;
-		z-index: 0;
-		top: 0;
-		left: 0;
-		height: 100px;
+
+
+	.scrollView {
+		flex: 1;
 		width: 100%;
-		background-image: linear-gradient(#3fa89a, #fff);
+		padding: 10px;
+		box-sizing: border-box;
 	}
-	
 </style>
