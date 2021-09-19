@@ -7,7 +7,7 @@
 			<view class="rightBox">
 				<view class="name">{{userInfo.name}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
-				<view class="tag">{{userInfo.position}}</view>
+				<view class="tag">{{userInfo.position[userPosition]}}</view>
 			</view>
 		</view>
 	</view>
@@ -15,12 +15,23 @@
 
 <script>
 	export default {
+		computed: {
+			userPosition: {
+				get: function() {
+					return this.$store.state.userPosition
+				},
+
+				set: function(e) {
+					console.log(e)
+				}
+			}
+		},
 		data() {
 			return {
 				userInfo: {
 					name: 'Suezp',
 					phone: '132959329210',
-					position: '销售内勤'
+					position: ['管理员', '业务员', '销售内勤', '客户', '司机', '收货人', ]
 				},
 				isWxOpen: false
 			}
@@ -43,7 +54,7 @@
 				//     }
 				// });
 				// 判断微信内部打开
-				if(window.navigator.userAgent.toLocaleLowerCase().match(/microMessenger/i)) {
+				if (window.navigator.userAgent.toLocaleLowerCase().match(/microMessenger/i)) {
 					this.isWxOpen = true;
 					console.log('微信内部打开')
 				} else {
@@ -67,6 +78,7 @@
 		padding-top: 20px;
 		background-image: linear-gradient(#3fa89a, #fff);
 	}
+
 	.infoBox {
 		// background-image: url(../../static/bg1.png);
 		background-color: #ffffff;

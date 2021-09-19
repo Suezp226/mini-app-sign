@@ -28,9 +28,9 @@
 			</ul>
 			<u-popup v-model="showChangeModel" mode="center" border-radius="10" width="90%" closeable>
 				<view class="popupBox">
-					<u-radio-group v-model="value" @change="radioGroupChange" :wrap="true" size="20px">
-						<u-radio @change="radioChange" v-for="(item, index) in list" :key="index" :name="item.name" style="margin-bottom: 20px;"
-							:disabled="item.disabled">
+					<u-radio-group v-model="userPosition" @change="radioGroupChange" :wrap="true" size="20px">
+						<u-radio @change="radioChange" v-for="(item, index) in list" :key="index" :name="item.value"
+							style="margin-bottom: 20px;" :disabled="item.disabled">
 							{{item.name}}
 						</u-radio>
 					</u-radio-group>
@@ -41,27 +41,59 @@
 </template>
 
 <script>
-	import UserHeader from '../components/userHeader.vue'
+	import UserHeader from '../components/userHeader.vue';
+	import {
+		mapState
+	} from 'vuex';
 	export default {
 		components: {
 			UserHeader
+		},
+		computed: {
+			userPosition: {
+				get:function(){
+					return this.$store.state.userPosition
+				},
+					
+				set:function(e){
+					console.log(e)
+				}
+			}
 		},
 		data() {
 			return {
 				msg: '没错就是我',
 				showChangeModel: false,
 				list: [{
-						name: 'apple',
+						name: '管理员',
+						value: 0,
 						disabled: false
 					},
 					{
-						name: 'banner',
+						name: '业务员',
+						value: 1,
 						disabled: false
 					},
 					{
-						name: 'orange',
+						name: '销售内勤',
+						value: 2,
 						disabled: false
-					}
+					},
+					{
+						name: '客户',
+						value: 3,
+						disabled: false
+					},
+					{
+						name: '司机',
+						value: 4,
+						disabled: false
+					},
+					{
+						name: '收货人',
+						value: 5,
+						disabled: false
+					},
 				],
 				// u-radio-group的v-model绑定的值如果设置为某个radio的name，就会被默认选中
 				value: 'orange',
@@ -94,7 +126,11 @@
 			},
 			// 选中任一radio时，由radio-group触发
 			radioGroupChange(e) {
-				// console.log(e);
+				this.$store.commit('changePosition', e);
+				uni.showToast({
+					title: '身份修改成功',
+					icon: 'success'
+				})
 			}
 		},
 	}

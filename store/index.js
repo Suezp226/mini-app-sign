@@ -6,7 +6,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 const store = new Vuex.Store({
     state:{//存放状态
-        "userPosition": 2
+        "userPosition": 0
     },
 	mutations: {
 		changePosition(state, num) {

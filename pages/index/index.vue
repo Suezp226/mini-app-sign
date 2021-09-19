@@ -78,30 +78,40 @@
 		components: {
 			UserHeader
 		},
+		computed: {
+			userPosition: {
+				get: function() {
+					return this.$store.state.userPosition
+				},
+
+				set: function(e) {
+					console.log(e)
+				}
+			}
+		},
 		data() {
 			return {
 				title: 'Hello',
 				files: [],
-				userPosition: null,
 			}
 		},
 		onLoad() {
 			this.userPosition = this.$store.state.userPosition;
-			console.log('当前用户身份',this.$store.state.userPosition)
+			console.log('当前用户身份', this.$store.state.userPosition)
 		},
 		methods: {
 			goNextPage(url) {
 				console.log('执行跳转')
 				uni.getSystemInfo({
-				    success: function (res) {
-				        console.log(res.model);
-				        console.log(res.pixelRatio);
-				        console.log(res.windowWidth);
-				        console.log(res.windowHeight);
-				        console.log(res.language);
-				        console.log(res.version);
-				        console.log(res.platform);
-				    }
+					success: function(res) {
+						console.log(res.model);
+						console.log(res.pixelRatio);
+						console.log(res.windowWidth);
+						console.log(res.windowHeight);
+						console.log(res.language);
+						console.log(res.version);
+						console.log(res.platform);
+					}
 				});
 				uni.navigateTo({
 					url: url
@@ -162,7 +172,7 @@
 				display: flex;
 				flex-wrap: wrap;
 				justify-content: flex-start;
-				padding: 10px 0 0 0 ;
+				padding: 10px 0 0 0;
 
 				li {
 					box-sizing: border-box;
@@ -215,6 +225,7 @@
 					.bgcolor4 {
 						background-color: #fcaeae;
 					}
+
 					.bgcolor5 {
 						background-color: #88dfde;
 					}
