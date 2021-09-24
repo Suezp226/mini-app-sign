@@ -50,10 +50,10 @@
 		},
 		methods: {
 			login() {
-				console.log('登入');
-				// wx.navigateBack({
-				// 	delta: 1
-				// })
+				uni.reLaunch({
+					url:'/pages/index/index'
+				})
+				console.log('执行登入');
 				if(this.timer) {
 					clearInterval(this.timer);
 				}

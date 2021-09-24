@@ -35,7 +35,7 @@
 					</view>
 					<view class="liBox">启运货物</view>
 				</li>
-				<li @click="goNextPage('/pages/signIn/signIn')" v-if="[0,5].includes(userPosition)">
+				<li @click="goNextPage('/pages/signIn/signIn')" v-if="[0,3,5].includes(userPosition)">
 					<view class="liBox imgBox bgcolor5">
 						<image src="../../static/orderDone.png" mode="aspectFit"></image>
 					</view>
@@ -47,34 +47,6 @@
 				<li>6</li> -->
 			</ul>
 		</view>
-		<!-- <view class="buttonBox">
-			<ul>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					发送订单
-				</li>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					发送发货单
-				</li>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					确认订单（客户）
-				</li>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					确认启运（司机）
-				</li>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					查询运输情况（通用）
-				</li>
-				<li>
-					<image src="../../static/home2.png" mode="aspectFit"></image>
-					货物签收（收货人/变更人）
-				</li>
-			</ul>
-		</view> -->
 		<!-- <button type="default" @click="goNextPage">跳转第二页</button> -->
 		<!-- <button type="default" @click="getInfo" style="margin-top:20px;">获取信息</button> -->
 	</view>
