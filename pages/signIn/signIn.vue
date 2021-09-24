@@ -28,13 +28,35 @@
 						<view class="input">
 							<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 								:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
-							<button class="changePeople" type="primary">变更收货人</button>
-							<button type="primary">签收</button>
+							<button class="changePeople" @click="changeDialog=true" type="primary">变更收货人</button>
+							<button type="primary" @click="confirmDialog = true">签收</button>
 						</view>
 					</view>
 				</view>
 			</u-card>
 		</scroll-view>
+		<u-modal v-model="confirmDialog" title="确认签收" :show-cancel-button="true" @confirm="confirmRecive">
+			<view class="modelContent">
+				<u-radio-group v-model="haveMsg" :wrap="true" size="20px">
+					<u-radio name="0" style="margin-bottom: 20px;"> 无异议</u-radio>
+					<u-radio name="1" style="margin-bottom: 20px;"> 有异议</u-radio>
+					<u-input v-if="haveMsg==1" v-model="confirmMsg" style="width: 220px;" type="textarea" :border="true"
+						height="100" :auto-height="true" />
+				</u-radio-group>
+			</view>
+		</u-modal>
+		<u-modal v-model="changeDialog" title="变更收货人" :show-cancel-button="true" @confirm="confirmChange">
+			<view class="modelContent">
+				<view class="form-item">
+					<view class="title">姓名</view>
+					<input class="input" name="input" v-model="reciver.name" placeholder="请输入..." />
+				</view>
+				<view class="form-item">
+					<view class="title">手机号</view>
+					<input class="input" name="input" v-model="reciver.phone" placeholder="请输入..." />
+				</view>
+			</view>
+		</u-modal>
 	</view>
 </template>
 
@@ -47,7 +69,16 @@
 					url: '../../static/orderImg.png',
 					extname: 'png',
 					name: 'shuijiao.png'
-				}]
+				}],
+				confirmDialog: false,
+				haveMsg: 0,
+				confirmMsg: '',
+				confirmDialog: false, // 确认签收弹窗显示
+				changeDialog: false, // 变更收货人
+				reciver: {
+					name: '',
+					phone: ''
+				}
 			}
 		},
 		onLoad() {
@@ -64,6 +95,22 @@
 				setTimeout(() => {
 					this.refreshTrigger = false;
 				}, 500)
+			},
+			radioChange(key) {
+				console.log(this.haveMsg)
+				console.log()
+			},
+			// 确认签收
+			confirmRecive() {
+				let param = {
+					haveMsg: this.haveMsg,
+					confirmMsg: this.confirmMsg
+				}
+				console.log('签收', param)
+			},
+			// 变更收货人
+			confirmChange() {
+				console.dir(this.reciver)
 			}
 		}
 	}
@@ -129,11 +176,32 @@
 		}
 	}
 
+	.modelContent {
+		padding: 20px;
+	}
 
 	.scrollView {
 		flex: 1;
 		width: 100%;
 		padding: 10px;
 		box-sizing: border-box;
+	}
+
+	.form-item {
+		border-bottom: 1rpx solid #e7e7e7;
+		padding: 10px;
+		display: flex;
+		font-size: 14px;
+
+		.title {
+			font-size: 14px;
+			width: 80px;
+			color: #333;
+		}
+
+		.input {
+			font-size: 14px;
+			flex: 1;
+		}
 	}
 </style>

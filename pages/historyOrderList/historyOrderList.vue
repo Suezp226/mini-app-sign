@@ -45,18 +45,18 @@
 		data() {
 			return {
 				list: [{
-					name: '全部'
+					name: '订货单'
 				}, {
-					name: '运输中'
+					name: '发货单'
 				}, {
-					name: '已签收'
+					name: '对账单'
 				}],
 				tabsView: [{
-					name: '全部'
+					name: '订货单'
 				}, {
-					name: '运输中'
+					name: '发货单'
 				}, {
-					name: '已签收'
+					name: '对账单'
 				}],
 				current: 0,
 				swiperCurrent: 0,
