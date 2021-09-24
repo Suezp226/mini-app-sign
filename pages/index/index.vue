@@ -3,23 +3,31 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li @click="goNextPage('/pages/sendOrder/sendOrder')" v-if="[0,2].includes(userPosition)">
+				<!-- 工作人员相关 -->
+				<li @click="goNextPage('/pages/orderManageList/orderList')" v-if="[0,1,2].includes(userPosition)">
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/order.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">发送订单</view>
+					<view class="liBox">历史订货单</view>
 				</li>
+				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="[0,1,2].includes(userPosition)">
+					<view class="liBox imgBox bgcolor2">
+						<image src="../../static/sendOrder.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">历史发货单</view>
+				</li>
+				<li @click="goNextPage('/pages/orderManageList/statementOrder')" v-if="[0,1,2].includes(userPosition)">
+					<view class="liBox imgBox bgcolor6">
+						<image src="../../static/statement.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">历史对账单</view>
+				</li>
+				<!-- 客户、 司机 -->
 				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="[0,3].includes(userPosition)">
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/confirm.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">确认订单</view>
-				</li>
-				<li @click="goNextPage('/pages/sendShipments/sendShipments')" v-if="[0,2].includes(userPosition)">
-					<view class="liBox imgBox bgcolor2">
-						<image src="../../static/sendOrder.png" mode="aspectFit"></image>
-					</view>
-					<view class="liBox">发送发货单</view>
 				</li>
 				<li @click="goNextPage('/pages/startRunning/startRunning')" v-if="[0,4].includes(userPosition)">
 					<view class="liBox imgBox bgcolor4">
@@ -228,6 +236,10 @@
 
 					.bgcolor5 {
 						background-color: #88dfde;
+					}
+					
+					.bgcolor6 {
+						background-color: #ab8fb8;
 					}
 				}
 			}

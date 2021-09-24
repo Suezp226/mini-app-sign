@@ -131,6 +131,7 @@
 					title: '身份修改成功',
 					icon: 'success'
 				})
+				this.showChangeModel = false;
 			}
 		},
 	}

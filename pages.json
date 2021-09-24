@@ -21,20 +21,20 @@
 				"disableScroll": true
 			}
 		},
-		{
-			"path": "pages/sendOrder/sendOrder",
-			"style": {
-				"navigationBarTitleText": "发送订货单",
-				"disableScroll": true
-			}
-		},
-		{
-			"path": "pages/sendShipments/sendShipments",
-			"style": {
-				"navigationBarTitleText": "发送发货单",
-				"disableScroll": true
-			}
-		},
+		// {
+		// 	"path": "pages/sendOrder/sendOrder",
+		// 	"style": {
+		// 		"navigationBarTitleText": "发送订货单",
+		// 		"disableScroll": true
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/sendShipments/sendShipments",
+		// 	"style": {
+		// 		"navigationBarTitleText": "发送发货单",
+		// 		"disableScroll": true
+		// 	}
+		// },
 		{
 			"path": "pages/login/login",
 			"style": {
@@ -76,11 +76,32 @@
 				"navigationBarTitleText": "启运货物",
 				"disableScroll": true
 			}
+		},
+		{
+			"path": "pages/orderManageList/dispatchOrder",
+			"style": {
+				"navigationBarTitleText": "历史发货单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/orderManageList/orderList",
+			"style": {
+				"navigationBarTitleText": "历史订货单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/orderManageList/statementOrder",
+			"style": {
+				"navigationBarTitleText": "历史对账单",
+				"disableScroll": true
+			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "",
+		"navigationBarTitleText": "收货网签程序",
 		"navigationBarBackgroundColor": "#3fa89a",
 		"backgroundColor": "#f5f7fb",
 		"navigationStyle": "custom"
