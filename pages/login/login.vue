@@ -2,22 +2,22 @@
 	<view class="content">
 		<view class="bgView">
 			<view class="userLogo">
-				<image src="../../static/user.png" mode="aspectFit"></image>
+				<image src="../../static/image/user.png" mode="aspectFit"></image>
 			</view>
 			<view class="desc">请登入</view>
-			<image class="fixBottom" src="../../static/curveNegative.svg" mode="aspectFit"></image>
+			<image class="fixBottom" src="../../static/image/curveNegative.svg" mode="aspectFit"></image>
 		</view>
 
 		<view class="formBox">
 			<view class="form-item">
 				<view class="title">
-					<image src="../../static/phone.png" mode="aspectFit"></image>
+					<image src="../../static/image/phone.png" mode="aspectFit"></image>
 				</view>
 				<input class="input" name="input" placeholder="请输入手机号" />
 			</view>
 			<view class="form-item">
 				<view class="title">
-					<image src="../../static/lock.png" mode="aspectFit"></image>
+					<image src="../../static/image/lock.png" mode="aspectFit"></image>
 				</view>
 				<input class="input" name="input" placeholder="请输入验证码" />
 				<view class="getNumBtn" @click="getPhoneCheckNum">
@@ -50,6 +50,7 @@
 		},
 		methods: {
 			login() {
+				uni.setStorageSync('token', '123321')
 				uni.reLaunch({
 					url:'/pages/index/index'
 				})

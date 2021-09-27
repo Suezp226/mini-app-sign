@@ -58,7 +58,7 @@
 				swiperCurrent: 0,
 				refreshTrigger: false,
 				fileLists:[{
-					url:'../../static/orderImg.png',
+					url:'../../static/image/orderImg.png',
 					extname:'png',
 					name:'shuijiao.png'
 				}]

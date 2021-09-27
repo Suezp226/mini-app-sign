@@ -5,22 +5,22 @@
 			<ul>
 				<li @click="goHistory">
 					<view class="liBox">
-						<image src="../../static/history.png" mode="aspectFit"></image>
+						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史订单</view>
 				</li>
 				<li>
 					<view class="liBox">
-						<image src="../../static/pen.png" mode="aspectFit"></image>
+						<image src="../../static/image/pen.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">个人信息</view>
 				</li>
 				<li @click="changePosition">
-					<image src="../../static/change.png" mode="aspectFit"></image>
+					<image src="../../static/image/change.png" mode="aspectFit"></image>
 					<view class="liBox">切换身份</view>
 				</li>
 				<li @click="logout">
-					<image src="../../static/exit.png" mode="aspectFit"></image>
+					<image src="../../static/image/exit.png" mode="aspectFit"></image>
 					<view class="liBox">退出登入</view>
 				</li>
 				<!-- <li>5</li>

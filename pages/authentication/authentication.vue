@@ -2,21 +2,21 @@
 	<view class="content">
 		<view class="bgView">
 			<view class="userLogo">
-				<image src="../../static/check.png" mode="aspectFit"></image>
+				<image src="../../static/image/check.png" mode="aspectFit"></image>
 			</view>
-			<image class="fixBottom" src="../../static/curveNegative.svg" mode="aspectFit"></image>
+			<image class="fixBottom" src="../../static/image/curveNegative.svg" mode="aspectFit"></image>
 		</view>
 
 		<view class="formBox">
 			<!-- <view class="form-item">
 				<view class="title">
-					<image src="../../static/name.png" mode="aspectFit"></image>
+					<image src="../../static/image/name.png" mode="aspectFit"></image>
 				</view>
 				<input class="input" name="input" placeholder="请输入姓名" />
 			</view>
 			<view class="form-item">
 				<view class="title">
-					<image src="../../static/idcard.png" mode="aspectFit"></image>
+					<image src="../../static/image/idcard.png" mode="aspectFit"></image>
 				</view>
 				<input class="input" name="input" placeholder="请输入身份证" />
 			</view> -->

@@ -2,7 +2,7 @@
 	<view class="outBox" @click="goLogin">
 		<view class="infoBox">
 			<view class="leftBox">
-				<image src="../../static/user.png" mode="aspectFit"></image>
+				<image src="../../static/image/user.png" mode="aspectFit"></image>
 			</view>
 			<view class="rightBox">
 				<view class="name">{{userInfo.name}}</view>
@@ -80,7 +80,7 @@
 	}
 
 	.infoBox {
-		// background-image: url(../../static/bg1.png);
+		// background-image: url(../../static/image/bg1.png);
 		background-color: #ffffff;
 		width: 95%;
 		margin: 0 auto;
