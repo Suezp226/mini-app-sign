@@ -25,9 +25,7 @@ const request = async function(url, method, data, header) {
 		uni.request({
 			url: url, //仅为示例，并非真实接口地址。
 			method: method.toUpperCase(),
-			data: {
-				text: 'uni.request',
-			},
+			data: data,
 			header: {
 				'Authorization': token, //自定义请求头信息
 				'Content-Type': header ? header['Content-Type'] : 'application/json'

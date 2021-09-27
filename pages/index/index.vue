@@ -82,7 +82,7 @@
 		},
 		methods: {
 			requestTest() {
-				this.$request('https://suezp.cn/server/getImglist','GET').then(res=>{
+				this.$request('/api/user/query','POST',{offset:0,limit:20}).then(res=>{
 					console.log(res,'请求测试')
 				})
 				
