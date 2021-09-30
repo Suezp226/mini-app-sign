@@ -13,13 +13,13 @@
 				<view class="title">
 					<image src="../../static/image/phone.png" mode="aspectFit"></image>
 				</view>
-				<input class="input" name="input" placeholder="请输入手机号" />
+				<input class="input" name="input" v-model="input.phone" placeholder="请输入手机号" />
 			</view>
 			<view class="form-item">
 				<view class="title">
 					<image src="../../static/image/lock.png" mode="aspectFit"></image>
 				</view>
-				<input class="input" name="input" placeholder="请输入验证码" />
+				<input class="input" name="input" v-model="input.code" placeholder="请输入验证码" />
 				<view class="getNumBtn" @click="getPhoneCheckNum">
 					<button type="primary" v-if="timer == null">获取验证码</button>
 					<button type="primary" v-else class="counting">{{count}}秒后可重新获取</button>
@@ -37,7 +37,11 @@
 		data() {
 			return {
 				timer: null,
-				count: 0
+				count: 0,
+				input: {
+					phone: '',
+					code: ''
+				}
 			}
 		},
 		onLoad(options) {
@@ -50,31 +54,67 @@
 		},
 		methods: {
 			login() {
-				uni.setStorageSync('token', '123321')
-				uni.reLaunch({
-					url:'/pages/index/index'
-				})
-				console.log('执行登入');
-				if(this.timer) {
-					clearInterval(this.timer);
+				if(!this.input.phone) {
+					uni.showToast({
+						title: '请输入手机号',
+						icon: 'none',
+						duration: 1500
+					})
+					return
 				}
+				
+				if(!this.input.code) {
+					uni.showToast({
+						title: '请输入验证码',
+						icon: 'none',
+						duration: 1500
+					})
+					return
+				}
+				
+				let param = {
+					uuid: new Date().valueOf(),
+					msgCode: this.input.code,
+					phone: this.input.phone + ''
+				}
+				this.$request('/user/login','POST',param).then(res=>{
+					console.log(res)
+					uni.setStorageSync('token', '123321')
+					uni.reLaunch({
+						url:'/pages/index/index'
+					})
+					console.log('执行登入');
+					if(this.timer) {
+						clearInterval(this.timer);
+					}
+				})
+					
 			},
 			getPhoneCheckNum() {
 				if (this.timer == null) {
-					uni.showToast({
-						title: '发送成功',
-						icon: 'success',
-						duration: 2000
+					let param = {
+						uuid: new Date().valueOf(),
+						receiverPhone: this.input.phone,
+						receiver: '中文用户名'
+					}
+					this.$request('/msg/getMsgCode','POST',param).then(res=>{
+						console.log(res.data)
+						this.input.code = res.data;
+						if(res.code != 200) return
+						uni.showToast({
+							title: '发送成功',
+							icon: 'success',
+							duration: 2000
+						})
+						setTimeout(() => {
+							clearInterval(this.timer);
+							this.timer = null;
+						}, 60000)
+						this.count = 60;
+						this.timer = setInterval(() => {
+							this.count--;
+						}, 1000)
 					})
-					setTimeout(() => {
-						clearInterval(this.timer);
-						this.timer = null;
-					}, 60000)
-					this.count = 60;
-					this.timer = setInterval(() => {
-						console.log('执行', this.count)
-						this.count--;
-					}, 1000)
 				}
 			}
 		},

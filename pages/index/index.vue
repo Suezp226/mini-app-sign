@@ -4,44 +4,45 @@
 		<view class="buttonBox">
 			<ul>
 				<!-- 工作人员相关 -->
-				<li @click="goNextPage('/pages/orderManageList/orderList')" v-if="[0,1,2].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/orderList')" v-if="['gly','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/image/order.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史订货单</view>
 				</li>
-				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="[0,1,2].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['gly','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史发货单</view>
 				</li>
-				<li @click="goNextPage('/pages/orderManageList/statementOrder')" v-if="[0,1,2].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/statementOrder')" v-if="['gly','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor6">
 						<image src="../../static/image/statement.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史对账单</view>
 				</li>
-				<!-- 客户、 司机 -->
-				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="[0,3].includes(userPosition)">
+				<!-- 客户 -->
+				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="['gly','kh'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">确认订单</view>
 				</li>
-				<li @click="goNextPage('/pages/startRunning/startRunning')" v-if="[0,4].includes(userPosition)">
+				<!-- 司机 -->
+				<li @click="goNextPage('/pages/startRunning/startRunning')" v-if="['gly','sj'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor4">
 						<image src="../../static/image/car.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">启运货物</view>
 				</li>
-				<li @click="goNextPage('/pages/signIn/signIn')" v-if="[0,3,5].includes(userPosition)">
+				<!-- 客户  变更收货人 -->
+				<li @click="goNextPage('/pages/signIn/signIn')" v-if="['gly','kh','shr'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor5">
 						<image src="../../static/image/orderDone.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">货物签收</view>
 				</li>
-				<button @click="requestTest">请求</button>
 				<!-- <li>3</li>
 				<li>4</li>
 				<li>5</li>

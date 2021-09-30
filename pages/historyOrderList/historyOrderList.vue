@@ -5,7 +5,7 @@
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition" :refresher-threshold="90"
 			@animationfinish="animationfinish">
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
-				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger"
+				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
 					<u-card margin="10px 5px 20px 5px" class="ucard">
 						<view slot="head" class="head">

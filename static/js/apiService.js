@@ -9,7 +9,7 @@ const request = async function(url, method, data, header) {
 	let token = '';
 	token = uni.getStorageSync('token');
 	
-	if(!token) {
+	if(!token && !['/msg/getMsgCode','/user/login'].includes(url)) {
 		goLogin();
 		setTimeout(()=>{
 			uni.showToast({
@@ -23,7 +23,7 @@ const request = async function(url, method, data, header) {
 	
 	return new Promise((resolve, reject) => {
 		uni.request({
-			url: url, //仅为示例，并非真实接口地址。
+			url: '/api'+url, //仅为示例，并非真实接口地址。
 			method: method.toUpperCase(),
 			data: data,
 			header: {
@@ -31,7 +31,7 @@ const request = async function(url, method, data, header) {
 				'Content-Type': header ? header['Content-Type'] : 'application/json'
 			},
 			success: (res) => {
-				resolve(res)
+				resolve(res.data)
 			},
 			fail: (err) => {
 				reject(err);

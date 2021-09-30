@@ -4,14 +4,6 @@ var qs = require("querystring");
 const superagent = require('superagent');
 
 
-// 获取 access_token
-
-const param = qs.stringify({
-    grant_type: "client_credentials",
-    client_id: "fCgAiFAi96vtWKWdDMdtam0e",
-    client_secret: "brgUGWCrPaZp4MxEdv4joopTmUfIAAWr",
-  });
-
 // https.get(
 //   {
 //     hostname: "aip.baidubce.com",
@@ -24,6 +16,14 @@ const param = qs.stringify({
 //   }
 // );
 
+// 获取 access_token
+
+const param = qs.stringify({
+    grant_type: "client_credentials",
+    client_id: "nHWKB70UCG2vewliEKwx8EME",
+    client_secret: "QDCKaLg3PTgeydva7dvqz6pZBmxjhAdM",
+  })
+
 
 superagent
    .post('https://aip.baidubce.com/oauth/2.0/token?'+param)
@@ -34,7 +34,7 @@ superagent
     superagent
         .post('https://aip.baidubce.com/rpc/2.0/brain/solution/faceprint/verifyToken/generate?access_token='+res.body.access_token)
         .set('Accept','application/json')
-        .send({"plan_id":12585})
+        .send({"plan_id":12669})
         .end((err,res2)=>{
             console.log('在这',res2.body)
             

@@ -62,36 +62,35 @@
 		},
 		data() {
 			return {
-				msg: '没错就是我',
 				showChangeModel: false,
 				list: [{
 						name: '管理员',
-						value: 0,
+						value: 'gly',
 						disabled: false
 					},
 					{
 						name: '业务员',
-						value: 1,
+						value: 'ywy',
 						disabled: false
 					},
 					{
 						name: '销售内勤',
-						value: 2,
+						value: 'xsnq',
 						disabled: false
 					},
 					{
 						name: '客户',
-						value: 3,
+						value: 'kh',
 						disabled: false
 					},
 					{
 						name: '司机',
-						value: 4,
+						value: 'sj',
 						disabled: false
 					},
 					{
 						name: '收货人',
-						value: 5,
+						value: 'shr',
 						disabled: false
 					},
 				],
@@ -103,9 +102,6 @@
 			console.log('接受传参', options)
 		},
 		methods: {
-			sayHi() {
-				console.log('sayHi!', this.msg)
-			},
 			logout() {
 				uni.reLaunch({
 					url: "/pages/login/login?type=logout"

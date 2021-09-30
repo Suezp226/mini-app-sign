@@ -27,7 +27,7 @@
 						<view class="input">
 							<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 								:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
-							<button type="primary">去确认</button>
+							<button type="primary" @click="goConfirm">去确认</button>
 						</view>
 					</view>
 				</view>
@@ -49,7 +49,7 @@
 			}
 		},
 		onLoad() {
-
+			console.log(this.$route.query)
 		},
 		methods: {
 			// scroll-view到底部加载更多
@@ -62,6 +62,15 @@
 				setTimeout(() => {
 					this.refreshTrigger = false;
 				}, 500)
+			},
+			goConfirm() {
+				console.log(window.location.href)
+				let nowUrl = window.location.href;
+				console.log('跳转人脸识别')
+				return
+				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
+				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&
+				failedUrl=${nowUrl}`
 			}
 		}
 	}

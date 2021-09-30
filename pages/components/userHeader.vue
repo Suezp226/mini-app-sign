@@ -7,7 +7,7 @@
 			<view class="rightBox">
 				<view class="name">{{userInfo.name}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
-				<view class="tag">{{userInfo.position[userPosition]}}</view>
+				<view class="tag">{{userPosition}}</view>
 			</view>
 		</view>
 	</view>
