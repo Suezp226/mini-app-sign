@@ -64,6 +64,13 @@
 			}
 		},
 		{
+			"path": "pages/allOrderList/allOrderList",
+			"style": {
+				"navigationBarTitleText": "全部订单",
+				"disableScroll": true
+			}
+		},
+		{
 			"path": "pages/signIn/signIn",
 			"style": {
 				"navigationBarTitleText": "货物签收",

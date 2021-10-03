@@ -1,30 +1,33 @@
 <template>
 	<view class="content">
-		<u-tabs ref="uTabs" class="utabs" :list="list" :is-scroll="false" :current="current" @change="changeTab">
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
-		<swiper class="swiper" :current="swiperCurrent" @transition="transition" :refresher-threshold="90"
+		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
 			@animationfinish="animationfinish">
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
 				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
-					<u-card margin="10px 5px 20px 5px" class="ucard">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-								XH2021080114
+								{{item.invoiceCode}}
 							</view>
-							<u-tag type="info" text="待确认" mode="dark" :closeable="false" />
-							<!-- <u-tag type="primary" text="运输中" mode="dark" :closeable="false" />
-							<u-tag type="success" text="已签收" mode="dark" :closeable="false" /> -->
+							<u-tag type="warning" v-if="item.invoiceStat == '0'" text="待启运" mode="dark" :closeable="false" />
+							<u-tag 				  v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.invoiceStat == '2'" text="已签收" mode="dark" :closeable="false" />
+							<u-tag type="info"    v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+
 						</view>
 						<view slot="body" class="body">
 							<view class="form-item" >
 								<view class="title">客户:</view>
-								<view class="input">普定县向荣矿业有限公司</view>
+								<view class="input">{{item.custName}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">2021-09-18 15:25</view>
+								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
@@ -34,6 +37,9 @@
 							</view>
 						</view>
 					</u-card>
+					<view class="loadingWarp" v-if="showLoading">
+						<u-loading size="70" color="#3498db"></u-loading>
+					</view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -42,17 +48,28 @@
 
 <script>
 	export default {
+		name: 'DispatchOrder',
+		props:{
+			isComponent: {
+				type:Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
 				list: [{
-					name: '正常使用'
+					name: '全部'
 				}, {
-					name: '已销毁'
+					name: '待启运'
+				}, {
+					name: '已签收'
 				}],
 				tabsView: [{
-					name: '正常使用'
+					name: '全部'
 				}, {
-					name: '已销毁'
+					name: '待启运'
+				}, {
+					name: '已签收'
 				}],
 				current: 0,
 				swiperCurrent: 0,
@@ -61,41 +78,94 @@
 					url:'../../static/image/orderImg.png',
 					extname:'png',
 					name:'shuijiao.png'
-				}]
+				}],
+				searchForm: {
+					invoiceCode: "",
+					custName: "",
+					busiManName: "", //业务员
+					makerName: "",  //销售内勤
+					driverName: "", // 司机
+					invoiceStat: "",
+					offset: 0,
+					limit: 10,
+				},
+				total: 0,
+				showLoading: false,
+				tableList: []
 			}
 		},
-		onLoad() {
-
+		watch:{
+			'swiperCurrent':function() {  //监听页面滚动
+				this.searchForm.invoiceCode = '';
+				this.getData();
+			},
+		},
+		mounted() {
+			this.getData();
+			if(this.isComponent) {
+				this.tabsView = [{name: '全部'}];
+				// TODO 需要把 当前用户的身份信息带上
+				// this.searchForm.custName = ''
+			}
 		},
 		methods: {
 			changeTab(tab) {
-				console.log(tab)
 				this.current = tab;
 				this.swiperCurrent = tab;
+				if(tab != 0) {
+					this.searchForm.invoiceStat = tab - 1;
+				} else {
+					this.searchForm.invoiceStat = '';
+				}
 			},
 			transition(e) {
 				let dx = e.detail.dx;
-				// this.$refs.uTabs.setDx(dx);
 			},
 			// 由于swiper的内部机制问题，快速切换swiper不会触发dx的连续变化，需要在结束时重置状态
 			// swiper滑动结束，分别设置tabs和swiper的状态
 			animationfinish(e) {
 				let current = e.detail.current;
-				// this.$refs.uTabs.setFinishCurrent(current);
 				this.swiperCurrent = current;
 				this.current = current;
+				if(current != 0) {
+					this.searchForm.invoiceStat = current - 1;
+				} else {
+					this.searchForm.invoiceStat = '';
+				}
 			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
-
+				if(this.searchForm.limit >= this.total) {
+					uni.showToast({
+						icon: 'none',
+						title: '已经没有更多了~'
+					})
+					return
+				}
+				this.searchForm.limit += 10;
+				this.getMoreData();
 			},
 			// scroll-view 下拉刷新
 			refresherrefresh() {
-				console.log('下拉刷新')
 				this.refreshTrigger = true;
-				setTimeout(() => {
+				this.getData();
+			},
+			getData() {
+				console.log(this.current);
+				this.showLoading = true;
+				this.tableList = [];
+				this.$request('/mallInvoice/query','POST',this.searchForm).then(res=>{
+					this.tableList = res.data.list
+					this.total = res.data.total;
 					this.refreshTrigger = false;
-				}, 500)
+					this.showLoading = false;
+				})
+			},
+			getMoreData() {
+				this.$request('/mallInvoice/query','POST',this.searchForm).then(res=>{
+					this.tableList = res.data.list
+					this.total = res.data.total;
+				})
 			},
 			copy(info) {
 				uni.setClipboardData({
@@ -156,6 +226,9 @@
 				}
 			}
 		}
+		.ucard:nth-last-child(1){
+			margin-bottom: 30px;
+		}
 	}
 
 	.swiper {
@@ -166,7 +239,26 @@
 	.scrollView {
 		height: 100%;
 		width: 100%;
-		padding: 10px;
+		padding: 0 10px;
 		box-sizing: border-box;
+	}
+	/deep/ .u-search {
+		flex: none;
+		padding: 10px 20px;
+		background-color: #fff;
+	}
+	.loadingWarp {
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 50;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		background-color: rgba(255,255,255,0.1);
+		transition: all 0.5s ease-in-out;
 	}
 </style>

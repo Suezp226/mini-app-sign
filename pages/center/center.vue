@@ -3,11 +3,17 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li @click="goHistory">
+				<li @click="goHistory" v-if="['gly','kh'].includes(userPosition)">
 					<view class="liBox">
 						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史订单</view>
+				</li>
+				<li @click="goAll" v-if="['gly','ywy','xsnq'].includes(userPosition)">
+					<view class="liBox">
+						<image src="../../static/image/history.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">全部订单</view>
 				</li>
 				<li>
 					<view class="liBox">
@@ -23,8 +29,8 @@
 					<image src="../../static/image/exit.png" mode="aspectFit"></image>
 					<view class="liBox">退出登入</view>
 				</li>
-				<!-- <li>5</li>
-				<li>6</li> -->
+				<li class="hidden"></li>
+				<!-- <li>6</li> -->
 			</ul>
 			<u-popup v-model="showChangeModel" mode="center" border-radius="10" width="90%" closeable>
 				<view class="popupBox">
@@ -112,6 +118,11 @@
 					url: '/pages/historyOrderList/historyOrderList'
 				})
 			},
+			goAll() {
+				uni.navigateTo({
+					url: '/pages/allOrderList/allOrderList'
+				})
+			},
 			changePosition() {
 				this.showChangeModel = true;
 				// this.$store.commit('changePosition',2);
@@ -177,6 +188,9 @@
 						width: 100%;
 						display: block;
 					}
+				}
+				.hidden {
+					opacity: 0;
 				}
 			}
 		}

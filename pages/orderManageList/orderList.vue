@@ -1,12 +1,12 @@
 <template>
 	<view class="content">
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
-		<u-tabs ref="uTabs" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
+		<u-tabs v-if="!isComponent" ref="uTabs" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
 			@animationfinish="animationfinish">
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
-				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
+				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="65"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
 					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
 						<view slot="head" class="head">
@@ -46,6 +46,13 @@
 
 <script>
 	export default {
+		name: 'OrderList',
+		props:{
+			isComponent: {
+				type:Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
 				list: [{
@@ -90,8 +97,13 @@
 				this.getData();
 			},
 		},
-		onLoad() {
+		mounted() {
 			this.getData();
+			if(this.isComponent) {
+				this.tabsView = [{name: '全部'}];
+				// TODO 需要把 当前用户的身份信息带上
+				// this.searchForm.custName = ''
+			}
 		},
 		methods: {
 			changeTab(tab) {

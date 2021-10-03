@@ -30,4 +30,19 @@
 		padding: 10px!important;
 	}
 	@import "uview-ui/index.scss";
+	.tipsContent {
+		padding: 20px 30px;
+		font-size: 14px;
+	}
+	
+	// modal 样式
+	.boldFont {
+		font-weight: 600;
+		display: inline-block;
+		padding: 0 5px;
+	}
+	.tipsContent {
+		padding: 20px 30px;
+		font-size: 14px;
+	}
 </style>
