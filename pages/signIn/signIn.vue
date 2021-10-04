@@ -12,9 +12,9 @@
 							<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
 							{{item.orderCode}}
 						</view>
-						<u-tag type="info" v-if="item.orderStat == '0'" text="待签收" mode="dark" :closeable="false" />
-						<u-tag type="success" v-if="item.orderStat == '1'" text="已签收" mode="dark" :closeable="false" />
-						<u-tag type="info" v-if="item.orderStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+						<u-tag type="info" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
+						<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
+						<u-tag type="info" v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 					</view>
 					<view slot="body" class="body">
 						<view class="form-item">
@@ -40,7 +40,7 @@
 					<u-loading size="70" color="#3498db"></u-loading>
 				</view>
 			</scroll-view>
-			<u-modal v-model="confirmDialog" title="确认签收" :show-cancel-button="true" @confirm="confirmRecive">
+			<u-modal v-model="confirmDialog" title="确认签收" :show-cancel-button="true" @confirm="goConfirm()">
 				<view class="modelContent">
 					<u-radio-group v-model="haveMsg" :wrap="true" size="20px">
 						<u-radio name="0" style="margin-bottom: 20px;"> 无异议</u-radio>
@@ -50,7 +50,7 @@
 					</u-radio-group>
 				</view>
 			</u-modal>
-			<u-modal v-model="changeDialog" title="变更收货人" :show-cancel-button="true" @confirm="confirmChange">
+			<u-modal v-model="changeDialog" title="变更收货人" :show-cancel-button="true" @confirm="goConfirm()">
 				<view class="modelContent">
 					<view class="form-item modal-item">
 						<view class="title">姓名</view>
@@ -87,7 +87,7 @@
 					custName: "",
 					busiManName: "", //业务员
 					makerName: "", //销售内勤
-					orderStat: "0",
+					invoiceStat: "",
 					offset: 0,
 					limit: 10,
 				},
@@ -103,7 +103,8 @@
 				reciver: {
 					name: '',
 					phone: ''
-				}
+				},
+				nowItem: {}
 			}
 		},
 		watch: {},
@@ -132,7 +133,7 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/mallOrder/query', 'POST', this.searchForm).then(res => {
+				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
 					this.tableList = res.data.list
 					this.total = res.data.total;
 					this.refreshTrigger = false;
@@ -140,7 +141,7 @@
 				})
 			},
 			getMoreData() {
-				this.$request('/mallOrder/query', 'POST', this.searchForm).then(res => {
+				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
 					this.tableList = res.data.list
 					this.total = res.data.total;
 				})
@@ -156,9 +157,11 @@
 			// 变更收货人
 			openChangeModal(item) {
 				this.changeDialog = true;
+				this.nowItem = item;
 			},
 			// 确认签收
 			openSignModal(item) {
+				this.nowItem = item;
 				this.confirmDialog = true;
 			},
 			openConformModal() {
@@ -183,7 +186,13 @@
 			goConfirm() {
 				console.log(window.location.href)
 				let nowUrl = window.location.href;
+				let param = {...this.nowItem};
+				param.invoiceStat = '3';
 				console.log('跳转人脸识别')
+				
+				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					console.log(res,'回参')
+				})
 				return
 				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
 				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&

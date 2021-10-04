@@ -78,7 +78,8 @@
 				total: 0,
 				showLoading: false,
 				tableList: [],
-				showModal: false
+				showModal: false,
+				nowItem: {}
 			}
 		},
 		watch: {},
@@ -130,12 +131,18 @@
 			},
 			openStartModal(item) {
 				console.log(item)
+				this.nowItem = item;
 				this.showModal = true;
 			},
 			goConfirm() {
 				console.log(window.location.href)
 				let nowUrl = window.location.href;
+				let param = {...this.nowItem};
+				param.invoiceStat = '1';
 				console.log('跳转人脸识别')
+				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					console.log(res,'回参')
+				})
 				return
 				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
 				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&
