@@ -10,7 +10,7 @@
 					<view slot="head" class="head">
 						<view class="headTips">
 							<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-							{{item.orderCode}}
+							{{item.invoiceCode}}
 						</view>
 						<u-tag type="info" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
 						<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
@@ -87,7 +87,7 @@
 					custName: "",
 					busiManName: "", //业务员
 					makerName: "", //销售内勤
-					invoiceStat: "",
+					invoiceStat: "2",
 					offset: 0,
 					limit: 10,
 				},
