@@ -109,6 +109,10 @@
 		},
 		watch: {},
 		onLoad() {
+			if(options.param) {
+				console.log(JSON.parse(options.param));
+				this.confirmSuccess(JSON.parse(options.param));
+			}
 			this.getData();
 		},
 		methods: {
@@ -184,19 +188,40 @@
 				console.dir(this.reciver)
 			},
 			goConfirm() {
-				console.log(window.location.href)
 				let nowUrl = window.location.href;
 				let param = {...this.nowItem};
+				this.$request('/get/faceAuth','POST',{}).then(res=>{
+					console.log(res,'回参')
+					let token = res.data;
+					let local = window.location.host;
+					let stringParam = JSON.stringify(this.nowItem);
+					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					successUrl=${local}/#/pages/confirmOrder/confirmOrder?param=${stringParam}&
+					failedUrl=${nowUrl}`
+				})
+			},
+			confirmSuccess(options) {
+				let param = {...options};
 				param.invoiceStat = '3';
-				console.log('跳转人脸识别')
-				
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
 					console.log(res,'回参')
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '启运成功！'
+						})
+						// setTimeout(()=>{
+						// 	uni.navigateTo({
+						// 		url: '/pages/historyOrderList/historyOrderList'
+						// 	})
+						// },500)
+					} else {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg
+						})
+					}
 				})
-				return
-				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
-				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&
-				failedUrl=${nowUrl}`
 			}
 		}
 	}

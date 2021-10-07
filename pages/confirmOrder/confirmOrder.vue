@@ -76,7 +76,10 @@
 			}
 		},
 		watch: {},
-		onLoad() {
+		onLoad(options) {
+			if(options.code) { // 人脸成功更改订单状态
+				this.confirmSuccess(options.code);
+			}
 			this.getData();
 		},
 		methods: {
@@ -128,19 +131,54 @@
 				this.showModal = true;
 			},
 			goConfirm() {
-				console.log(window.location.href)
 				let nowUrl = window.location.href;
-				let param = {...this.nowItem};
-				param.orderStat = '1';
-				console.log('跳转人脸识别')
-				
-				this.$request('/mallOrder/save','POST', param).then(res=>{
-					console.log(res,'回参')
+				this.$request('/face/getAuth','POST',{}).then(res=>{
+					console.log(JSON.parse(res.data).result.verify_token,'回参')
+					let token = JSON.parse(res.data).result.verify_token;
+					let local = window.location.host;
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
+					let faillUrl = encodeURIComponent(`http://192.168.31.192:1114/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
+					console.log(faillUrl)
+					// return
+					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					successUrl=${successUrl}&
+					failedUrl=${faillUrl}`
 				})
-				return
-				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
-				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&
-				failedUrl=${nowUrl}`
+			},
+			confirmSuccess(code) {
+				let query = {
+					orderCode: code,
+					custName: "",
+					busiManName: "", //业务员
+					makerName: "", //销售内勤
+					orderStat: "",
+					offset: 0,
+					limit: 10,
+				};
+				this.$request('/mallOrder/query', 'POST', query).then(res => {
+					let param = res.data.list[0];
+					param.orderStat = '0';
+					this.$request('/mallOrder/save','POST', param).then(res=>{
+						console.log(res,'回参')
+						if(res.code == 200) {
+							uni.showToast({
+								icon: 'success',
+								title: '订单确认成功！',
+							})
+							this.getData();
+							// setTimeout(()=>{
+							// 	uni.navigateTo({
+							// 		url: '/pages/historyOrderList/historyOrderList'
+							// 	})
+							// },500)
+						} else {
+							uni.showToast({
+								icon: 'success',
+								title: res.msg
+							})
+						}
+					})
+				})
 			}
 		}
 	}

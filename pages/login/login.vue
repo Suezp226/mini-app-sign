@@ -38,6 +38,7 @@
 			return {
 				timer: null,
 				count: 0,
+				nowUuid: '',
 				input: {
 					phone: '',
 					code: ''
@@ -73,7 +74,7 @@
 				}
 				
 				let param = {
-					uuid: new Date().valueOf(),
+					uuid: this.nowUuid,
 					msgCode: this.input.code,
 					phone: this.input.phone + ''
 				}
@@ -91,11 +92,12 @@
 					
 			},
 			getPhoneCheckNum() {
+				this.nowUuid = new Date().valueOf() + '';
 				if (this.timer == null) {
 					let param = {
-						uuid: new Date().valueOf(),
+						uuid: this.nowUuid,
 						receiverPhone: this.input.phone,
-						receiver: '中文用户名'
+						receiver: 'suezp'
 					}
 					this.$request('/msg/getMsgCode','POST',param).then(res=>{
 						console.log(res.data)

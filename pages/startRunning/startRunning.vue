@@ -15,10 +15,9 @@
 						<u-tag type="warning" v-if="item.invoiceStat == '0'" text="待启运" mode="dark"
 							:closeable="false" />
 						<u-tag v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
-						<u-tag type="success" v-if="item.invoiceStat == '2'" text="已签收" mode="dark"
-							:closeable="false" />
+						<u-tag type="info" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
+						<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
 						<u-tag type="info" v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
-
 					</view>
 					<view slot="body" class="body">
 						<view class="form-item">
@@ -83,7 +82,11 @@
 			}
 		},
 		watch: {},
-		onLoad() {
+		onLoad(options) {
+			if(options.param) {
+				console.log(JSON.parse(options.param));
+				this.confirmSuccess(JSON.parse(options.param));
+			}
 			this.getData();
 		},
 		methods: {
@@ -135,18 +138,40 @@
 				this.showModal = true;
 			},
 			goConfirm() {
-				console.log(window.location.href)
 				let nowUrl = window.location.href;
 				let param = {...this.nowItem};
+				this.$request('/get/faceAuth','POST',{}).then(res=>{
+					console.log(res,'回参')
+					let token = res.data;
+					let local = window.location.host;
+					let stringParam = JSON.stringify(this.nowItem);
+					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					successUrl=${local}/#/pages/confirmOrder/confirmOrder?param=${stringParam}&
+					failedUrl=${nowUrl}`
+				})
+			},
+			confirmSuccess(options) {
+				let param = {...options};
 				param.invoiceStat = '1';
-				console.log('跳转人脸识别')
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
 					console.log(res,'回参')
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '启运成功！'
+						})
+						// setTimeout(()=>{
+						// 	uni.navigateTo({
+						// 		url: '/pages/historyOrderList/historyOrderList'
+						// 	})
+						// },500)
+					} else {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg
+						})
+					}
 				})
-				return
-				window.location.href = `https://brain.baidu.com/face/print/?token=uoBrkx5MvpitFn00qD6R84Dy&
-				successUrl=http://172.168.1.190:1114/#/pages/orderManageList/orderList&
-				failedUrl=${nowUrl}`
 			}
 		}
 	}

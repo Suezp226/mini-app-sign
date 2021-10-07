@@ -16,7 +16,8 @@
 							</view>
 							<u-tag type="warning" v-if="item.invoiceStat == '0'" text="待启运" mode="dark" :closeable="false" />
 							<u-tag 				  v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
-							<u-tag type="success" v-if="item.invoiceStat == '2'" text="已签收" mode="dark" :closeable="false" />
+							<u-tag type="warning" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
 							<u-tag type="info"    v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 
 						</view>
