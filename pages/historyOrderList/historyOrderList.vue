@@ -49,8 +49,12 @@
 				}]
 			}
 		},
-		onLoad() {
-
+		onLoad(options) {
+			console.log(options)
+			if(options) {
+				this.current = options.type;
+				this.swiperCurrent = options.type;
+			}
 		},
 		methods: {
 			changeTab(tab) {

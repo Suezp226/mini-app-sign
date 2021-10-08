@@ -30,11 +30,12 @@
 							<view class="input">
 								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
-								<button type="primary" @click="openConformModal(item)">去确认</button>
+								<button type="primary" v-if="item.orderStat == '0'" @click="openConformModal(item)">去确认</button>
 							</view>
 						</view>
 					</view>
 				</u-card>
+				<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
 				<view class="loadingWarp" v-if="showLoading">
 					<u-loading size="70" color="#3498db"></u-loading>
 				</view>
@@ -137,7 +138,7 @@
 					let token = JSON.parse(res.data).result.verify_token;
 					let local = window.location.host;
 					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
-					let faillUrl = encodeURIComponent(`http://192.168.31.192:1114/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
+					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
 					console.log(faillUrl)
 					// return
 					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
@@ -157,7 +158,7 @@
 				};
 				this.$request('/mallOrder/query', 'POST', query).then(res => {
 					let param = res.data.list[0];
-					param.orderStat = '0';
+					param.orderStat = '1';
 					this.$request('/mallOrder/save','POST', param).then(res=>{
 						console.log(res,'回参')
 						if(res.code == 200) {
@@ -166,11 +167,11 @@
 								title: '订单确认成功！',
 							})
 							this.getData();
-							// setTimeout(()=>{
-							// 	uni.navigateTo({
-							// 		url: '/pages/historyOrderList/historyOrderList'
-							// 	})
-							// },500)
+							setTimeout(()=>{
+								uni.navigateTo({
+									url: '/pages/historyOrderList/historyOrderList?type=0'
+								})
+							},1500)
 						} else {
 							uni.showToast({
 								icon: 'success',

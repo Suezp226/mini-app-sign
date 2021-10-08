@@ -12,6 +12,7 @@
 							<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
 							{{item.invoiceCode}}
 						</view>
+						<u-tag type="primary" v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
 						<u-tag type="info" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
 						<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
 						<u-tag type="info" v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
@@ -25,22 +26,31 @@
 							<view class="title">时间:</view>
 							<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
 						</view>
+						<view class="form-item" v-if="item.receiveName">
+							<view class="title">变更收货人:</view>
+							<view class="input">{{item.receiveName}}</view>
+						</view>
+						<view class="form-item" v-if="item.receivePhone">
+							<view class="title">变更手机号:</view>
+							<view class="input">{{item.receivePhone}}</view>
+						</view>
 						<view class="form-item">
 							<view class="title">货单:</view>
 							<view class="input">
 								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
-								<button class="changePeople" @click="openChangeModal(item)" type="primary">变更收货人</button>
-								<button type="primary" @click="openSignModal(item)">签收</button>
+								<button class="changePeople" v-if="item.invoiceStat == '1' && !item.receiveName" @click="openChangeModal(item)" type="primary">变更收货人</button>
+								<button type="primary" v-if="item.invoiceStat == '1'" @click="openSignModal(item)">签收</button>
 							</view>
 						</view>
 					</view>
 				</u-card>
+				<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
 				<view class="loadingWarp" v-if="showLoading">
 					<u-loading size="70" color="#3498db"></u-loading>
 				</view>
 			</scroll-view>
-			<u-modal v-model="confirmDialog" title="确认签收" :show-cancel-button="true" @confirm="goConfirm()">
+			<u-modal v-model="confirmDialog" title="确认签收" :show-cancel-button="true" @confirm="confirmRecive()">
 				<view class="modelContent">
 					<u-radio-group v-model="haveMsg" :wrap="true" size="20px">
 						<u-radio name="0" style="margin-bottom: 20px;"> 无异议</u-radio>
@@ -50,7 +60,7 @@
 					</u-radio-group>
 				</view>
 			</u-modal>
-			<u-modal v-model="changeDialog" title="变更收货人" :show-cancel-button="true" @confirm="goConfirm()">
+			<u-modal v-model="changeDialog" title="变更收货人" :show-cancel-button="true" @confirm="goConfirmChange()">
 				<view class="modelContent">
 					<view class="form-item modal-item">
 						<view class="title">姓名</view>
@@ -69,6 +79,7 @@
 				</view>
 			</u-modal>
 		</view>
+		<u-top-tips ref="uTips"></u-top-tips>
 	</view>
 </template>
 
@@ -87,7 +98,7 @@
 					custName: "",
 					busiManName: "", //业务员
 					makerName: "", //销售内勤
-					invoiceStat: "2",
+					invoiceStat: "1",
 					offset: 0,
 					limit: 10,
 				},
@@ -108,10 +119,9 @@
 			}
 		},
 		watch: {},
-		onLoad() {
-			if(options.param) {
-				console.log(JSON.parse(options.param));
-				this.confirmSuccess(JSON.parse(options.param));
+		onLoad(options) {
+			if(options.code) { // 人脸成功更改订单状态
+				this.confirmSuccess(options.code);
 			}
 			this.getData();
 		},
@@ -182,45 +192,82 @@
 					confirmMsg: this.confirmMsg
 				}
 				console.log('签收', param)
+				// 多一步 处理有无异议 图片处理
+				this.goConfirm();
 			},
 			// 变更收货人
-			confirmChange() {
-				console.dir(this.reciver)
+			goConfirmChange() {
+				console.log(this.reciver)
+				if(!this.reciver.name || !this.reciver.phone) {
+					this.$refs.uTips.show({
+						title: '请填写完整信息',
+						type: 'warning',
+						duration: '2000'
+					})
+					return
+				}
+				let param = {...this.nowItem};
+				param.receiveName = this.reciver.name;
+				param.receivePhone = this.reciver.phone;
+				console.log(param);
+				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '收货人变更成功！',
+						})
+						this.getData();
+					}
+				})
 			},
 			goConfirm() {
 				let nowUrl = window.location.href;
 				let param = {...this.nowItem};
-				this.$request('/get/faceAuth','POST',{}).then(res=>{
+				this.$request('/face/getAuth','POST',{}).then(res=>{
 					console.log(res,'回参')
-					let token = res.data;
+					let token = JSON.parse(res.data).result.verify_token;
 					let local = window.location.host;
-					let stringParam = JSON.stringify(this.nowItem);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.invoiceCode}`);
+					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
+					console.log(faillUrl)
 					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					successUrl=${local}/#/pages/confirmOrder/confirmOrder?param=${stringParam}&
-					failedUrl=${nowUrl}`
+					successUrl=${successUrl}&
+					failedUrl=${faillUrl}`
 				})
 			},
-			confirmSuccess(options) {
-				let param = {...options};
-				param.invoiceStat = '3';
-				this.$request('/mallInvoice/save','POST', param).then(res=>{
-					console.log(res,'回参')
-					if(res.code == 200) {
-						uni.showToast({
-							icon: 'success',
-							title: '启运成功！'
-						})
-						// setTimeout(()=>{
-						// 	uni.navigateTo({
-						// 		url: '/pages/historyOrderList/historyOrderList'
-						// 	})
-						// },500)
-					} else {
-						uni.showToast({
-							icon: 'success',
-							title: res.msg
-						})
-					}
+			confirmSuccess(code) {
+				let query = {
+					invoiceCode: code,
+					custName: "",
+					busiManName: "", //业务员
+					makerName: "", //销售内勤
+					invoiceStat: "",
+					offset: 0,
+					limit: 10,
+				};
+				this.$request('/mallInvoice/query', 'POST', query).then(res => {
+					let param = res.data.list[0];
+					param.invoiceStat = '3';
+					this.$request('/mallInvoice/save','POST', param).then(res=>{
+						console.log(res,'回参')
+						if(res.code == 200) {
+							uni.showToast({
+								icon: 'success',
+								title: '货物签收成功！',
+							})
+							this.getData();
+							setTimeout(()=>{
+								uni.navigateTo({
+									url: '/pages/historyOrderList/historyOrderList?type=2'
+								})
+							},1500)
+						} else {
+							uni.showToast({
+								icon: 'success',
+								title: res.msg
+							})
+						}
+					})
 				})
 			}
 		}
@@ -261,7 +308,8 @@
 
 				.title {
 					font-size: 15px;
-					width: 50px;
+					min-width: 50px;
+					margin-right: 2px;
 					color: #333;
 				}
 

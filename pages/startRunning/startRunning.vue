@@ -34,11 +34,12 @@
 								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
 									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image">
 								</uni-file-picker>
-								<button type="primary" @click="openStartModal(item)">确认启运</button>
+								<button type="primary" v-if="item.invoiceStat == '0'" @click="openStartModal(item)">确认启运</button>
 							</view>
 						</view>
 					</view>
 				</u-card>
+				<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
 				<view class="loadingWarp" v-if="showLoading">
 					<u-loading size="70" color="#3498db"></u-loading>
 				</view>
@@ -83,9 +84,8 @@
 		},
 		watch: {},
 		onLoad(options) {
-			if(options.param) {
-				console.log(JSON.parse(options.param));
-				this.confirmSuccess(JSON.parse(options.param));
+			if(options.code) { // 人脸成功更改订单状态
+				this.confirmSuccess(options.code);
 			}
 			this.getData();
 		},
@@ -140,37 +140,52 @@
 			goConfirm() {
 				let nowUrl = window.location.href;
 				let param = {...this.nowItem};
-				this.$request('/get/faceAuth','POST',{}).then(res=>{
+				this.$request('/face/getAuth','POST',{}).then(res=>{
 					console.log(res,'回参')
-					let token = res.data;
+					let token = JSON.parse(res.data).result.verify_token;
 					let local = window.location.host;
-					let stringParam = JSON.stringify(this.nowItem);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.invoiceCode}`);
+					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
+					console.log(faillUrl)
 					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					successUrl=${local}/#/pages/confirmOrder/confirmOrder?param=${stringParam}&
-					failedUrl=${nowUrl}`
+					successUrl=${successUrl}&
+					failedUrl=${faillUrl}`
 				})
 			},
-			confirmSuccess(options) {
-				let param = {...options};
-				param.invoiceStat = '1';
-				this.$request('/mallInvoice/save','POST', param).then(res=>{
-					console.log(res,'回参')
-					if(res.code == 200) {
-						uni.showToast({
-							icon: 'success',
-							title: '启运成功！'
-						})
-						// setTimeout(()=>{
-						// 	uni.navigateTo({
-						// 		url: '/pages/historyOrderList/historyOrderList'
-						// 	})
-						// },500)
-					} else {
-						uni.showToast({
-							icon: 'success',
-							title: res.msg
-						})
-					}
+			confirmSuccess(code) {
+				let query = {
+					invoiceCode: code,
+					custName: "",
+					busiManName: "", //业务员
+					makerName: "", //销售内勤
+					driverName: "", // 司机
+					invoiceStat: "",
+					offset: 0,
+					limit: 10,
+				};
+				this.$request('/mallInvoice/query', 'POST', query).then(res => {
+					let param = res.data.list[0];
+					param.invoiceStat = '1';
+					this.$request('/mallInvoice/save','POST', param).then(res=>{
+						console.log(res,'回参')
+						if(res.code == 200) {
+							uni.showToast({
+								icon: 'success',
+								title: '货物启运成功！',
+							})
+							this.getData();
+							setTimeout(()=>{
+								uni.navigateTo({
+									url: '/pages/historyOrderList/historyOrderList?type=1'
+								})
+							},1500)
+						} else {
+							uni.showToast({
+								icon: 'success',
+								title: res.msg
+							})
+						}
+					})
 				})
 			}
 		}

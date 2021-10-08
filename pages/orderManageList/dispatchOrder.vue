@@ -30,6 +30,14 @@
 								<view class="title">时间:</view>
 								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
 							</view>
+							<view class="form-item" v-if="item.receiveName">
+								<view class="title">变更收货人:</view>
+								<view class="input">{{item.receiveName}}</view>
+							</view>
+							<view class="form-item" v-if="item.receivePhone">
+								<view class="title">变更手机号:</view>
+								<view class="input">{{item.receivePhone}}</view>
+							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
@@ -38,6 +46,7 @@
 							</view>
 						</view>
 					</u-card>
+					<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
 					<view class="loadingWarp" v-if="showLoading">
 						<u-loading size="70" color="#3498db"></u-loading>
 					</view>
@@ -113,11 +122,14 @@
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
-				if(tab != 0) {
+				if(tab == 1) {
 					this.searchForm.invoiceStat = tab - 1;
+				} else if(tab == 2){
+					this.searchForm.invoiceStat = tab + 1;
 				} else {
 					this.searchForm.invoiceStat = '';
 				}
+				
 			},
 			transition(e) {
 				let dx = e.detail.dx;
@@ -213,7 +225,8 @@
 
 				.title {
 					font-size: 15px;
-					width: 50px;
+					min-width: 50px;
+					margin-right: 2px;
 					color: #333;
 				}
 

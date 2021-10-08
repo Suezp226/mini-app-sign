@@ -35,6 +35,7 @@
 							</view>
 						</view>
 					</u-card>
+					<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
 					<view class="loadingWarp" v-if="showLoading">
 						<u-loading size="70" color="#3498db"></u-loading>
 					</view>

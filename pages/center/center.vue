@@ -3,13 +3,13 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li @click="goHistory" v-if="['gly','kh'].includes(userPosition)">
+				<li @click="goHistory" v-if="['admin','kh'].includes(userPosition)">
 					<view class="liBox">
 						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史订单</view>
 				</li>
-				<li @click="goAll" v-if="['gly','ywy','xsnq'].includes(userPosition)">
+				<li @click="goAll" v-if="['admin','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox">
 						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>
@@ -71,7 +71,7 @@
 				showChangeModel: false,
 				list: [{
 						name: '管理员',
-						value: 'gly',
+						value: 'admin',
 						disabled: false
 					},
 					{
