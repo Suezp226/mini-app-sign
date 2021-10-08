@@ -163,10 +163,10 @@
 					offset: 0,
 					limit: 10,
 				};
-				this.$request('/mallInvoice/query', 'POST', query).then(res => {
+				this.$request('/mallInvoice/query', 'POST', query).then(res => {  // 查询
 					let param = res.data.list[0];
 					param.invoiceStat = '1';
-					this.$request('/mallInvoice/save','POST', param).then(res=>{
+					this.$request('/mallInvoice/save','POST', param).then(res=>{  // 修改
 						console.log(res,'回参')
 						if(res.code == 200) {
 							uni.showToast({

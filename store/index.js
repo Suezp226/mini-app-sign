@@ -6,11 +6,19 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 const store = new Vuex.Store({
     state:{//存放状态
-        "userPosition": 'admin'
+        "userPosition": 'admin',
+		"userInfo": {
+			name: '未登入',
+			phone: '',
+			roleName: '暂无',
+		}
     },
 	mutations: {
 		changePosition(state, str) {
 			state.userPosition = str;
+		},
+		putUserInfo(state,obj) {
+			state.userInfo = obj;
 		}
 	}
 })

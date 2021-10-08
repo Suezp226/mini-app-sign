@@ -78,8 +78,10 @@
 			}
 		},
 		onLoad() {
-			this.userPosition = this.$store.state.userPosition;
-			console.log('当前用户身份', this.$store.state.userPosition)
+			// 取本地 已经登入的信息
+			if(uni.getStorageSync('userInfo')){
+				this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
+			}
 		},
 		methods: {
 			requestTest() {

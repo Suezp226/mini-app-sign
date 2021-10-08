@@ -7,7 +7,7 @@
 			<view class="rightBox">
 				<view class="name">{{userInfo.name}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
-				<view class="tag">{{userPosition}}</view>
+				<view class="tag">{{userInfo.roleName}}</view>
 			</view>
 		</view>
 	</view>
@@ -24,20 +24,25 @@
 				set: function(e) {
 					console.log(e)
 				}
+			},
+			userInfo: {
+				get: function() {
+					return this.$store.state.userInfo
+				},
+				
+				set: function(e) {
+					console.log(e)
+				}
 			}
 		},
 		data() {
 			return {
-				userInfo: {
-					name: 'Suezp',
-					phone: '132959329210',
-					position: ['管理员', '业务员', '销售内勤', '客户', '司机', '收货人', ]
-				},
 				isWxOpen: false
 			}
 		},
 		onLoad() {
-
+			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'));
+			console.log(JSON.parse(UserInfo));
 		},
 		methods: {
 			goNextPage() {

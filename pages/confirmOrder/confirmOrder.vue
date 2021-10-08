@@ -134,8 +134,9 @@
 			goConfirm() {
 				let nowUrl = window.location.href;
 				this.$request('/face/getAuth','POST',{}).then(res=>{
-					console.log(JSON.parse(res.data).result.verify_token,'回参')
-					let token = JSON.parse(res.data).result.verify_token;
+					console.log(res.data.access_token,JSON.parse(res.data.verify_token).verify_token,'回参')
+					let accToken = res.data.access_token;
+					let token = JSON.parse(res.data.verify_token).verify_token;
 					let local = window.location.host;
 					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
@@ -156,10 +157,10 @@
 					offset: 0,
 					limit: 10,
 				};
-				this.$request('/mallOrder/query', 'POST', query).then(res => {
+				this.$request('/mallOrder/query', 'POST', query).then(res => {  // 查询
 					let param = res.data.list[0];
 					param.orderStat = '1';
-					this.$request('/mallOrder/save','POST', param).then(res=>{
+					this.$request('/mallOrder/save','POST', param).then(res=>{  //修改
 						console.log(res,'回参')
 						if(res.code == 200) {
 							uni.showToast({

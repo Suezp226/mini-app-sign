@@ -47,6 +47,11 @@
 		},
 		onLoad(options) {
 			console.log(options.type)
+			if(options.type == 'logout') {
+				this.$store.commit('putUserInfo', JSON.stringify({name: '请先登入',phone: '',roleName: '暂无'}));
+				uni.removeStorageSync('userInfo');
+				uni.removeStorageSync('token');
+			}
 		},
 		onUnload() {
 			if(this.timer) {
@@ -81,6 +86,8 @@
 				this.$request('/user/login','POST',param).then(res=>{
 					console.log(res)
 					uni.setStorageSync('token', '123321')
+					uni.setStorageSync('userInfo',JSON.stringify({name: '管理员',phone: '13295932921',roleName: '管理员'}));
+					this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
 					uni.reLaunch({
 						url:'/pages/index/index'
 					})
