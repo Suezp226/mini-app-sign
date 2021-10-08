@@ -40,10 +40,7 @@
 				isWxOpen: false
 			}
 		},
-		onLoad() {
-			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'));
-			console.log(JSON.parse(UserInfo));
-		},
+		onLoad() {},
 		methods: {
 			goNextPage() {
 				console.log('执行跳转')
@@ -70,6 +67,9 @@
 				// });
 			},
 			goLogin() {
+				if( this.userInfo.name !== '点击登录'){
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/login/login'
 				});

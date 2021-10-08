@@ -8,7 +8,7 @@ const store = new Vuex.Store({
     state:{//存放状态
         "userPosition": 'admin',
 		"userInfo": {
-			name: '未登入',
+			name: '点击登录',
 			phone: '',
 			roleName: '暂无',
 		}
