@@ -79,6 +79,9 @@
 				</view>
 			</u-modal>
 		</view>
+		<img :src="nowItem.invoiceImage" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon">
+		<!-- <button @click="handleAddWaterMarker">添加水印</button>
+		<img :src="image" alt="" style="width: 250px;opacity: 1;"> -->
 		<u-top-tips ref="uTips"></u-top-tips>
 	</view>
 </template>
@@ -90,8 +93,8 @@
 				refreshTrigger: false,
 				fileLists: [{
 					url: '../../static/image/orderImg.png',
-					extname: 'png',
-					name: 'shuijiao.png'
+					// extname: 'png',
+					// name: 'shuijiao.png'
 				}],
 				searchForm: {
 					orderCode: "",
@@ -115,13 +118,15 @@
 					name: '',
 					phone: ''
 				},
-				nowItem: {}
+				nowItem: {},
+				image: '',
+				imageUrl: ""
 			}
 		},
 		watch: {},
 		onLoad(options) {
 			if(options.code) { // 人脸成功更改订单状态
-				this.confirmSuccess(options.code);
+				this.confirmSuccess(options);
 			}
 			this.getData();
 		},
@@ -185,6 +190,49 @@
 				console.log(this.haveMsg)
 				console.log()
 			},
+			// 图片添加水印
+			handleAddWaterMarker (str,param) {
+			    let content = str;
+			    let imageCon = this.$refs.imageCon;//获取图片
+			    let canvas = document.createElement("canvas");//创建canvas容器
+			    canvas.width = imageCon.width;//设置canvas容器宽度
+			    canvas.height = imageCon.height;//设置canvas容器高度
+			
+			    let ctx = canvas.getContext("2d");//获取2d画笔
+			
+			    //在canvas画布上绘制图片 ctx.drawImage(图片, x位置, y位置,  图像宽度, 图像高度);
+			    ctx.drawImage(imageCon, 0, 0, imageCon.width, imageCon.height);
+			
+			     //设置文本画笔的样式
+			    ctx.textAlign = 'left';//设置文本对齐方式
+			    ctx.textBaseline = 'top';//设置文本基线
+			    ctx.font = "15px Microsoft Yahei";//设置文本字体属性
+			    ctx.fillStyle = "rgba(0, 0, 0, 1)"//设置文本字体颜色
+			      
+			    //在canvas画布上绘制文字 ctx.fillText(文字内容, x位置, y位置, 文本最大宽度)
+			    ctx.fillText(content, imageCon.width - (content.split("").length * 14 + 10), imageCon.height - (14 + 10), imageCon.width)//14为文字大小
+			      
+				// blob 可以 转 file
+			    canvas.toBlob((blob)=>{
+					this.image = blob;
+					console.log(blob,'blob')
+					//  将blob 转为file   参数 blob, filename
+					let fileOfBlob = new File([this.image], new Date().valueOf()+'.png');
+					
+					 uni.uploadFile({
+					    url: '/api/file/upload',
+					    file: fileOfBlob,
+					    name: 'file',
+					    success: (uploadFileRes) => {
+					        console.log(uploadFileRes.data);
+							// 更改当前item 的
+							param.invoiceImage = 'https://suezp.cn/server/kmProfile.png';
+							this.doneSave(param);
+							// this.imageUrl = 'https://suezp.cn/server/kmProfile.png'
+					    }
+					});
+				});
+			},
 			// 确认签收
 			confirmRecive() {
 				let param = {
@@ -192,7 +240,6 @@
 					confirmMsg: this.confirmMsg
 				}
 				console.log('签收', param)
-				// 多一步 处理有无异议 图片处理
 				this.goConfirm();
 			},
 			// 变更收货人
@@ -222,22 +269,22 @@
 			},
 			goConfirm() {
 				let nowUrl = window.location.href;
-				let param = {...this.nowItem};
 				this.$request('/face/getAuth','POST',{}).then(res=>{
 					console.log(res,'回参')
 					let token = JSON.parse(res.data).result.verify_token;
 					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.invoiceCode}`);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}`);
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
-					console.log(faillUrl)
 					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
 					successUrl=${successUrl}&
 					failedUrl=${faillUrl}`
 				})
 			},
-			confirmSuccess(code) {
+			// 人脸核验 成功
+			confirmSuccess(options) {
+				console.log(options)
 				let query = {
-					invoiceCode: code,
+					invoiceCode: options.code,
 					custName: "",
 					busiManName: "", //业务员
 					makerName: "", //销售内勤
@@ -247,27 +294,37 @@
 				};
 				this.$request('/mallInvoice/query', 'POST', query).then(res => {
 					let param = res.data.list[0];
-					param.invoiceStat = '3';
-					this.$request('/mallInvoice/save','POST', param).then(res=>{
-						console.log(res,'回参')
-						if(res.code == 200) {
-							uni.showToast({
-								icon: 'success',
-								title: '货物签收成功！',
+					param.invoiceStat = '1';
+					// 多一步 处理有无异议 图片处理 修改水印图片地址
+					if(options.msg) {
+						 this.handleAddWaterMarker(options.msg,param);
+						 return
+					}
+					console.log(param)
+				    this.doneSave(param);
+				})
+			},
+			// 更改订单信息
+			doneSave(param) {
+				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					console.log(res,'回参')
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '货物签收成功！',
+						})
+						this.getData();
+						setTimeout(()=>{
+							uni.navigateTo({
+								url: '/pages/historyOrderList/historyOrderList?type=1'
 							})
-							this.getData();
-							setTimeout(()=>{
-								uni.navigateTo({
-									url: '/pages/historyOrderList/historyOrderList?type=2'
-								})
-							},1500)
-						} else {
-							uni.showToast({
-								icon: 'success',
-								title: res.msg
-							})
-						}
-					})
+						},1500)
+					} else {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg
+						})
+					}
 				})
 			}
 		}

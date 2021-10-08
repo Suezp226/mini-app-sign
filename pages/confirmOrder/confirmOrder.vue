@@ -141,9 +141,9 @@
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
 					console.log(faillUrl)
 					// return
-					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					successUrl=${successUrl}&
-					failedUrl=${faillUrl}`
+					// window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					// successUrl=${successUrl}&
+					// failedUrl=${faillUrl}`
 				})
 			},
 			confirmSuccess(code) {
