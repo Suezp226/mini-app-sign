@@ -317,7 +317,7 @@
 						setTimeout(()=>{
 							this.$request('/mallInvoice/query', 'POST', query).then(res => {
 								let param = res.data.list[0];
-								param.invoiceStat = '1';
+								param.invoiceStat = '3';
 								// 多一步 处理有无异议 图片处理 修改水印图片地址
 								if(options.msg) {
 									this.nowItem = res.data.list[0];
