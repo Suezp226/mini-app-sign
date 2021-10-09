@@ -80,7 +80,9 @@
 		onLoad() {
 			// 取本地 已经登入的信息
 			if(uni.getStorageSync('userInfo')){
-				this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				this.$store.commit('putUserInfo',info);
+				this.$store.commit('changePosition', info.roleCode);
 			}
 		},
 		methods: {

@@ -30,7 +30,7 @@
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url:item.orderImage}]" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
 								</view>
 							</view>
 						</view>
@@ -99,12 +99,23 @@
 			},
 		},
 		mounted() {
-			this.getData();
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
-				// TODO 需要把 当前用户的身份信息带上
-				// this.searchForm.custName = ''
+				if(['kh','shr'].includes(this.$store.state.userPosition) ) {
+					this.searchForm.custName = this.$store.state.userInfo.userName
+				}
+			} else {
+				if(this.$store.state.userPosition == 'sj') {
+					this.searchForm.driverName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'xsnq') {
+					this.searchForm.makerName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'ywy') {
+					this.searchForm.busiManName = this.$store.state.userInfo.userName
+				}
 			}
+			this.getData();
 		},
 		methods: {
 			changeTab(tab) {

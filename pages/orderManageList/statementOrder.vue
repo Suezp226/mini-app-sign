@@ -14,8 +14,8 @@
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
 								{{item.acctStatCode}}
 							</view>
-							<u-tag type="primary"  v-if="item.acctStatStat == '0'" text="待确认" mode="dark" :closeable="false" />
-							<u-tag type="success" v-if="item.acctStatStat == '1'" text="已确认" mode="dark" :closeable="false" />
+							<u-tag type="primary"  v-if="item.acctStatStat == '0'" text="正常" mode="dark" :closeable="false" />
+							<!-- <u-tag type="success" v-if="item.acctStatStat == '1'" text="已确认" mode="dark" :closeable="false" /> -->
 							<u-tag type="info" v-if="item.acctStatStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 						</view>
 						<view slot="body" class="body">
@@ -30,7 +30,7 @@
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url: item.invoiceImage}]" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
 								</view>
 							</view>
 						</view>
@@ -99,21 +99,36 @@
 			},
 		},
 		mounted() {
-			this.getData();
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
+				if(['kh','shr'].includes(this.$store.state.userPosition) ) {
+					this.searchForm.custName = this.$store.state.userInfo.userName
+				}
 				// TODO 需要把 当前用户的身份信息带上
 				// this.searchForm.custName = ''
+			} else {
+				if(this.$store.state.userPosition == 'sj') {
+					this.searchForm.driverName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'xsnq') {
+					this.searchForm.makerName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'ywy') {
+					this.searchForm.busiManName = this.$store.state.userInfo.userName
+				}
 			}
+			this.getData();
 		},
 		methods: {
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
-				if(tab != 0) {
+				if(tab == 0) {
+					this.searchForm.acctStatStat = '';
+				} else if( tab ==2 ){
 					this.searchForm.acctStatStat = '9';
 				} else {
-					this.searchForm.acctStatStat = '';
+					this.searchForm.acctStatStat = '0';
 				}
 			},
 			transition(e) {

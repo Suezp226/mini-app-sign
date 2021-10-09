@@ -1,5 +1,6 @@
 <template>
 	<view class="content">
+		<!-- 这里用来 给 客户、 收货人员 查看 历史相关的订单 -->
 		<u-tabs ref="uTabs" class="utabs" :list="list" :is-scroll="false" :current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition" :refresher-threshold="90"
@@ -51,7 +52,7 @@
 		},
 		onLoad(options) {
 			console.log(options)
-			if(options) {
+			if(options.type) {
 				this.current = options.type;
 				this.swiperCurrent = options.type;
 			}

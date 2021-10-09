@@ -1,5 +1,6 @@
 <template>
 	<view class="content">
+		<!-- 全部订单 给员工包括 销售内勤、业务员 管理员查看 不带参数 -->
 		<u-tabs ref="uTabs" class="utabs" :list="list" :is-scroll="false" :current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition" :refresher-threshold="90"

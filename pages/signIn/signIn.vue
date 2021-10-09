@@ -37,7 +37,7 @@
 						<view class="form-item">
 							<view class="title">货单:</view>
 							<view class="input">
-								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
+								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url: item.invoiceImage}]"
 									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
 								<button class="changePeople" v-if="item.invoiceStat == '1' && !item.receiveName" @click="openChangeModal(item)" type="primary">变更收货人</button>
 								<button type="primary" v-if="item.invoiceStat == '1'" @click="openSignModal(item)">签收</button>
@@ -128,6 +128,7 @@
 			if(options.code) { // 人脸成功更改订单状态
 				this.confirmSuccess(options);
 			}
+			this.searchForm.custName = this.$store.state.userInfo.userName;
 			this.getData();
 		},
 		methods: {
@@ -226,7 +227,7 @@
 					    success: (uploadFileRes) => {
 					        console.log(uploadFileRes.data);
 							// 更改当前item 的
-							param.invoiceImage = 'https://suezp.cn/server/kmProfile.png';
+							param.invoiceImage = this.$imgBaseUrl + uploadFileRes.data.replace('/app/file','/image');
 							this.doneSave(param);
 							// this.imageUrl = 'https://suezp.cn/server/kmProfile.png'
 					    }

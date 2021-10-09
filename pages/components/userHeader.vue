@@ -5,9 +5,9 @@
 				<image src="../../static/image/user.png" mode="aspectFit"></image>
 			</view>
 			<view class="rightBox">
-				<view class="name">{{userInfo.name}}</view>
-				<view class="phone">{{userInfo.phone}}</view>
-				<view class="tag">{{userInfo.roleName}}</view>
+				<view class="name">{{userInfo.userName}}</view>
+				<view class="phone">{{userInfo.userPhone}}</view>
+				<view class="tag">{{userInfo.roleName?userInfo.roleName:translateRoleName}}</view>
 			</view>
 		</view>
 	</view>
@@ -37,10 +37,46 @@
 		},
 		data() {
 			return {
-				isWxOpen: false
+				isWxOpen: false,
+				translateRoleName: '',
+				list: [
+						{
+							name: '管理员',
+							value: 'admin',
+							disabled: false
+						},
+						{
+							name: '业务员',
+							value: 'ywy',
+							disabled: false
+						},
+						{
+							name: '销售内勤',
+							value: 'xsnq',
+							disabled: false
+						},
+						{
+							name: '客户',
+							value: 'kh',
+							disabled: false
+						},
+						{
+							name: '司机',
+							value: 'sj',
+							disabled: false
+						},
+						{
+							name: '收货人',
+							value: 'shr',
+							disabled: false
+						},
+					]
 			}
 		},
 		onLoad() {},
+		mounted() {
+			this.changeRoleName()
+		},
 		methods: {
 			goNextPage() {
 				console.log('执行跳转')
@@ -66,8 +102,16 @@
 				// 	url: '/pages/index/center?id=1&name=uniapp'
 				// });
 			},
+			changeRoleName(){
+				console.log(this.$store.state.userInfo.roleCode,'在这')
+				this.list.forEach(ele=>{
+					if(ele.value == this.$store.state.userInfo.roleCode) {
+						this.translateRoleName = ele.name
+					}
+				})
+			},
 			goLogin() {
-				if( this.userInfo.name !== '点击登录'){
+				if( this.userInfo.userName !== '点击登录'){
 					return
 				}
 				uni.navigateTo({

@@ -1,5 +1,6 @@
 <template>
 	<view class="content">
+		<!-- 只有客户能看到的 确认订单 -->
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入订单号"
 			@search="getData" @custom="getData" @clear="getData"></u-search>
 		<view style="flex: 1;overflow: hidden;" >
@@ -28,7 +29,7 @@
 						<view class="form-item">
 							<view class="title">货单:</view>
 							<view class="input">
-								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists"
+								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url:item.orderImage}]"
 									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
 								<button type="primary" v-if="item.orderStat == '0'" @click="openConformModal(item)">去确认</button>
 							</view>
@@ -78,9 +79,10 @@
 		},
 		watch: {},
 		onLoad(options) {
-			if(options.code) { // 人脸成功更改订单状态
-				this.confirmSuccess(options.code);
+			if(options.id) { // 人脸成功更改订单状态
+				this.confirmSuccess(options.id);
 			}
+			this.searchForm.custName = this.$store.state.userInfo.userName;
 			this.getData();
 		},
 		methods: {
@@ -138,48 +140,40 @@
 					let accToken = res.data.access_token;
 					let token = JSON.parse(res.data.verify_token).verify_token;
 					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.orderCode}`);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?id=${this.nowItem.moId}`);
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
 					console.log(faillUrl)
 					// return
-					// window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					// successUrl=${successUrl}&
-					// failedUrl=${faillUrl}`
+					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					successUrl=${successUrl}&
+					failedUrl=${faillUrl}`
 				})
 			},
-			confirmSuccess(code) {
-				let query = {
-					orderCode: code,
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "", //销售内勤
-					orderStat: "",
-					offset: 0,
-					limit: 10,
-				};
-				this.$request('/mallOrder/query', 'POST', query).then(res => {  // 查询
-					let param = res.data.list[0];
-					param.orderStat = '1';
-					this.$request('/mallOrder/save','POST', param).then(res=>{  //修改
-						console.log(res,'回参')
-						if(res.code == 200) {
-							uni.showToast({
-								icon: 'success',
-								title: '订单确认成功！',
+			confirmSuccess(id) {
+				let param = {
+					moId: id,
+					orderStat: '1'
+				}
+				
+				this.$request('/mallOrder/updateStat','POST',param).then(res=>{
+					console.log(res,'回参')
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '订单确认成功！',
+						})
+						this.getData();
+						setTimeout(()=>{
+							uni.navigateTo({
+								url: '/pages/historyOrderList/historyOrderList?type=0'
 							})
-							this.getData();
-							setTimeout(()=>{
-								uni.navigateTo({
-									url: '/pages/historyOrderList/historyOrderList?type=0'
-								})
-							},1500)
-						} else {
-							uni.showToast({
-								icon: 'success',
-								title: res.msg
-							})
-						}
-					})
+						},1500)
+					} else {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg
+						})
+					}
 				})
 			}
 		}

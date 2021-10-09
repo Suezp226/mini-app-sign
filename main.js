@@ -14,6 +14,7 @@ Vue.use(uView);
 Vue.config.productionTip = false
 Vue.prototype.$store = store
 Vue.prototype.$request = apiService
+Vue.prototype.$imgBaseUrl = 'http:suezp.cn:1118'
 
 App.mpType = 'app'
 const app = new Vue({

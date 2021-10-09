@@ -48,7 +48,7 @@
 		onLoad(options) {
 			console.log(options.type)
 			if(options.type == 'logout') {
-				this.$store.commit('putUserInfo', JSON.stringify({name: '点击登录',phone: '',roleName: '暂无'}));
+				this.$store.commit('putUserInfo', JSON.stringify({userName: '点击登录',userPhone: '',roleName: '暂无'}));
 				uni.removeStorageSync('userInfo');
 				uni.removeStorageSync('token');
 			}
@@ -85,13 +85,17 @@
 				}
 				this.$request('/user/login','POST',param).then(res=>{
 					console.log(res)
-					uni.setStorageSync('token', '123321')
-					uni.setStorageSync('userInfo',JSON.stringify({name: '管理员',phone: '13295932921',roleName: '管理员'}));
-					this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
-					uni.reLaunch({
-						url:'/pages/index/index'
-					})
-					console.log('执行登入');
+					if(res.code == 200) {
+						uni.setStorageSync('token', res.data.token)
+						uni.setStorageSync('userInfo',JSON.stringify(res.data.user));
+						this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
+						this.$store.commit('changePosition', res.data.user.roleCode);
+						console.log(this.$store.userInfo,this.$store.userPosition,'在这俩 ')
+						uni.reLaunch({
+							url:'/pages/index/index'
+						})
+						console.log('执行登入');
+					}
 					if(this.timer) {
 						clearInterval(this.timer);
 					}

@@ -21,10 +21,10 @@
 					</view>
 					<view class="liBox">个人信息</view>
 				</li> -->
-				<li @click="changePosition" v-if="userPosition == 'admin' || true">
+				<!-- <li @click="changePosition" v-if="userPosition == 'admin' || true">
 					<image src="../../static/image/change.png" mode="aspectFit"></image>
 					<view class="liBox">切换身份</view>
-				</li>
+				</li> -->
 				<li @click="logout">
 					<image src="../../static/image/exit.png" mode="aspectFit"></image>
 					<view class="liBox">退出登入</view>

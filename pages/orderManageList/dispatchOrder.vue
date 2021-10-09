@@ -1,5 +1,6 @@
 <template>
 	<view class="content">
+		<!-- 发货单查看 -->
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
@@ -41,7 +42,7 @@
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="fileLists" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+									<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url: item.invoiceImage}]" :imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
 								</view>
 							</view>
 						</view>
@@ -111,12 +112,26 @@
 			},
 		},
 		mounted() {
-			this.getData();
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
-				// TODO 需要把 当前用户的身份信息带上
-				// this.searchForm.custName = ''
+				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
+				if(['kh','shr'].includes(this.$store.state.userPosition) ) {
+					this.searchForm.custName = this.$store.state.userInfo.userName
+				}
+				
+			} else {  //在非组件的情况下 按登录用户把查询信息带上
+				if(this.$store.state.userPosition == 'sj') {
+					this.searchForm.driverName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'xsnq') {
+					this.searchForm.makerName = this.$store.state.userInfo.userName
+				}
+				if(this.$store.state.userPosition == 'ywy') {
+					this.searchForm.busiManName = this.$store.state.userInfo.userName
+				}
 			}
+			
+			this.getData();
 		},
 		methods: {
 			changeTab(tab) {
