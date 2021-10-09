@@ -51,7 +51,6 @@
 			}
 		},
 		onLoad(options) {
-			console.log(options)
 			if(options.type) {
 				this.current = options.type;
 				this.swiperCurrent = options.type;

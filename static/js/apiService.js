@@ -24,7 +24,7 @@ const request = async function(url, method, data, header) {
 	return new Promise((resolve, reject) => {
 		uni.request({
 			// TODO 处理请求地址
-			url: '/api'+url, //仅为示例，并非真实接口地址。
+			url: url.indexOf('baidu') !== -1 ?url:'/api'+url, //仅为示例，并非真实接口地址。
 			method: method.toUpperCase(),
 			data: data,
 			header: {

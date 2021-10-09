@@ -84,6 +84,12 @@
                     "changeOrigin": true,
                     "secure": false,
                     "pathRewrite": { "^/api": "" }
+                },
+                "/baidu": {
+                    "target": "https://aip.baidubce.com",
+                    "changeOrigin": true,
+                    "secure": false,
+                    "pathRewrite": { "^/baidu": "" }
                 }
             }
         },

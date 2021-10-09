@@ -80,7 +80,7 @@
 		watch: {},
 		onLoad(options) {
 			if(options.id) { // 人脸成功更改订单状态
-				this.confirmSuccess(options.id);
+				this.confirmSuccess(options);
 			}
 			this.searchForm.custName = this.$store.state.userInfo.userName;
 			this.getData();
@@ -136,11 +136,11 @@
 			goConfirm() {
 				let nowUrl = window.location.href;
 				this.$request('/face/getAuth','POST',{}).then(res=>{
-					console.log(res.data.access_token,JSON.parse(res.data.verify_token).verify_token,'回参')
+					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')
 					let accToken = res.data.access_token;
-					let token = JSON.parse(res.data.verify_token).verify_token;
+					let token = JSON.parse(res.data.verify_token).result.verify_token;
 					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?id=${this.nowItem.moId}`);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/startRunning/startRunning?id=${this.nowItem.miId}&name=${this.$store.state.userInfo.custHandler}&atoken=${accToken}&vtoken=${token}`);
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
 					console.log(faillUrl)
 					// return
@@ -149,32 +149,46 @@
 					failedUrl=${faillUrl}`
 				})
 			},
-			confirmSuccess(id) {
+			confirmSuccess(options) {
 				let param = {
-					moId: id,
+					moId: options.id,
 					orderStat: '1'
 				}
 				
-				this.$request('/mallOrder/updateStat','POST',param).then(res=>{
-					console.log(res,'回参')
-					if(res.code == 200) {
+				// 确认
+				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
+				.then(res=>{
+					console.log(res,'获取结果')
+					if(res.success && res.result.idcard_confirm.name == options.name) {
+						// 验证成功
 						uni.showToast({
 							icon: 'success',
-							title: '订单确认成功！',
+							title: '人脸核验成功',
 						})
-						this.getData();
 						setTimeout(()=>{
-							uni.navigateTo({
-								url: '/pages/historyOrderList/historyOrderList?type=0'
+							this.$request('/mallOrder/updateStat','POST',param).then(res=>{
+								console.log(res,'回参')
+								if(res.code == 200) {
+									uni.showToast({
+										icon: 'success',
+										title: '订单确认成功！',
+									})
+									setTimeout(()=>{
+										uni.navigateTo({
+											url: '/pages/historyOrderList/historyOrderList?type=0'
+										})
+									},1500)
+								} else {
+									uni.showToast({
+										icon: 'success',
+										title: '服务器异常'
+									})
+								}
 							})
-						},1500)
-					} else {
-						uni.showToast({
-							icon: 'success',
-							title: res.msg
-						})
+						},1000)
 					}
 				})
+				
 			}
 		}
 	}

@@ -79,9 +79,9 @@
 				</view>
 			</u-modal>
 		</view>
-		<img :src="nowItem.invoiceImage" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon">
-		<!-- <button @click="handleAddWaterMarker">添加水印</button>
-		<img :src="image" alt="" style="width: 250px;opacity: 1;"> -->
+		<img :src="nowItem.invoiceImage" @load="imgload" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon">
+		<!-- <button @click="handleAddWaterMarker('测试水印')">添加水印</button> -->
+		<!-- <img :src="image" alt="" style="width: 250px;opacity: 1;"> -->
 		<u-top-tips ref="uTips"></u-top-tips>
 	</view>
 </template>
@@ -120,7 +120,8 @@
 				},
 				nowItem: {},
 				image: '',
-				imageUrl: ""
+				imageUrl: "",
+				imgloadDown: false // 监听图片加载完成
 			}
 		},
 		watch: {},
@@ -143,6 +144,9 @@
 				}
 				this.searchForm.limit += 10;
 				this.getMoreData();
+			},
+			imgload(e) {
+				this.imgloadDown = true;
 			},
 			// scroll-view 下拉刷新
 			refresherrefresh() {
@@ -182,7 +186,8 @@
 			// 确认签收
 			openSignModal(item) {
 				this.nowItem = item;
-				this.confirmDialog = true;
+				console.log(this.nowItem.invoiceImage)
+				// this.confirmDialog = true;
 			},
 			openConformModal() {
 				this.showModal = true;
@@ -196,13 +201,16 @@
 			    let content = str;
 			    let imageCon = this.$refs.imageCon;//获取图片
 			    let canvas = document.createElement("canvas");//创建canvas容器
-			    canvas.width = imageCon.width;//设置canvas容器宽度
-			    canvas.height = imageCon.height;//设置canvas容器高度
+				let h = imageCon.height > 1000? imageCon.height/2 : imageCon.height;
+				let w = imageCon.width > 1000? imageCon.width/2 : imageCon.width;
+			    canvas.width = w;//设置canvas容器宽度
+			    canvas.height = h;//设置canvas容器高度
 			
 			    let ctx = canvas.getContext("2d");//获取2d画笔
 			
 			    //在canvas画布上绘制图片 ctx.drawImage(图片, x位置, y位置,  图像宽度, 图像高度);
-			    ctx.drawImage(imageCon, 0, 0, imageCon.width, imageCon.height);
+				
+			    ctx.drawImage(imageCon, 0, 0, w, h);
 			
 			     //设置文本画笔的样式
 			    ctx.textAlign = 'left';//设置文本对齐方式
@@ -225,9 +233,9 @@
 					    file: fileOfBlob,
 					    name: 'file',
 					    success: (uploadFileRes) => {
-					        console.log(uploadFileRes.data);
+					        console.log(JSON.parse(uploadFileRes.data).data);
 							// 更改当前item 的
-							param.invoiceImage = this.$imgBaseUrl + uploadFileRes.data.replace('/app/file','/image');
+							param.invoiceImage = this.$imgBaseUrl + JSON.parse(uploadFileRes.data).data.replace('/app/file','/image');
 							this.doneSave(param);
 							// this.imageUrl = 'https://suezp.cn/server/kmProfile.png'
 					    }
@@ -271,11 +279,13 @@
 			goConfirm() {
 				let nowUrl = window.location.href;
 				this.$request('/face/getAuth','POST',{}).then(res=>{
-					console.log(res,'回参')
-					let token = JSON.parse(res.data).result.verify_token;
+					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')
+					let accToken = res.data.access_token;
+					let token = JSON.parse(res.data.verify_token).result.verify_token;
 					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}`);
-					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}&name=${this.$store.state.userInfo.custHandler}&atoken=${accToken}&vtoken=${token}`);
+					// let successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}`);
+					let faillUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn`);
 					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
 					successUrl=${successUrl}&
 					failedUrl=${faillUrl}`
@@ -293,16 +303,53 @@
 					offset: 0,
 					limit: 10,
 				};
-				this.$request('/mallInvoice/query', 'POST', query).then(res => {
-					let param = res.data.list[0];
-					param.invoiceStat = '1';
-					// 多一步 处理有无异议 图片处理 修改水印图片地址
-					if(options.msg) {
-						 this.handleAddWaterMarker(options.msg,param);
-						 return
+				
+				// 确认
+				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
+				.then(res=>{
+					console.log(res,'获取结果')
+					if(res.success && res.result.idcard_confirm.name == options.name) {
+						// 验证成功
+						uni.showToast({
+							icon: 'success',
+							title: '人脸核验成功',
+						})
+						setTimeout(()=>{
+							this.$request('/mallInvoice/query', 'POST', query).then(res => {
+								let param = res.data.list[0];
+								param.invoiceStat = '1';
+								// 多一步 处理有无异议 图片处理 修改水印图片地址
+								if(options.msg) {
+									this.nowItem = res.data.list[0];
+									console.log(this.nowItem,'nowitem')
+									// 查询图片加载情况 一旦加载完成 立刻加水印
+									if(this.imgloadDown) {
+										this.handleAddWaterMarker(options.msg,param);
+										// clearInterval(timer);
+									} else {
+										console.log('等待图片加载外层')
+										let timer = setInterval(()=>{
+											if(this.imgloadDown) {
+												this.handleAddWaterMarker(options.msg,param);
+												clearInterval(timer);
+											} else {
+												console.log('等待图片加载')
+											}
+										},500)
+									}
+									
+									return
+								}
+								console.log(param)
+							    this.doneSave(param);
+							})
+						},1000)
+					} else {
+						uni.showToast({
+							icon: 'error',
+							title: '人脸信息与订单不符',
+						})
 					}
-					console.log(param)
-				    this.doneSave(param);
 				})
 			},
 			// 更改订单信息
@@ -314,7 +361,6 @@
 							icon: 'success',
 							title: '货物签收成功！',
 						})
-						this.getData();
 						setTimeout(()=>{
 							uni.navigateTo({
 								url: '/pages/historyOrderList/historyOrderList?type=1'
@@ -323,7 +369,7 @@
 					} else {
 						uni.showToast({
 							icon: 'success',
-							title: res.msg
+							title: '服务异常'
 						})
 					}
 				})

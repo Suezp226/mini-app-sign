@@ -115,8 +115,9 @@
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
 				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
-				if(['kh','shr'].includes(this.$store.state.userPosition) ) {
-					this.searchForm.custName = this.$store.state.userInfo.userName
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				if(['kh','shr'].includes(info.roleCode) ) {
+					this.searchForm.custName = info.userName;
 				}
 				
 			} else {  //在非组件的情况下 按登录用户把查询信息带上
@@ -155,8 +156,10 @@
 				let current = e.detail.current;
 				this.swiperCurrent = current;
 				this.current = current;
-				if(current != 0) {
+				if(current == 1 ) {
 					this.searchForm.invoiceStat = current - 1;
+				} else if( current == 2){
+					this.searchForm.invoiceStat = current + 1;
 				} else {
 					this.searchForm.invoiceStat = '';
 				}

@@ -101,8 +101,9 @@
 		mounted() {
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
-				if(['kh','shr'].includes(this.$store.state.userPosition) ) {
-					this.searchForm.custName = this.$store.state.userInfo.userName
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				if(['kh','shr'].includes(info.roleCode) ) {
+					this.searchForm.custName = info.userName;
 				}
 			} else {
 				if(this.$store.state.userPosition == 'sj') {

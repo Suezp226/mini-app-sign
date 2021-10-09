@@ -78,12 +78,12 @@
 			}
 		},
 		onLoad() {
-			// 取本地 已经登入的信息
-			if(uni.getStorageSync('userInfo')){
-				let info = JSON.parse(uni.getStorageSync('userInfo'));
-				this.$store.commit('putUserInfo',info);
-				this.$store.commit('changePosition', info.roleCode);
-			}
+			// 取本地 已经登入的信息 转入 main.js
+			// if(uni.getStorageSync('userInfo')){
+			// 	let info = JSON.parse(uni.getStorageSync('userInfo'));
+			// 	this.$store.commit('putUserInfo',info);
+			// 	this.$store.commit('changePosition', info.roleCode);
+			// }
 		},
 		methods: {
 			requestTest() {

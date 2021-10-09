@@ -14,7 +14,14 @@ Vue.use(uView);
 Vue.config.productionTip = false
 Vue.prototype.$store = store
 Vue.prototype.$request = apiService
-Vue.prototype.$imgBaseUrl = 'http:suezp.cn:1118'
+Vue.prototype.$imgBaseUrl = 'http://suezp.cn:1118'
+
+if(uni.getStorageSync('userInfo')){
+	let info = JSON.parse(uni.getStorageSync('userInfo'));
+	store.commit('putUserInfo',info);
+	store.commit('changePosition', info.roleCode);
+	console.log('初始化获取本地信息给store')
+}
 
 App.mpType = 'app'
 const app = new Vue({
