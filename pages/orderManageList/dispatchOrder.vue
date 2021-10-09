@@ -28,6 +28,10 @@
 								<view class="input">{{item.custName}}</view>
 							</view>
 							<view class="form-item" >
+								<view class="title">手机号:</view>
+								<view class="input">{{item.custPhone}}</view>
+							</view>
+							<view class="form-item" >
 								<view class="title">时间:</view>
 								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
 							</view>

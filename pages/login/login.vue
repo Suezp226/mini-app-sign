@@ -59,7 +59,11 @@
 			}
 		},
 		methods: {
+			isMobile (mobile) {
+			  return /^1\d{10}$/.test(mobile)
+			},
 			login() {
+			
 				if(!this.input.phone) {
 					uni.showToast({
 						title: '请输入手机号',
@@ -103,6 +107,14 @@
 					
 			},
 			getPhoneCheckNum() {
+				if(!this.isMobile(this.input.phone)) {
+					uni.showToast({
+						title: '请输入正确手机号',
+						icon: 'none',
+						duration: 1500
+					})
+					return
+				}
 				this.nowUuid = new Date().valueOf() + '';
 				if (this.timer == null) {
 					let param = {

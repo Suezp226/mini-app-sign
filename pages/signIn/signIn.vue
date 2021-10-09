@@ -22,6 +22,10 @@
 							<view class="title">客户:</view>
 							<view class="input">{{item.custName}}</view>
 						</view>
+						<view class="form-item" >
+							<view class="title">手机号:</view>
+							<view class="input">{{item.custPhone}}</view>
+						</view>
 						<view class="form-item">
 							<view class="title">时间:</view>
 							<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
@@ -187,7 +191,7 @@
 			openSignModal(item) {
 				this.nowItem = item;
 				console.log(this.nowItem.invoiceImage)
-				// this.confirmDialog = true;
+				this.confirmDialog = true;
 			},
 			openConformModal() {
 				this.showModal = true;
