@@ -85,7 +85,7 @@
 			</u-modal>
 		</view>
 		<!-- <image src="" mode=""></image> -->
-		<img :src="nowItem.invoiceImage" crossorigin="anonymous"  @load="imgload" alt="" v-show="true" style="width: 250px;position: absolute;z-index: 10;" ref="imageCon"></img>
+		<img :src="nowItem.invoiceImage" crossorigin="anonymous"  @load="imgload" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon"></img>
 		<!-- <button @click="handleAddWaterMarker('测试水印')">添加水印</button> -->
 		<!-- <img :src="image" alt="" style="width: 250px;opacity: 1;"> -->
 		<u-top-tips ref="uTips"></u-top-tips>
@@ -219,10 +219,10 @@
 			    let content = str;
 			    let imageCon = this.$refs.imageCon;//获取图片
 				// let imageCon = new Image();
-				
+					console.log(imageCon)
 					let canvas = document.createElement("canvas");//创建canvas容器
-					let h = imageCon.height > 1000? imageCon.height/2 : imageCon.height;
-					let w = imageCon.width > 1000? imageCon.width/2 : imageCon.width;
+					let h = imageCon.height > 1500? imageCon.height/2 : imageCon.height;
+					let w = imageCon.width > 1500? imageCon.width/2 : imageCon.width;
 					canvas.width = w;//设置canvas容器宽度
 					canvas.height = h;//设置canvas容器高度
 								
@@ -235,11 +235,11 @@
 					 //设置文本画笔的样式
 					ctx.textAlign = 'left';//设置文本对齐方式
 					ctx.textBaseline = 'top';//设置文本基线
-					ctx.font = "15px Microsoft Yahei";//设置文本字体属性
+					ctx.font = "18px Microsoft Yahei";//设置文本字体属性
 					ctx.fillStyle = "rgba(0, 0, 0, 1)"//设置文本字体颜色
 					  
 					//在canvas画布上绘制文字 ctx.fillText(文字内容, x位置, y位置, 文本最大宽度)
-					ctx.fillText(content, imageCon.width - (content.split("").length * 14 + 10), imageCon.height - (14 + 10), imageCon.width)//14为文字大小
+					ctx.fillText(content, imageCon.width - (content.split("").length * 18 + 10), imageCon.height - (14 + 10), imageCon.width)//14为文字大小
 					  
 					// blob 可以 转 file
 					canvas.toBlob((blob)=>{
@@ -257,6 +257,7 @@
 								// 更改当前item 的
 								param.invoiceImage = this.$imgBaseUrl + JSON.parse(uploadFileRes.data).data.replace('/app/file','/image');
 								param.invoiceStat = '4';  //4为有异议
+								param.suggest = str;
 								this.doneSave(param);
 								// this.imageUrl = 'https://suezp.cn/server/kmProfile.png'
 						    }
@@ -383,7 +384,7 @@
 								console.log(param)
 							    this.doneSave(param);
 							})
-						},1000)
+						},500)
 					} else {
 						uni.showToast({
 							icon: 'error',
