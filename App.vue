@@ -45,4 +45,19 @@
 		padding: 20px 30px;
 		font-size: 14px;
 	}
+	// 页面加载
+	.loadCover {
+		position: absolute;
+		z-index: 10;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		transition: all 0.5s ease-in-out;
+	}
 </style>

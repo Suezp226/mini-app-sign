@@ -52,6 +52,9 @@
 				</view>
 			</u-modal>
 		</view>
+		<view class="loadCover" v-if="pageLoading">
+			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
+		</view>
 	</view>
 </template>
 
@@ -78,12 +81,14 @@
 				showLoading: false,
 				tableList: [],
 				showModal: false,
-				nowItem: {}
+				nowItem: {},
+				pageLoading: false
 			}
 		},
 		watch: {},
 		onLoad(options) {
 			if(options.id) { // 人脸成功更改订单状态
+				this.pageLoading = true
 				this.confirmSuccess(options);
 			}
 			this.searchForm.custName = this.$store.state.userInfo.userName;
@@ -144,7 +149,7 @@
 					let accToken = res.data.access_token;
 					let token = JSON.parse(res.data.verify_token).result.verify_token;
 					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/startRunning/startRunning?id=${this.nowItem.miId}&name=${this.$store.state.userInfo.custHandler}&atoken=${accToken}&vtoken=${token}`);
+					let successUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder?id=${this.nowItem.moId}&name=${this.$store.state.userInfo.roleName}&atoken=${accToken}&vtoken=${token}`);
 					let faillUrl = encodeURIComponent(`http://${local}/#/pages/confirmOrder/confirmOrder`);
 					console.log(faillUrl)
 					// return
@@ -165,6 +170,7 @@
 					console.log(res,'获取结果')
 					if(res.success && res.result.idcard_confirm.name == options.name) {
 						// 验证成功
+						this.pageLoading = false;
 						uni.showToast({
 							icon: 'success',
 							title: '人脸核验成功',

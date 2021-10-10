@@ -19,6 +19,7 @@
 							<u-tag 				  v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
 							<u-tag type="warning" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
 							<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.invoiceStat == '4'" text="已签收(有异议)" mode="dark" :closeable="false" />
 							<u-tag type="info"    v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 
 						</view>
@@ -120,8 +121,12 @@
 				this.tabsView = [{name: '全部'}];
 				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
 				let info = JSON.parse(uni.getStorageSync('userInfo'));
-				if(['kh','shr'].includes(info.roleCode) ) {
+				if(['kh'].includes(info.roleCode) ) {
 					this.searchForm.custName = info.userName;
+				}
+				
+				if(['shr'].includes(info.roleCode) ) {
+					this.searchForm.receiveName = info.userName;
 				}
 				
 			} else {  //在非组件的情况下 按登录用户把查询信息带上

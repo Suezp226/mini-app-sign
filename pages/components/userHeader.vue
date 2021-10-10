@@ -7,7 +7,8 @@
 			<view class="rightBox">
 				<view class="name">{{userInfo.userName}}</view>
 				<view class="phone">{{userInfo.userPhone}}</view>
-				<view class="tag">{{userInfo.roleName?userInfo.roleName:translateRoleName}}</view>
+				<view class="tag" v-if="userInfo.roleCode != 'kh'" >{{userInfo.roleName?userInfo.roleName:translateRoleName}}</view>
+				<view class="tag" v-else >{{translateRoleName}}</view>
 			</view>
 		</view>
 	</view>

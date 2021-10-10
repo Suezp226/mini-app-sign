@@ -56,6 +56,9 @@
 				点击 <view class="boldFont">确认</view> 进入人脸识别 启运货物.
 			</view>
 		</u-modal>
+		<view class="loadCover" v-if="pageLoading">
+			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
+		</view>
 	</view>
 </template>
 
@@ -83,12 +86,14 @@
 				showLoading: false,
 				tableList: [],
 				showModal: false,
-				nowItem: {}
+				nowItem: {},
+				pageLoading: false
 			}
 		},
 		watch: {},
 		onLoad(options) {
 			if(options.id) { // 人脸成功更改订单状态
+				this.pageLoading = true;
 				this.confirmSuccess(options);
 			}
 			this.searchForm.driverName = this.$store.state.userInfo.userName;
@@ -170,6 +175,7 @@
 					console.log(res,'获取结果')
 					if(res.success && res.result.idcard_confirm.name == options.name) {
 						// 验证成功
+						this.pageLoading = false;
 						uni.showToast({
 							icon: 'success',
 							title: '人脸核验成功',
