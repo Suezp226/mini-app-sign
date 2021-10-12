@@ -1,5 +1,8 @@
 <template>
 	<view class="content">
+		<!-- <navigator url="/pages/orderManageList/dispatchOrder" hover-class="navigator-hover">
+		    <button type="default">去历史发货单</button>
+		</navigator> -->
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入订单号"
 			@search="getData" @custom="getData" @clear="getData"></u-search>
 		<view style="flex: 1;overflow: hidden;">

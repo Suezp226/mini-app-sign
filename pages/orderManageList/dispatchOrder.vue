@@ -116,6 +116,14 @@
 				this.getData();
 			},
 		},
+		onUnload() {  //监听页面卸载 如果是百度人脸过来的 返回直接跳转首页
+			let pages = getCurrentPages();
+			if(['pages/startRunning/startRunning'].includes(pages[pages.length-1].route)) {
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
+			}
+		},
 		mounted() {
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];

@@ -1,5 +1,8 @@
 <template>
 	<view class="content">
+		<!-- <navigator url="/pages/historyOrderList/historyOrderList" hover-class="navigator-hover">
+		    <button type="default">去历史发货单</button>
+		</navigator> -->
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入订单号"
 			@search="getData" @custom="getData" @clear="getData"></u-search>
 		<view style="flex: 1;overflow: hidden;" >
@@ -395,8 +398,10 @@
 			},
 			// 更改订单信息
 			doneSave(param) {
+				this.pageLoading = true;
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
 					console.log(res,'回参')
+					this.pageLoading = false;
 					if(res.code == 200) {
 						uni.showToast({
 							icon: 'success',
@@ -408,11 +413,19 @@
 							})
 						},1500)
 					} else {
+						this.pageLoading = false;
 						uni.showToast({
 							icon: 'success',
 							title: '服务异常'
 						})
 					}
+				})
+				.catch(err=>{
+					this.pageLoading = false;
+					uni.showToast({
+						icon: 'success',
+						title: '服务异常'
+					})
 				})
 			}
 		}

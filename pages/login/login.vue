@@ -19,7 +19,7 @@
 				<view class="title">
 					<image src="../../static/image/lock.png" mode="aspectFit"></image>
 				</view>
-				<input class="input" name="input" v-model="input.code" placeholder="请输入验证码" />
+				<input class="input" name="input" maxlength="6" v-model="input.code" placeholder="请输入验证码" />
 				<view class="getNumBtn" @click="getPhoneCheckNum">
 					<button type="primary" v-if="timer == null">获取验证码</button>
 					<button type="primary" v-else class="counting">{{count}}秒后可重新获取</button>
@@ -99,6 +99,12 @@
 							url:'/pages/index/index'
 						})
 						console.log('执行登入');
+					} else {
+						uni.showToast({
+							title: res.message,
+							icon: 'none',
+							duration: 2000
+						})
 					}
 					if(this.timer) {
 						clearInterval(this.timer);
@@ -117,6 +123,14 @@
 				}
 				this.nowUuid = new Date().valueOf() + '';
 				if (this.timer == null) {
+					setTimeout(() => {
+						clearInterval(this.timer);
+						this.timer = null;
+					}, 60000)
+					this.count = 60;
+					this.timer = setInterval(() => {
+						this.count--;
+					}, 1000)
 					let param = {
 						uuid: this.nowUuid,
 						receiverPhone: this.input.phone,
@@ -124,21 +138,19 @@
 					}
 					this.$request('/msg/getMsgCode','POST',param).then(res=>{
 						console.log(res.data)
-						this.input.code = res.data;
-						if(res.code != 200) return
-						uni.showToast({
-							title: '发送成功',
-							icon: 'success',
-							duration: 2000
-						})
-						setTimeout(() => {
-							clearInterval(this.timer);
-							this.timer = null;
-						}, 60000)
-						this.count = 60;
-						this.timer = setInterval(() => {
-							this.count--;
-						}, 1000)
+						// this.input.code = res.data;
+						if(res.code != 200) {
+							uni.showToast({
+								title: res.message,
+								icon: 'none',
+								duration: 2000
+							})
+						}
+					})
+					uni.showToast({
+						title: '发送成功',
+						icon: 'success',
+						duration: 2000
 					})
 				}
 			}

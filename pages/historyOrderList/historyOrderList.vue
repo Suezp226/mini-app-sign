@@ -51,9 +51,20 @@
 			}
 		},
 		onLoad(options) {
+			let pages = getCurrentPages();
+			console.log(pages)
 			if(options.type) {
 				this.current = options.type;
 				this.swiperCurrent = options.type;
+			}
+		},
+		onUnload() {  //监听页面卸载 如果是百度人脸过来的 返回直接跳转首页
+			let pages = getCurrentPages();
+			if(['pages/confirmOrder/confirmOrder','pages/signIn/signIn'].includes(pages[pages.length-1].route)) {
+				console.log('zhixing ')
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			}
 		},
 		methods: {
