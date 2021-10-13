@@ -8,19 +8,19 @@
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/image/order.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">历史订货单</view>
+					<view class="liBox">订货单</view>
 				</li>
 				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['admin','ywy','xsnq','sj'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">历史发货单</view>
+					<view class="liBox">发货单</view>
 				</li>
 				<li @click="goNextPage('/pages/orderManageList/statementOrder')" v-if="['admin','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor6">
 						<image src="../../static/image/statement.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">历史对账单</view>
+					<view class="liBox">对账单</view>
 				</li>
 				<!-- 客户 -->
 				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="['admin','kh'].includes(userPosition)">
