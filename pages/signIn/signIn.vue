@@ -94,6 +94,7 @@
 		<u-top-tips ref="uTips"></u-top-tips>
 		<view class="loadCover" v-if="pageLoading">
 			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
+			<view style="color:#fff;width: 100%;margin-top: 10px;" >正在短信通知相关人员请稍后...</view>
 		</view>
 	</view>
 </template>
@@ -438,6 +439,11 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #f5f7fb;
+		.loadCover {
+			display: flex;
+			flex-direction: column;
+			text-align: center;
+		}
 
 		.utabs {
 			border-bottom: 1px solid #e7e7e7;
