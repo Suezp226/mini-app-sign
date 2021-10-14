@@ -2,7 +2,7 @@
 	<view class="outBox" @click="goLogin">
 		<view class="infoBox">
 			<view class="leftBox">
-				<image src="../../static/image/user.png" mode="aspectFit"></image>
+				<u-image src="/static/image/user.png" mode="widthFix"></u-image>
 			</view>
 			<view class="rightBox">
 				<view class="name">{{userInfo.userName}}</view>

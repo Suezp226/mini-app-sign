@@ -45,8 +45,8 @@
 						<view class="form-item">
 							<view class="title">货单:</view>
 							<view class="input">
-								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url: item.invoiceImage}]"
-									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+								<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).list" ></u-image>
+								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).file" ></u-image>
 								<button class="changePeople" v-if="item.invoiceStat == '1' && !item.receiveName" @click="openChangeModal(item)" type="primary">变更收货人</button>
 								<button type="primary" v-if="item.invoiceStat == '1'" @click="openSignModal(item)">签收</button>
 							</view>
@@ -88,7 +88,7 @@
 			</u-modal>
 		</view>
 		<!-- <image src="" mode=""></image> -->
-		<img :src="nowItem.invoiceImage" crossorigin="anonymous"  @load="imgload" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon"></img>
+		<!-- <img :src="nowItem.invoiceImage" crossorigin="anonymous"  @load="imgload" alt="" v-show="false" style="width: 250px;position: absolute;z-index: -10;" ref="imageCon"></img> -->
 		<!-- <button @click="handleAddWaterMarker('测试水印')">添加水印</button> -->
 		<!-- <img :src="image" alt="" style="width: 250px;opacity: 1;"> -->
 		<u-top-tips ref="uTips"></u-top-tips>
@@ -136,7 +136,7 @@
 				nowItem: {},
 				image: '',
 				imageUrl: "",
-				imgloadDown: false, // 监听图片加载完成
+				invoiceImage: false, // 监听图片加载完成
 				pageLoading: false
 			}
 		},
@@ -174,12 +174,42 @@
 				this.refreshTrigger = true;
 				this.getData();
 			},
+			getFileList(arr) {
+				let list = [];
+				let file = [];
+				if(arr.length != 0) {
+					arr.forEach(ele=>{
+						if(this.$judgeFiletype.isImageFn(ele)) {
+							list.push(this.$imgBaseUrl + ele)
+						} else {
+							file.push(this.$imgBaseUrl + ele);
+						}
+					})
+				}
+				return {
+					list,
+					file
+				}
+			},
+			goFile(item) {
+				window.open(item);
+			},
+			previewImg(item) {
+				let urls = this.getFileList(item).list
+				console.log(urls)
+				uni.previewImage({
+				    urls: urls
+				});
+			},
 			getData() {
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
 				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
 					this.tableList = res.data.list
+					res.data.list.forEach((ele,i)=>{
+						this.tableList[i].invoiceImage = JSON.parse(ele.invoiceImage);
+					})
 					this.total = res.data.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
@@ -351,42 +381,45 @@
 						setTimeout(()=>{
 							this.$request('/mallInvoice/query', 'POST', query).then(res => {
 								let param = res.data.list[0];
-								param.invoiceStat = '3';
-								// 多一步 处理有无异议 图片处理 修改水印图片地址
+								param.invoiceStat = '3';  //无异议
 								if(options.msg) {
-									this.nowItem = res.data.list[0];
-									console.log(this.nowItem,'nowitem')
-									// 查询图片加载情况 一旦加载完成 立刻加水印
-									if(this.imgloadDown) {
-										this.handleAddWaterMarker(options.msg,param);
-										// clearInterval(timer);
-									} else {
-										console.log('等待图片加载外层')
-										let timer = setInterval(()=>{
-											if(this.imgloadDown) {
-												this.handleAddWaterMarker(options.msg,param);
-												clearInterval(timer);
-											} else {
-												console.log('等待图片加载',this.imgloadDown)
-											}
-										},500)
-										setTimeout(()=>{
-											if(!this.imgloadDown) {
-												this.imgloadDown = true;
-												uni.showToast({
-													icon: 'none',
-													title: '网络异常，请稍后再试',
-												})
-											}
-											clearInterval(timer);
-											
-										},5000)
-									}
-									
-									return
+									param.invoiceStat = '4';  //4为有异议
+									param.suggest = options.msg;
 								}
-								console.log(param)
-							    this.doneSave(param);
+								this.doneSave(param);
+								// 多一步 处理有无异议 图片处理 修改水印图片地址
+								// if(options.msg) {
+								// 	this.nowItem = res.data.list[0];
+								// 	console.log(this.nowItem,'nowitem')
+								// 	// 查询图片加载情况 一旦加载完成 立刻加水印
+								// 	if(this.imgloadDown) {
+								// 		this.handleAddWaterMarker(options.msg,param);
+								// 		// clearInterval(timer);
+								// 	} else {
+								// 		console.log('等待图片加载外层')
+								// 		let timer = setInterval(()=>{
+								// 			if(this.imgloadDown) {
+								// 				this.handleAddWaterMarker(options.msg,param);
+								// 				clearInterval(timer);
+								// 			} else {
+								// 				console.log('等待图片加载',this.imgloadDown)
+								// 			}
+								// 		},500)
+								// 		setTimeout(()=>{
+								// 			if(!this.imgloadDown) {
+								// 				this.imgloadDown = true;
+								// 				uni.showToast({
+								// 					icon: 'none',
+								// 					title: '网络异常，请稍后再试',
+								// 				})
+								// 			}
+								// 			clearInterval(timer);
+											
+								// 		},5000)
+								// 	}
+									
+								// 	return
+								// }
 							})
 						},500)
 					} else {
@@ -489,13 +522,13 @@
 				
 					button {
 						position: absolute;
-						right: 0;
-						bottom: 0;
+						right: -13px;
+						bottom: -35px;
 						font-size: 14px;
 					}
 				
 					.changePeople {
-						right: 70px;
+						right: 55px;
 						background-color: #ffa502;
 					}
 				}

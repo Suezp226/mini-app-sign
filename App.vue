@@ -60,4 +60,14 @@
 		background-color: rgba(0, 0, 0, 0.5);
 		transition: all 0.5s ease-in-out;
 	}
+	.file-box {
+		height: 70px;
+		width: 70px;
+		margin: 5px;
+		display: inline-block;
+		border: 1px solid rgb(182, 178, 178);
+	}
+	/deep/ .u-card__body {
+		padding: 15px 15px 35px 15px!important;
+	}
 </style>

@@ -33,8 +33,8 @@
 						<view class="form-item">
 							<view class="title">货单:</view>
 							<view class="input">
-								<uni-file-picker style="margin-top:5px;" limit="1" readonly :value="[{url:item.orderImage}]"
-									:imageStyles="{height: '70px',width: '70px'}" file-mediatype="image"></uni-file-picker>
+								<u-image @click="previewImg(item.orderImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.orderImage).list" ></u-image>
+								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.orderImage).file" ></u-image>
 								<button type="primary" v-if="item.orderStat == '0'" @click="openConformModal(item)">去确认</button>
 							</view>
 						</view>
@@ -112,12 +112,42 @@
 				this.refreshTrigger = true;
 				this.getData();
 			},
+			getFileList(arr) {
+				let list = [];
+				let file = [];
+				if(arr.length != 0) {
+					arr.forEach(ele=>{
+						if(this.$judgeFiletype.isImageFn(ele)) {
+							list.push(this.$imgBaseUrl + ele)
+						} else {
+							file.push(this.$imgBaseUrl + ele);
+						}
+					})
+				}
+				return {
+					list,
+					file
+				}
+			},
+			goFile(item) {
+				window.open(item);
+			},
+			previewImg(item) {
+				let urls = this.getFileList(item).list
+				console.log(urls)
+				uni.previewImage({
+				    urls: urls
+				});
+			},
 			getData() {
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
 				this.$request('/mallOrder/query', 'POST', this.searchForm).then(res => {
-					this.tableList = res.data.list
+					this.tableList = res.data.list;
+					res.data.list.forEach((ele,i)=>{
+						this.tableList[i].orderImage = JSON.parse(ele.orderImage);
+					})
 					this.total = res.data.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
@@ -254,8 +284,8 @@
 
 					button {
 						position: absolute;
-						right: 0;
-						bottom: 0;
+						right: -13px;
+						bottom: -35px;
 						font-size: 14px;
 					}
 				}
