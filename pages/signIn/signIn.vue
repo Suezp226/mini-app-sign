@@ -202,6 +202,13 @@
 				});
 			},
 			getData() {
+				if(this.$store.state.userPosition == 'shr' && !this.$store.state.userInfo.userName) {
+					uni.showToast({
+						icon: 'none',
+						title: '无访问权限'
+					})
+					return
+				}
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
