@@ -3,7 +3,7 @@
 		<UserHeader></UserHeader>
 		<view class="buttonBox">
 			<ul>
-				<li @click="goHistory" v-if="['admin','kh', 'shr'].includes(userPosition)">
+				<li @click="goHistory" v-if="['admin','kh'].includes(userPosition)">
 					<view class="liBox">
 						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>

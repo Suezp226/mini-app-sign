@@ -126,6 +126,17 @@
 			}
 		},
 		mounted() {
+			
+			if(this.$store.state.userPosition == 'shr') {
+				this.list = [ {
+					name: '已签收'
+				}];
+				this.tabsView = [ {
+					name: '已签收'
+				}];
+				this.searchForm.invoiceStat = 3;
+			}
+			
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
 				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
@@ -227,6 +238,13 @@
 				});
 			},
 			getData() {
+				if(this.$store.state.userPosition == 'shr' && !this.$store.state.userInfo.userName) {
+					uni.showToast({
+						icon: 'none',
+						title: '无访问权限'
+					})
+					return
+				}
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
