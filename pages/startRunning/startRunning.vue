@@ -233,6 +233,12 @@
 								}
 							})
 						},1000)
+					} else {
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'error',
+							title: '身份信息与订单不符',
+						})
 					}
 				})
 			}

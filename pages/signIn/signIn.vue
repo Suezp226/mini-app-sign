@@ -430,6 +430,7 @@
 							})
 						},500)
 					} else {
+						this.pageLoading = false;
 						uni.showToast({
 							icon: 'error',
 							title: '人脸信息与订单不符',
