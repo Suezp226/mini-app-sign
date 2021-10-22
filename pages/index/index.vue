@@ -10,7 +10,7 @@
 					</view>
 					<view class="liBox">订货单</view>
 				</li>
-				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['admin','ywy','xsnq','sj'].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['admin','ywy','xsnq'].includes(userPosition)">
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
