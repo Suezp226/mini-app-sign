@@ -30,7 +30,7 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
@@ -38,7 +38,7 @@
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
-								<view class="input">{{item.receiveName}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.receiveName)">{{item.receiveName}}</view>
 							</view>
 							<view class="form-item" v-if="item.receivePhone">
 								<view class="title">变更手机号:</view>
@@ -209,6 +209,12 @@
 			refresherrefresh() {
 				this.refreshTrigger = true;
 				this.getData();
+			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
 			},
 			getFileList(arr) {
 				let list = [];

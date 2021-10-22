@@ -29,7 +29,7 @@
 						</view>
 						<view class="form-item" >
 							<view class="title">手机号:</view>
-							<view class="input">{{item.custPhone}}</view>
+							<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">时间:</view>
@@ -136,6 +136,12 @@
 					file
 				}
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			goFile(item) {
 				window.open(item);
 			},
@@ -151,7 +157,7 @@
 				this.showLoading = true;
 				this.tableList = [];
 				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
-					this.tableList = res.data.list
+					this.tableList = res.data.list;
 					res.data.list.forEach((ele,i)=>{
 						this.tableList[i].invoiceImage = JSON.parse(ele.invoiceImage);
 					})

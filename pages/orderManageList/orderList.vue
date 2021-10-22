@@ -25,7 +25,7 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
@@ -148,6 +148,12 @@
 				} else {
 					this.searchForm.orderStat = '';
 				}
+			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
 			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
