@@ -330,6 +330,7 @@
 				let param = {...this.nowItem};
 				param.receiveName = this.reciver.name;
 				param.receivePhone = this.reciver.phone;
+				param.invoiceImage = JSON.stringify(param.invoiceImage);
 				console.log(param);
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
 					if(res.code == 200) {

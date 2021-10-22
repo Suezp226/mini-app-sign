@@ -138,7 +138,10 @@
 					}
 					this.$request('/msg/getMsgCode','POST',param).then(res=>{
 						console.log(res.data)
-						// this.input.code = res.data;
+						// 管理员自动复制 验证码
+						if(param.receiverPhone == '13812345678') {
+							this.input.code = res.data;
+						}
 						if(res.code != 200) {
 							uni.showToast({
 								title: res.message,
