@@ -29,7 +29,7 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>

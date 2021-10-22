@@ -34,15 +34,15 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
-								<view class="input phoneCall" @click="phoneCall(item.receiveName)">{{item.receiveName}}</view>
+								<view class="input">{{item.receiveName}}</view>
 							</view>
 							<view class="form-item" v-if="item.receivePhone">
 								<view class="title">变更手机号:</view>
-								<view class="input">{{item.receivePhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
