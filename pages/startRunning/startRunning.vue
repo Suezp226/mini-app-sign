@@ -28,6 +28,10 @@
 							<view class="input">{{item.custName}}</view>
 						</view>
 						<view class="form-item" >
+							<view class="title">经办人:</view>
+							<view class="input">{{item.custHandler}}</view>
+						</view>
+						<view class="form-item" >
 							<view class="title">手机号:</view>
 							<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 						</view>
@@ -61,6 +65,10 @@
 		<view class="loadCover" v-if="pageLoading">
 			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
 		</view>
+		<view class="loadCover" v-if="informLoading" >
+			<view style="color:#fff;">正在通知相关人员</view>
+			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
+		</view>
 	</view>
 </template>
 
@@ -89,7 +97,8 @@
 				tableList: [],
 				showModal: false,
 				nowItem: {},
-				pageLoading: false
+				pageLoading: false,
+				informLoading: false
 			}
 		},
 		watch: {},
@@ -219,9 +228,11 @@
 							title: '人脸核验成功',
 						})
 						setTimeout(()=>{
+							this.informLoading = true;
 							this.$request('/mallInvoice/updateStat','POST',param).then(res=>{
 								console.log(res,'回参')
 								if(res.code == 200) {
+									this.informLoading = false;
 									uni.showToast({
 										icon: 'success',
 										title: '货物启运成功！',
@@ -232,6 +243,7 @@
 										})
 									},1500)
 								} else {
+									this.informLoading = false;
 									uni.showToast({
 										icon: 'success',
 										title: '服务器异常'
@@ -240,6 +252,7 @@
 							})
 						},1000)
 					} else {
+						this.informLoading = false;
 						this.pageLoading = false;
 						uni.showToast({
 							icon: 'error',

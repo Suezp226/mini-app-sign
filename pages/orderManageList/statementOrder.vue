@@ -23,6 +23,10 @@
 								<view class="title">客户:</view>
 								<view class="input">{{item.custName}}</view>
 							</view>
+							<!-- <view class="form-item" >
+								<view class="title">经办人:</view>
+								<view class="input">{{item.busiManName}}</view>
+							</view> -->
 							<view class="form-item" >
 								<view class="title">手机号:</view>
 								<view class="input">{{item.custPhone}}</view>

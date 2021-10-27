@@ -27,6 +27,10 @@
 							<view class="input">{{item.custName}}</view>
 						</view>
 						<view class="form-item" >
+							<view class="title">经办人:</view>
+							<view class="input">{{item.custHandler}}</view>
+						</view>
+						<view class="form-item" >
 							<view class="title">手机号:</view>
 							<view class="input phoneCall"  @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 						</view>
@@ -385,6 +389,7 @@
 				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
 				.then(res=>{
 					console.log(res,'获取结果')
+					let conformRes = res;
 					if(res.success && res.result.idcard_confirm.name == options.name) {
 						// 验证成功
 						this.pageLoading = false;
@@ -393,13 +398,15 @@
 							title: '人脸核验成功',
 						})
 						setTimeout(()=>{
-							this.$request('/mallInvoice/query', 'POST', query).then(res => {
-								let param = res.data.list[0];
+							this.$request('/mallInvoice/query', 'POST', query).then(res2 => {
+								let param = res2.data.list[0];
 								param.invoiceStat = '3';  //无异议
 								if(options.msg) {
 									param.invoiceStat = '4';  //4为有异议
 									param.suggest = options.msg;
 								}
+								//  保存 签收人 身份证号
+								param.receiveIdnum = conformRes.result.idcard_confirm.idcard_number;
 								this.doneSave(param);
 								// 多一步 处理有无异议 图片处理 修改水印图片地址
 								// if(options.msg) {

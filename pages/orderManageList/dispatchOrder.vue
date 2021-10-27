@@ -29,6 +29,10 @@
 								<view class="input">{{item.custName}}</view>
 							</view>
 							<view class="form-item" >
+								<view class="title">经办人:</view>
+								<view class="input">{{item.custHandler}}</view>
+							</view>
+							<view class="form-item" >
 								<view class="title">手机号:</view>
 								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 							</view>
