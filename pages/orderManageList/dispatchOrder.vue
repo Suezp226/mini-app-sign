@@ -29,7 +29,7 @@
 								<view class="input">{{item.custName}}</view>
 							</view>
 							<view class="form-item" >
-								<view class="title">经办人:</view>
+								<view class="title">收货人:</view>
 								<view class="input">{{item.custHandler}}</view>
 							</view>
 							<view class="form-item" >

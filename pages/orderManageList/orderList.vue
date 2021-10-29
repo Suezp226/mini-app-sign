@@ -194,6 +194,18 @@
 				}
 			},
 			goFile(item) {
+				// uni.downloadFile({
+				//   url: item,
+				//   success: function (res) {
+				//     var filePath = res.tempFilePath;
+				//     uni.openDocument({
+				//       filePath: filePath,
+				//       success: function (res) {
+				//         console.log('打开文档成功');
+				//       }
+				//     });
+				//   }
+				// });
 				window.open(item);
 			},
 			previewImg(item) {
