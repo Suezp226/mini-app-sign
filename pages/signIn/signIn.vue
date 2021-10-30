@@ -52,6 +52,7 @@
 								<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).list" ></u-image>
 								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).file" ></u-image>
 								<button class="changePeople" v-if="item.invoiceStat == '1' && !item.receiveName" @click="openChangeModal(item)" type="primary">变更收货人</button>
+								<!-- <button class="changePeople"  @click="openChangeModal(item)" type="primary">变更收货人</button> -->
 								<button type="primary" v-if="item.invoiceStat == '1'" @click="openSignModal(item)">签收</button>
 							</view>
 						</view>
@@ -342,15 +343,30 @@
 				param.receivePhone = this.reciver.phone;
 				param.invoiceImage = JSON.stringify(param.invoiceImage);
 				console.log(param);
+				this.pageLoading = true;
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					this.pageLoading = false;
 					if(res.code == 200) {
 						uni.showToast({
 							icon: 'success',
 							title: '收货人变更成功！',
 						})
 						this.getData();
+						
+					} else {
+						uni.showToast({
+							icon: 'error',
+							title: '网络异常！',
+						})
 					}
 				})
+				.catch((err=>{
+					this.pageLoading = false;
+					uni.showToast({
+						icon: 'error',
+						title: '网络异常！',
+					})
+				}))
 			},
 			goConfirm() {
 				let nowUrl = window.location.href;
