@@ -29,6 +29,17 @@
 		<view class="btnBox">
 			<button type="primary" @click="login">登入</button>
 		</view>
+		
+		<u-modal v-model="showModal" title="温馨提示" :show-cancel-button="true" @confirm="agree" >
+			<view class="modalContent" >
+				<text class="blueColor" @click="showPrivateContent=true" >隐私协议</text>
+			</view>
+		</u-modal>
+		
+		<u-popup v-model="showPrivateContent" mode="bottom" border-radius="14" closeable >
+			<view class="privateContent" >隐私协议内容</view>
+		</u-popup>
+		
 	</view>
 </template>
 
@@ -39,6 +50,9 @@
 				timer: null,
 				count: 0,
 				nowUuid: '',
+				agreePrivacyPolicy: false, //是否统一隐私协议
+				showModal: false,  // 隐私协议提示框
+				showPrivateContent: false , // 隐私协议提示内容 弹层
 				input: {
 					phone: '',
 					code: ''
@@ -63,7 +77,14 @@
 			  return /^1\d{10}$/.test(mobile)
 			},
 			login() {
-			
+				
+				// 增加一个隐私协议拦截
+				if(!this.agreePrivacyPolicy) {
+					this.showModal = true;
+					
+					return
+				}
+				
 				if(!this.input.phone) {
 					uni.showToast({
 						title: '请输入手机号',
@@ -81,6 +102,13 @@
 					})
 					return
 				}
+				
+				// // 增加一个隐私协议拦截
+				// if(!this.agreePrivacyPolicy) {
+				// 	this.showModal = true;
+					
+				// 	return
+				// }
 				
 				let param = {
 					uuid: this.nowUuid,
@@ -156,6 +184,10 @@
 						duration: 2000
 					})
 				}
+			},
+			agree() {
+				this.agreePrivacyPolicy = true;  // 同意隐私协议
+				this.showModal = false; //关闭隐私协议模态框
 			}
 		},
 	}
@@ -288,5 +320,15 @@
 				border-radius: 30px;
 			}
 		}
+	}
+	.modalContent {
+		padding: 20rpx;
+		.blueColor {
+			color: blue;
+		}
+	}
+	.privateContent {
+		padding: 60rpx 20rpx 20rpx;
+		min-height: 700rpx;
 	}
 </style>
