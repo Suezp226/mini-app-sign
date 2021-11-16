@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs v-if="!isComponent" ref="uTabs" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"

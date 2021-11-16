@@ -87,8 +87,9 @@
 			</u-modal>
 			<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
 				<view class="tipsContent" >
-					请仔细查看货单内容,<br>
-					点击 <view class="boldFont">确认</view> 进入人脸识别确认订单.
+					货物签收确认，<br>
+					本人对上述货物的数量及金额确认无误，作为双方的结算依据。 <br>
+					点击 <view class="boldFont">确认</view> 进入人脸识别确认签收.
 				</view>
 			</u-modal>
 		</view>
@@ -129,7 +130,6 @@
 				showLoading: false,
 				tableList: [],
 				showModal: false,
-				confirmDialog: false,
 				haveMsg: 0,
 				confirmMsg: '',
 				confirmDialog: false, // 确认签收弹窗显示
