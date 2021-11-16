@@ -78,13 +78,6 @@
 			},
 			login() {
 				
-				// 增加一个隐私协议拦截
-				if(!this.agreePrivacyPolicy) {
-					this.showModal = true;
-					
-					return
-				}
-				
 				if(!this.input.phone) {
 					uni.showToast({
 						title: '请输入手机号',
@@ -103,12 +96,12 @@
 					return
 				}
 				
-				// // 增加一个隐私协议拦截
-				// if(!this.agreePrivacyPolicy) {
-				// 	this.showModal = true;
+				// 增加一个隐私协议拦截
+				if(!this.agreePrivacyPolicy) {
+					this.showModal = true;
 					
-				// 	return
-				// }
+					return
+				}
 				
 				let param = {
 					uuid: this.nowUuid,
@@ -188,6 +181,7 @@
 			agree() {
 				this.agreePrivacyPolicy = true;  // 同意隐私协议
 				this.showModal = false; //关闭隐私协议模态框
+				this.login();
 			}
 		},
 	}
