@@ -38,8 +38,8 @@
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.acctStatCimage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.acctStatCimage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.acctStatCimage).file" ></u-image>
+									<u-image @click="previewImg(item.acctStatCimage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.acctStatCimage).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.acctStatCimage).file" ></u-image>
 								</view>
 							</view>
 						</view>
