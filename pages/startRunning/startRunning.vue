@@ -28,12 +28,16 @@
 							<view class="input">{{item.custName}}</view>
 						</view>
 						<view class="form-item" >
+							<view class="title">收货人:</view>
+							<view class="input">{{item.custHandler}}</view>
+						</view>
+						<view class="form-item" >
 							<view class="title">手机号:</view>
-							<view class="input">{{item.custPhone}}</view>
+							<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">时间:</view>
-							<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+							<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">货单:</view>
@@ -54,11 +58,15 @@
 		<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()"
 			@cancel="showModal=false">
 			<view class="tipsContent">
-				请仔细货单查看内容,<br>
+				请仔细查看货单内容,<br>
 				点击 <view class="boldFont">确认</view> 进入人脸识别 启运货物.
 			</view>
 		</u-modal>
 		<view class="loadCover" v-if="pageLoading">
+			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
+		</view>
+		<view class="loadCover" v-if="informLoading" >
+			<view style="color:#fff;">正在通知相关人员</view>
 			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
 		</view>
 	</view>
@@ -89,7 +97,8 @@
 				tableList: [],
 				showModal: false,
 				nowItem: {},
-				pageLoading: false
+				pageLoading: false,
+				informLoading: false
 			}
 		},
 		watch: {},
@@ -136,6 +145,12 @@
 					file
 				}
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			goFile(item) {
 				window.open(item);
 			},
@@ -151,7 +166,7 @@
 				this.showLoading = true;
 				this.tableList = [];
 				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
-					this.tableList = res.data.list
+					this.tableList = res.data.list;
 					res.data.list.forEach((ele,i)=>{
 						this.tableList[i].invoiceImage = JSON.parse(ele.invoiceImage);
 					})
@@ -213,9 +228,11 @@
 							title: '人脸核验成功',
 						})
 						setTimeout(()=>{
+							this.informLoading = true;
 							this.$request('/mallInvoice/updateStat','POST',param).then(res=>{
 								console.log(res,'回参')
 								if(res.code == 200) {
+									this.informLoading = false;
 									uni.showToast({
 										icon: 'success',
 										title: '货物启运成功！',
@@ -226,6 +243,7 @@
 										})
 									},1500)
 								} else {
+									this.informLoading = false;
 									uni.showToast({
 										icon: 'success',
 										title: '服务器异常'
@@ -233,6 +251,13 @@
 								}
 							})
 						},1000)
+					} else {
+						this.informLoading = false;
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'error',
+							title: '身份信息与订单不符',
+						})
 					}
 				})
 			}

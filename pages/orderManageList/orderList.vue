@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs v-if="!isComponent" ref="uTabs" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -23,19 +23,23 @@
 								<view class="title">客户:</view>
 								<view class="input">{{item.custName}}</view>
 							</view>
+						<!-- 	<view class="form-item" >
+								<view class="title">经办人:</view>
+								<view class="input">{{item.busiManName}}</view>
+							</view> -->
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.orderImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.orderImage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.orderImage).file" ></u-image>
+									<u-image @click="previewImg(item.orderImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.orderImage).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.orderImage).file" ></u-image>
 								</view>
 							</view>
 						</view>
@@ -149,6 +153,12 @@
 					this.searchForm.orderStat = '';
 				}
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
 				if(this.searchForm.limit >= this.total) {
@@ -184,6 +194,18 @@
 				}
 			},
 			goFile(item) {
+				// uni.downloadFile({
+				//   url: item,
+				//   success: function (res) {
+				//     var filePath = res.tempFilePath;
+				//     uni.openDocument({
+				//       filePath: filePath,
+				//       success: function (res) {
+				//         console.log('打开文档成功');
+				//       }
+				//     });
+				//   }
+				// });
 				window.open(item);
 			},
 			previewImg(item) {

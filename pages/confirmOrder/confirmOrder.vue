@@ -22,13 +22,17 @@
 							<view class="title">客户:</view>
 							<view class="input">{{item.custName}}</view>
 						</view>
+						<!-- <view class="form-item" >
+							<view class="title">经办人:</view>
+							<view class="input">{{item.busiManName}}</view>
+						</view> -->
 						<view class="form-item" >
 							<view class="title">手机号:</view>
 							<view class="input">{{item.custPhone}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">时间:</view>
-							<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+							<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">货单:</view>
@@ -47,7 +51,7 @@
 			</scroll-view>
 			<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
 				<view class="tipsContent" >
-					请仔细货单查看内容,<br>
+					请仔细查看货单内容,<br>
 					点击 <view class="boldFont">确认</view> 进入人脸识别确认订单.
 				</view>
 			</u-modal>
@@ -226,6 +230,12 @@
 								}
 							})
 						},1000)
+					} else {
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'error',
+							title: '身份信息与订单不符',
+						})
 					}
 				})
 				

@@ -13,6 +13,8 @@ export default {
 			type = 'pdf'
 		} else if (reg2.test(str)) {
 			type = 'excel'
+		} else {
+			type = 'file-text'
 		}
 		return type;
 	}

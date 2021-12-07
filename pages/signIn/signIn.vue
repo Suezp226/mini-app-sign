@@ -27,12 +27,16 @@
 							<view class="input">{{item.custName}}</view>
 						</view>
 						<view class="form-item" >
+							<view class="title">经办人:</view>
+							<view class="input">{{item.custHandler}}</view>
+						</view>
+						<view class="form-item" >
 							<view class="title">手机号:</view>
-							<view class="input">{{item.custPhone}}</view>
+							<view class="input phoneCall"  @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">时间:</view>
-							<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+							<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 						</view>
 						<view class="form-item" v-if="item.receiveName">
 							<view class="title">变更收货人:</view>
@@ -40,7 +44,7 @@
 						</view>
 						<view class="form-item" v-if="item.receivePhone">
 							<view class="title">变更手机号:</view>
-							<view class="input">{{item.receivePhone}}</view>
+							<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
 						</view>
 						<view class="form-item">
 							<view class="title">货单:</view>
@@ -48,6 +52,7 @@
 								<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).list" ></u-image>
 								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).file" ></u-image>
 								<button class="changePeople" v-if="item.invoiceStat == '1' && !item.receiveName" @click="openChangeModal(item)" type="primary">变更收货人</button>
+								<!-- <button class="changePeople"  @click="openChangeModal(item)" type="primary">变更收货人</button> -->
 								<button type="primary" v-if="item.invoiceStat == '1'" @click="openSignModal(item)">签收</button>
 							</view>
 						</view>
@@ -82,8 +87,9 @@
 			</u-modal>
 			<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
 				<view class="tipsContent" >
-					请仔细货单查看内容,<br>
-					点击 <view class="boldFont">确认</view> 进入人脸识别确认订单.
+					货物签收确认，<br>
+					本人对上述货物的数量及金额确认无误，作为双方的结算依据。 <br>
+					点击 <view class="boldFont">确认</view> 进入人脸识别确认签收.
 				</view>
 			</u-modal>
 		</view>
@@ -124,7 +130,6 @@
 				showLoading: false,
 				tableList: [],
 				showModal: false,
-				confirmDialog: false,
 				haveMsg: 0,
 				confirmMsg: '',
 				confirmDialog: false, // 确认签收弹窗显示
@@ -173,6 +178,12 @@
 			refresherrefresh() {
 				this.refreshTrigger = true;
 				this.getData();
+			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
 			},
 			getFileList(arr) {
 				let list = [];
@@ -330,16 +341,32 @@
 				let param = {...this.nowItem};
 				param.receiveName = this.reciver.name;
 				param.receivePhone = this.reciver.phone;
+				param.invoiceImage = JSON.stringify(param.invoiceImage);
 				console.log(param);
+				this.pageLoading = true;
 				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					this.pageLoading = false;
 					if(res.code == 200) {
 						uni.showToast({
 							icon: 'success',
 							title: '收货人变更成功！',
 						})
 						this.getData();
+						
+					} else {
+						uni.showToast({
+							icon: 'error',
+							title: '网络异常！',
+						})
 					}
 				})
+				.catch((err=>{
+					this.pageLoading = false;
+					uni.showToast({
+						icon: 'error',
+						title: '网络异常！',
+					})
+				}))
 			},
 			goConfirm() {
 				let nowUrl = window.location.href;
@@ -378,6 +405,7 @@
 				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
 				.then(res=>{
 					console.log(res,'获取结果')
+					let conformRes = res;
 					if(res.success && res.result.idcard_confirm.name == options.name) {
 						// 验证成功
 						this.pageLoading = false;
@@ -386,13 +414,15 @@
 							title: '人脸核验成功',
 						})
 						setTimeout(()=>{
-							this.$request('/mallInvoice/query', 'POST', query).then(res => {
-								let param = res.data.list[0];
+							this.$request('/mallInvoice/query', 'POST', query).then(res2 => {
+								let param = res2.data.list[0];
 								param.invoiceStat = '3';  //无异议
 								if(options.msg) {
 									param.invoiceStat = '4';  //4为有异议
 									param.suggest = options.msg;
 								}
+								//  保存 签收人 身份证号
+								param.receiveIdnum = conformRes.result.idcard_confirm.idcard_number;
 								this.doneSave(param);
 								// 多一步 处理有无异议 图片处理 修改水印图片地址
 								// if(options.msg) {
@@ -430,6 +460,7 @@
 							})
 						},500)
 					} else {
+						this.pageLoading = false;
 						uni.showToast({
 							icon: 'error',
 							title: '人脸信息与订单不符',

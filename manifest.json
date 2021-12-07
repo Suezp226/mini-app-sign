@@ -50,9 +50,10 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxd4b7d07a9df0804b",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "es6" : true
         },
         "usingComponents" : true,
         "permission" : {}
@@ -80,7 +81,7 @@
             "noInfo" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://47.107.124.70:1115",
+                    "target" : "http://shwq.mobile.xqzbk.top/api",
                     "changeOrigin" : true,
                     "secure" : false,
                     "pathRewrite" : {

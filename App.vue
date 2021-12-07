@@ -70,4 +70,8 @@
 	/deep/ .u-card__body {
 		padding: 15px 15px 35px 15px!important;
 	}
+	.phoneCall {
+		color: blue;
+		text-decoration: underline;
+	}
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<!-- 发货单查看 -->
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入订单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -29,12 +29,16 @@
 								<view class="input">{{item.custName}}</view>
 							</view>
 							<view class="form-item" >
+								<view class="title">收货人:</view>
+								<view class="input">{{item.custHandler}}</view>
+							</view>
+							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleString()}}</view>
+								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
@@ -42,13 +46,15 @@
 							</view>
 							<view class="form-item" v-if="item.receivePhone">
 								<view class="title">变更手机号:</view>
-								<view class="input">{{item.receivePhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).file" ></u-image>
+									<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.invoiceImage).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.invoiceImage).file" ></u-image>
+									<!--  -->
+									<button type="primary" v-if="item.invoiceStat == '4'" @click="openSignModal(item)">确认签收</button>
 								</view>
 							</view>
 						</view>
@@ -60,6 +66,17 @@
 				</scroll-view>
 			</swiper-item>
 		</swiper>
+		
+		<!-- 二次签收弹层 -->
+		<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
+			<view class="tipsContent" >
+				货物签收确认，<br>
+				本人对上述货物的数量及金额确认无误，作为双方的结算依据。 <br>
+				点击 <view class="boldFont">确认</view> 进入人脸识别确认签收.
+			</view>
+		</u-modal>
+		
+		
 	</view>
 </template>
 
@@ -108,7 +125,12 @@
 				},
 				total: 0,
 				showLoading: false,
-				tableList: []
+				tableList: [],
+				// 二次签收
+				nowItem: {},
+				showModal: false,
+				haveMsg: 0,  // 无异议
+				confirmMsg: '', // 异议内容
 			}
 		},
 		watch:{
@@ -164,6 +186,110 @@
 			this.getData();
 		},
 		methods: {
+			// 二次签收
+			openSignModal(item) {
+				this.nowItem = item;
+				console.log(this.nowItem.invoiceImage)
+				this.showModal = true;
+			},
+			goConfirm() {
+				let nowUrl = window.location.href;
+				this.$request('/face/getAuth','POST',{}).then(res=>{
+					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')
+					let accToken = res.data.access_token;
+					let token = JSON.parse(res.data.verify_token).result.verify_token;
+					let local = window.location.host;
+					let successUrl;
+					if(this.$store.state.userInfo.roleCode == 'shr') { //收货人
+						successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}&name=${this.$store.state.userInfo.userName}&atoken=${accToken}&vtoken=${token}`);
+					} else { // 客户
+						successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}&name=${this.$store.state.userInfo.roleName}&atoken=${accToken}&vtoken=${token}`);
+					}
+					let faillUrl = encodeURIComponent(`http://${local}/#/pages/orderManageList/dispatchOrder`);
+					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
+					successUrl=${successUrl}&
+					failedUrl=${faillUrl}`
+				})
+			},
+			// 人脸核验 成功
+			confirmSuccess(options) {
+				console.log(options)
+				let query = {
+					invoiceCode: options.code,
+					custName: "",
+					busiManName: "", //业务员
+					makerName: "", //销售内勤
+					invoiceStat: "",
+					offset: 0,
+					limit: 10,
+				};
+				
+				// 确认
+				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
+				.then(res=>{
+					console.log(res,'获取结果')
+					let conformRes = res;
+					if(res.success && res.result.idcard_confirm.name == options.name) {
+						// 验证成功
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'success',
+							title: '人脸核验成功',
+						})
+						setTimeout(()=>{
+							this.$request('/mallInvoice/query', 'POST', query).then(res2 => {
+								let param = res2.data.list[0];
+								param.invoiceStat = '3';  //无异议
+								if(options.msg) {
+									param.invoiceStat = '4';  //4为有异议
+									param.suggest = options.msg;
+								}
+								//  保存 签收人 身份证号
+								param.receiveIdnum = conformRes.result.idcard_confirm.idcard_number;
+								this.doneSave(param);
+							})
+						},500)
+					} else {
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'error',
+							title: '人脸信息与订单不符',
+						})
+					}
+				})
+			},
+			// 更改订单信息
+			doneSave(param) {
+				this.pageLoading = true;
+				this.$request('/mallInvoice/save','POST', param).then(res=>{
+					console.log(res,'回参')
+					this.pageLoading = false;
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '货物签收成功！',
+						})
+						setTimeout(()=>{
+							uni.navigateTo({
+								url: '/pages/historyOrderList/historyOrderList?type=1'
+							})
+						},1500)
+					} else {
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'success',
+							title: '服务异常'
+						})
+					}
+				})
+				.catch(err=>{
+					this.pageLoading = false;
+					uni.showToast({
+						icon: 'success',
+						title: '服务异常'
+					})
+				})
+			},
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
@@ -209,6 +335,12 @@
 			refresherrefresh() {
 				this.refreshTrigger = true;
 				this.getData();
+			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
 			},
 			getFileList(arr) {
 				let list = [];
@@ -317,9 +449,16 @@
 				.input {
 					font-size: 15px;
 					flex: 1;
+					position: relative;
 					image {
 						height: 70px;
 						width: 70px;
+					}
+					button {
+						position: absolute;
+						right: -13px;
+						bottom: -35px;
+						font-size: 14px;
 					}
 				}
 			}
