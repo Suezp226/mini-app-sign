@@ -193,6 +193,26 @@
 				this.showModal = true;
 			},
 			goConfirm() {
+				// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+				// https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=3EFOUalG1jlfCi3c3Y7XKdBi&client_secret=H9gc8A33fALYHgATu3RKSbSS4nhWnGQ3
+				
+				//  身份信息校验  https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+				
+				
+				// uni.request({
+				// 	url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
+				// 	method: 'POST',
+				// 	header: {},
+				// 	data: {
+				// 		"id_card_number": '35032219970226711X', 
+				// 		"name": "苏智鹏"
+				// 	},
+				// 	dataType: 'json',
+				// 	timeout: 300000,
+				// }).then(res=>{
+				// 	console.log(res.data,'校验回参')
+				// })
+				
 				let nowUrl = window.location.href;
 				this.$request('/face/getAuth','POST',{}).then(res=>{
 					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')

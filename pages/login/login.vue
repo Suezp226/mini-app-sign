@@ -78,6 +78,23 @@
 			},
 			login() {
 				
+				
+				uni.request({
+					url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
+					method: 'POST',
+					header: {},
+					data: {
+						"id_card_number": '35032219970226711X', 
+						"name": "苏智鹏"
+					},
+					dataType: 'json',
+					timeout: 300000,
+				}).then(res=>{
+					console.log(res,'校验回参')
+				})
+				
+				return
+				
 				if(!this.input.phone) {
 					uni.showToast({
 						title: '请输入手机号',
@@ -157,7 +174,7 @@
 						receiverPhone: this.input.phone,
 						receiver: 'suezp'
 					}
-					this.$request('/msg/getMsgCode','POST',param).then(res=>{
+					uni.request('/msg/getMsgCode','POST',param).then(res=>{
 						console.log(res.data)
 						// 管理员自动复制 验证码
 						if(param.receiverPhone == '13812345678') {
