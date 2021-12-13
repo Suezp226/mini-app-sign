@@ -9,7 +9,7 @@ const request = async function(url, method, data, header) {
 	let token = '';
 	token = uni.getStorageSync('token');
 	
-	if(!token && !['/msg/getMsgCode','/user/login'].includes(url)) {
+	if(!token && !['/getCode','/user/mobileLogin'].includes(url)) {
 		goLogin();
 		setTimeout(()=>{
 			uni.showToast({
@@ -28,7 +28,7 @@ const request = async function(url, method, data, header) {
 			method: method.toUpperCase(),
 			data: data,
 			header: {
-				'Authorization': token, //自定义请求头信息
+				'Authorization': token?token:'', //自定义请求头信息
 				'Content-Type': header ? header['Content-Type'] : 'application/json'
 			},
 			success: (res) => {

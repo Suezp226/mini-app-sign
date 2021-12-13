@@ -15,8 +15,8 @@ Vue.use(uView);
 Vue.config.productionTip = false
 Vue.prototype.$store = store
 Vue.prototype.$request = apiService
-// Vue.prototype.$imgBaseUrl = 'http://suezp.cn:1118'
-Vue.prototype.$imgBaseUrl = 'http://shwq.web.xqzbk.top'
+Vue.prototype.$imgBaseUrl = 'http://suezp.cn:1113'
+// Vue.prototype.$imgBaseUrl = 'http://shwq.web.xqzbk.top'
 Vue.prototype.$judgeFiletype = judgeFile
 
 

@@ -110,8 +110,7 @@
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "收货网签程序",
 		"navigationBarBackgroundColor": "#3fa89a",
-		"backgroundColor": "#f5f7fb",
-		"navigationStyle": "custom"
+		"backgroundColor": "#f5f7fb"
 	},
 	"usingComponents": {
 		"mp-uploader": "weui-miniprogram/uploader/uploader"

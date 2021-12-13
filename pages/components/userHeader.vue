@@ -5,10 +5,8 @@
 				<u-image src="/static/image/user.png" mode="widthFix"></u-image>
 			</view>
 			<view class="rightBox">
-				<view class="name">{{userInfo.userName}}</view>
-				<view class="phone">{{userInfo.userPhone}}</view>
-				<view class="tag" v-if="userInfo.roleCode != 'kh'" >{{userInfo.roleName?userInfo.roleName:translateRoleName}}</view>
-				<view class="tag" v-else >{{translateRoleName}}</view>
+				<view class="name">{{userInfo.name}}</view>
+				<view class="phone">{{userInfo.phone}}</view>
 			</view>
 		</view>
 	</view>
@@ -164,7 +162,7 @@
 			position: relative;
 			flex: 1;
 			text-align: left;
-			padding: 0 10px 0 20px;
+			padding: 0 10px 0 40px;
 
 			.name {
 				display: block;

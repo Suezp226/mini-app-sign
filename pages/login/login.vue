@@ -49,13 +49,12 @@
 			return {
 				timer: null,
 				count: 0,
-				nowUuid: '',
 				agreePrivacyPolicy: false, //是否统一隐私协议
 				showModal: false,  // 隐私协议提示框
 				showPrivateContent: false , // 隐私协议提示内容 弹层
 				input: {
-					phone: '',
-					code: ''
+					phone: '13295932921',
+					code: '803552'
 				}
 			}
 		},
@@ -76,8 +75,7 @@
 			isMobile (mobile) {
 			  return /^1\d{10}$/.test(mobile)
 			},
-			login() {
-				
+			judgeInfo() {
 				// 身份信息验证
 				// uni.request({
 				// 	url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
@@ -92,39 +90,9 @@
 				// }).then(res=>{
 				// 	console.log(res,'校验回参')
 				// })
-				
-				
-				// if(!this.input.phone) {
-				// 	uni.showToast({
-				// 		title: '请输入手机号',
-				// 		icon: 'none',
-				// 		duration: 1500
-				// 	})
-				// 	return
-				// }
-				
-				// if(!this.input.code) {
-				// 	uni.showToast({
-				// 		title: '请输入验证码',
-				// 		icon: 'none',
-				// 		duration: 1500
-				// 	})
-				// 	return
-				// }
-				
-				// 增加一个隐私协议拦截
-				// if(!this.agreePrivacyPolicy) {
-				// 	this.showModal = true;
-				// 	return
-				// }
-				
-				let param = {
-					uuid: this.nowUuid,
-					msgCode: this.input.code,
-					phone: this.input.phone + ''
-				}
+			},
+			fakeLogin() {
 				let json = {"muId":2,"userCode":"admin","userName":"admin","userPwd":"c30807e6587ade285ba7ade9f881b3d7","roleCode":"admin","roleName":"admin","workDate":"2021-09-20T16:00:00.000+00:00","userPhone":"13812345678","userCarnum":null,"offset":0,"limit":0};
-				
 				uni.setStorageSync('token', '5d68d25e-a7a3-42ae-8d31-49c31ef9d26c')
 				uni.setStorageSync('userInfo',JSON.stringify(json));
 				this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
@@ -132,16 +100,39 @@
 				uni.reLaunch({
 					url:'/pages/index/index'
 				})
+			},
+			login() {
+					
+				if(!this.input.phone) {
+					uni.showToast({
+						title: '请输入手机号',
+						icon: 'none',
+						duration: 1500
+					})
+					return
+				}
 				
-				return
+				if(!this.input.code) {
+					uni.showToast({
+						title: '请输入验证码',
+						icon: 'none',
+						duration: 1500
+					})
+					return
+				}
 				
-				this.$request('/user/login','POST',param).then(res=>{
+				let param = {
+					msgCode: this.input.code,
+					phone: this.input.phone + ''
+				}
+				
+				this.$request('/user/mobileLogin','POST',param).then(res=>{
 					console.log(res)
 					if(res.code == 200) {
 						uni.setStorageSync('token', res.data.token)
 						uni.setStorageSync('userInfo',JSON.stringify(res.data.user));
 						this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
-						this.$store.commit('changePosition', res.data.user.roleCode);
+						this.$store.commit('changePosition', res.data.user.userType);
 						console.log(this.$store.userInfo,this.$store.userPosition,'在这俩 ')
 						uni.reLaunch({
 							url:'/pages/index/index'
@@ -149,7 +140,7 @@
 						console.log('执行登入');
 					} else {
 						uni.showToast({
-							title: res.message,
+							title: res.msg,
 							icon: 'none',
 							duration: 2000
 						})
@@ -175,41 +166,24 @@
 					})
 					return
 				}
-				this.nowUuid = new Date().valueOf() + '';
-				if (this.timer == null) {
-					setTimeout(() => {
-						clearInterval(this.timer);
-						this.timer = null;
-					}, 60000)
-					this.count = 60;
-					this.timer = setInterval(() => {
-						this.count--;
-					}, 1000)
-					let param = {
-						uuid: this.nowUuid,
-						receiverPhone: this.input.phone,
-						receiver: 'suezp'
+				
+				this.$request('/getCode','GET',{phone:this.input.phone}).then(res=>{
+					console.log(res)
+					if(res.code == 200) {
+						uni.showToast({
+							title: res.msg,
+							icon: 'success',
+							duration: 1500
+						})
+					} else {
+						uni.showToast({
+							title: res.msg,
+							icon: 'none',
+							duration: 1500
+						})
 					}
-					uni.request('/msg/getMsgCode','POST',param).then(res=>{
-						console.log(res.data)
-						// 管理员自动复制 验证码
-						if(param.receiverPhone == '13812345678') {
-							this.input.code = res.data;
-						}
-						if(res.code != 200) {
-							uni.showToast({
-								title: res.message,
-								icon: 'none',
-								duration: 2000
-							})
-						}
-					})
-					uni.showToast({
-						title: '发送成功',
-						icon: 'success',
-						duration: 2000
-					})
-				}
+				})
+				
 			},
 			agree() {
 				this.agreePrivacyPolicy = true;  // 同意隐私协议

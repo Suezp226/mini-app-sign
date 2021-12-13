@@ -4,39 +4,39 @@
 		<view class="buttonBox">
 			<ul>
 				<!-- 工作人员相关 -->
-				<li @click="goNextPage('/pages/orderManageList/orderList')" v-if="['admin','ywy','xsnq'].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/orderList')" >
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/image/order.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">订货单</view>
 				</li>
-				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['admin','ywy','xsnq'].includes(userPosition)">
+				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" >
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">发货单</view>
 				</li>
-				<li @click="goNextPage('/pages/orderManageList/dispatchOrder')" v-if="['shr'].includes(userPosition)">
+				<!-- <li @click="goNextPage('/pages/orderManageList/dispatchOrder')" >
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史签收</view>
-				</li>
-				<li @click="goNextPage('/pages/orderManageList/statementOrder')" v-if="['admin','ywy','xsnq'].includes(userPosition)">
+				</li> -->
+				<li @click="goNextPage('/pages/orderManageList/statementOrder')" >
 					<view class="liBox imgBox bgcolor6">
 						<image src="../../static/image/statement.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">对账单</view>
 				</li>
 				<!-- 客户 -->
-				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" v-if="['admin','kh'].includes(userPosition)">
+				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" >
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">确认订单</view>
 				</li>
 				<!-- 司机 -->
-				<li @click="goNextPage('/pages/startRunning/startRunning')" v-if="['admin','sj'].includes(userPosition)">
+				<li @click="goNextPage('/pages/startRunning/startRunning')" >
 					<view class="liBox imgBox bgcolor4">
 						<image src="../../static/image/car.png" mode="aspectFit"></image>
 					</view>

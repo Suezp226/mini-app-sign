@@ -81,7 +81,7 @@
             "noInfo" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://shwq.mobile.xqzbk.top/api",
+                    "target" : "http://localhost:1113",
                     "changeOrigin" : true,
                     "secure" : false,
                     "pathRewrite" : {
