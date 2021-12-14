@@ -15,30 +15,30 @@
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
 								{{item.invoiceCode}}
 							</view>
-							<u-tag type="warning" v-if="item.invoiceStat == '0'" text="待启运" mode="dark" :closeable="false" />
-							<u-tag 				  v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
-							<u-tag type="warning" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
-							<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
-							<u-tag type="success" v-if="item.invoiceStat == '4'" text="已签收(有异议)" mode="dark" :closeable="false" />
-							<u-tag type="info"    v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+							<u-tag type="warning" v-if="item.orderStat == '0'" text="待启运" mode="dark" :closeable="false" />
+							<u-tag 				  v-if="item.orderStat == '1'" text="运输中" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.orderStat == '2'" text="已签收" mode="dark" :closeable="false" />
+							<u-tag type="warning" v-if="item.orderStat == '3'" text="已签收(有异议)" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.orderStat == '4'" text="已签收(二次确认)" mode="dark" :closeable="false" />
+							<u-tag type="info"    v-if="item.orderStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 
 						</view>
 						<view slot="body" class="body">
 							<view class="form-item" >
 								<view class="title">客户:</view>
-								<view class="input">{{item.custName}}</view>
+								<view class="input">{{item.company}}</view>
 							</view>
 							<view class="form-item" >
-								<view class="title">收货人:</view>
-								<view class="input">{{item.custHandler}}</view>
+								<view class="title">现场联系人:</view>
+								<view class="input">{{item.liveName}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.livePhone)">{{item.livePhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
+								<view class="input">{{new Date(item.makeTime*1).toLocaleDateString()}}</view>
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
@@ -51,10 +51,10 @@
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.invoiceImage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.invoiceImage).file" ></u-image>
+									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
 									<!--  -->
-									<button type="primary" v-if="item.invoiceStat == '4'" @click="openSignModal(item)">确认签收</button>
+									<button type="primary" v-if="item.orderStat == '4'" @click="openSignModal(item)">确认签收</button>
 								</view>
 							</view>
 						</view>
@@ -63,6 +63,7 @@
 					<view class="loadingWarp" v-if="showLoading">
 						<u-loading size="70" color="#3498db"></u-loading>
 					</view>
+					<view class="bottom-block" >.</view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -114,14 +115,11 @@
 					name:'shuijiao.png'
 				}],
 				searchForm: {
-					invoiceCode: "",
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "",  //销售内勤
-					driverName: "", // 司机
-					invoiceStat: "",
-					offset: 0,
-					limit: 10,
+					orderNo: "",
+					orderStat: "",
+					keyword: "",
+					page: 1,
+            pageNum: 10,
 				},
 				total: 0,
 				showLoading: false,
@@ -156,7 +154,7 @@
 				this.tabsView = [ {
 					name: '已签收'
 				}];
-				this.searchForm.invoiceStat = 3;
+				this.searchForm.orderStat = 3;
 			}
 			
 			if(this.isComponent) {
@@ -172,15 +170,6 @@
 				}
 				
 			} else {  //在非组件的情况下 按登录用户把查询信息带上
-				if(this.$store.state.userPosition == 'sj') {
-					this.searchForm.driverName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'xsnq') {
-					this.searchForm.makerName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'ywy') {
-					this.searchForm.busiManName = this.$store.state.userInfo.userName
-				}
 			}
 			
 			this.getData();
@@ -189,7 +178,7 @@
 			// 二次签收
 			openSignModal(item) {
 				this.nowItem = item;
-				console.log(this.nowItem.invoiceImage)
+				console.log(this.nowItem.fileList)
 				this.showModal = true;
 			},
 			goConfirm() {
@@ -212,76 +201,11 @@
 				// }).then(res=>{
 				// 	console.log(res.data,'校验回参')
 				// })
-				
-				let nowUrl = window.location.href;
-				this.$request('/face/getAuth','POST',{}).then(res=>{
-					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')
-					let accToken = res.data.access_token;
-					let token = JSON.parse(res.data.verify_token).result.verify_token;
-					let local = window.location.host;
-					let successUrl;
-					if(this.$store.state.userInfo.roleCode == 'shr') { //收货人
-						successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}&name=${this.$store.state.userInfo.userName}&atoken=${accToken}&vtoken=${token}`);
-					} else { // 客户
-						successUrl = encodeURIComponent(`http://${local}/#/pages/signIn/signIn?code=${this.nowItem.invoiceCode}${this.haveMsg?('&msg='+this.confirmMsg):''}&name=${this.$store.state.userInfo.roleName}&atoken=${accToken}&vtoken=${token}`);
-					}
-					let faillUrl = encodeURIComponent(`http://${local}/#/pages/orderManageList/dispatchOrder`);
-					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					successUrl=${successUrl}&
-					failedUrl=${faillUrl}`
-				})
-			},
-			// 人脸核验 成功
-			confirmSuccess(options) {
-				console.log(options)
-				let query = {
-					invoiceCode: options.code,
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "", //销售内勤
-					invoiceStat: "",
-					offset: 0,
-					limit: 10,
-				};
-				
-				// 确认
-				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
-				.then(res=>{
-					console.log(res,'获取结果')
-					let conformRes = res;
-					if(res.success && res.result.idcard_confirm.name == options.name) {
-						// 验证成功
-						this.pageLoading = false;
-						uni.showToast({
-							icon: 'success',
-							title: '人脸核验成功',
-						})
-						setTimeout(()=>{
-							this.$request('/mallInvoice/query', 'POST', query).then(res2 => {
-								let param = res2.data.list[0];
-								param.invoiceStat = '3';  //无异议
-								if(options.msg) {
-									param.invoiceStat = '4';  //4为有异议
-									param.suggest = options.msg;
-								}
-								//  保存 签收人 身份证号
-								param.receiveIdnum = conformRes.result.idcard_confirm.idcard_number;
-								this.doneSave(param);
-							})
-						},500)
-					} else {
-						this.pageLoading = false;
-						uni.showToast({
-							icon: 'error',
-							title: '人脸信息与订单不符',
-						})
-					}
-				})
 			},
 			// 更改订单信息
 			doneSave(param) {
 				this.pageLoading = true;
-				this.$request('/mallInvoice/save','POST', param).then(res=>{
+				this.$request('/dispatchForm/addOrder','POST', param).then(res=>{
 					console.log(res,'回参')
 					this.pageLoading = false;
 					if(res.code == 200) {
@@ -314,11 +238,11 @@
 				this.current = tab;
 				this.swiperCurrent = tab;
 				if(tab == 1) {
-					this.searchForm.invoiceStat = tab - 1;
+					this.searchForm.orderStat = tab - 1;
 				} else if(tab == 2){
-					this.searchForm.invoiceStat = tab + 1;
+					this.searchForm.orderStat = tab + 1;
 				} else {
-					this.searchForm.invoiceStat = '';
+					this.searchForm.orderStat = '';
 				}
 				
 			},
@@ -332,23 +256,23 @@
 				this.swiperCurrent = current;
 				this.current = current;
 				if(current == 1 ) {
-					this.searchForm.invoiceStat = current - 1;
+					this.searchForm.orderStat = current - 1;
 				} else if( current == 2){
-					this.searchForm.invoiceStat = current + 1;
+					this.searchForm.orderStat = current + 1;
 				} else {
-					this.searchForm.invoiceStat = '';
+					this.searchForm.orderStat = '';
 				}
 			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
-				if(this.searchForm.limit >= this.total) {
+				if(this.searchForm.pageNum >= this.total) {
 					uni.showToast({
 						icon: 'none',
 						title: '已经没有更多了~'
 					})
 					return
 				}
-				this.searchForm.limit += 10;
+				this.searchForm.pageNum += 10;
 				this.getMoreData();
 			},
 			// scroll-view 下拉刷新
@@ -367,10 +291,10 @@
 				let file = [];
 				if(arr.length != 0) {
 					arr.forEach(ele=>{
-						if(this.$judgeFiletype.isImageFn(ele)) {
-							list.push(this.$imgBaseUrl + ele)
+						if(this.$judgeFiletype.isImageFn(ele.filename)) {
+							list.push(this.$imgBaseUrl + ele.filename)
 						} else {
-							file.push(this.$imgBaseUrl + ele);
+							file.push(this.$imgBaseUrl + ele.filename);
 						}
 					})
 				}
@@ -400,20 +324,18 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/mallInvoice/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					res.data.list.forEach((ele,i)=>{
-						this.tableList[i].invoiceImage = JSON.parse(ele.invoiceImage);
-					})
-					this.total = res.data.total;
+				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					console.log(this.tableList)
+					this.total = res.pages.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
 				})
 			},
 			getMoreData() {
-				this.$request('/mallInvoice/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					this.total = res.data.total;
+				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					this.total = res.pages.total;
 				})
 			},
 			copy(info) {
@@ -496,7 +418,6 @@
 	.scrollView {
 		height: 100%;
 		width: 100%;
-		padding: 0 10px;
 		box-sizing: border-box;
 	}
 	/deep/ .u-search {

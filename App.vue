@@ -65,7 +65,7 @@
 		width: 70px;
 		margin: 5px;
 		display: inline-block;
-		border: 1px solid rgb(182, 178, 178);
+		// border: 1px solid rgb(182, 178, 178);
 	}
 	/deep/ .u-card__body {
 		padding: 15px 15px 35px 15px!important;
@@ -73,5 +73,11 @@
 	.phoneCall {
 		color: blue;
 		text-decoration: underline;
+	}
+	// 滚顶底部增高
+	.bottom-block {
+		height: 40px;
+		opacity: 0;
+		width: 100%;
 	}
 </style>

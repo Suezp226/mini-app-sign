@@ -54,7 +54,7 @@
 				showPrivateContent: false , // 隐私协议提示内容 弹层
 				input: {
 					phone: '13295932921',
-					code: '803552'
+					code: ''
 				}
 			}
 		},
@@ -77,19 +77,19 @@
 			},
 			judgeInfo() {
 				// 身份信息验证
-				// uni.request({
-				// 	url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
-				// 	method: 'POST',
-				// 	header: {},
-				// 	data: {
-				// 		"id_card_number": '35032219970226711X', 
-				// 		"name": "苏智鹏"
-				// 	},
-				// 	dataType: 'json',
-				// 	timeout: 300000,
-				// }).then(res=>{
-				// 	console.log(res,'校验回参')
-				// })
+				uni.request({
+					url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
+					method: 'POST',
+					header: {},
+					data: {
+						"id_card_number": '35032219970226711X', 
+						"name": "苏智鹏"
+					},
+					dataType: 'json',
+					timeout: 300000,
+				}).then(res=>{
+					console.log(res,'校验回参')
+				})
 			},
 			fakeLogin() {
 				let json = {"muId":2,"userCode":"admin","userName":"admin","userPwd":"c30807e6587ade285ba7ade9f881b3d7","roleCode":"admin","roleName":"admin","workDate":"2021-09-20T16:00:00.000+00:00","userPhone":"13812345678","userCarnum":null,"offset":0,"limit":0};
@@ -168,6 +168,8 @@
 				}
 				
 				this.$request('/getCode','GET',{phone:this.input.phone}).then(res=>{
+					// 过审
+					this.input.code = res.checkCode;
 					console.log(res)
 					if(res.code == 200) {
 						uni.showToast({

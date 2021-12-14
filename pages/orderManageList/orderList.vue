@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.keyword" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs v-if="!isComponent" ref="uTabs" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -8,38 +8,38 @@
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
 				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="65"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
-					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.orderNo">
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-								{{item.orderCode}}
+								{{item.orderNo}}
 							</view>
 							<u-tag type="primary"  v-if="item.orderStat == '0'" text="待确认" mode="dark" :closeable="false" />
 							<u-tag type="success" v-if="item.orderStat == '1'" text="已确认" mode="dark" :closeable="false" />
-							<u-tag type="info" v-if="item.orderStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+							<u-tag type="info" v-if="item.orderStat == '9'" text="已作废" mode="dark" :closeable="false" />
 						</view>
 						<view slot="body" class="body">
 							<view class="form-item" >
 								<view class="title">客户:</view>
-								<view class="input">{{item.custName}}</view>
+								<view class="input">{{item.company}}</view>
 							</view>
-						<!-- 	<view class="form-item" >
-								<view class="title">经办人:</view>
-								<view class="input">{{item.busiManName}}</view>
-							</view> -->
+							<view class="form-item" >
+								<view class="title">订货人:</view>
+								<view class="input">{{item.bookName}}</view>
+							</view>
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.bookPhone)">{{item.bookPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
+								<view class="input">{{new Date(item.makeTime*1).toLocaleString()}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.orderImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.orderImage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.orderImage).file" ></u-image>
+									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
 								</view>
 							</view>
 						</view>
@@ -48,6 +48,7 @@
 					<view class="loadingWarp" v-if="showLoading">
 						<u-loading size="70" color="#3498db"></u-loading>
 					</view>
+					<view class="bottom-block" >.</view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -89,13 +90,11 @@
 					name:'shuijiao.png'
 				}],
 				searchForm: {
-					orderCode: "",
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "",  //销售内勤
+					orderNo: "",
 					orderStat: "",
-					offset: 0,
-					limit: 10,
+					page: 1, // 页数
+					pageNum: 10,
+					keyword: '',
 				},
 				total: 0,
 				showLoading: false,
@@ -114,16 +113,6 @@
 				let info = JSON.parse(uni.getStorageSync('userInfo'));
 				if(['kh','shr'].includes(info.roleCode) ) {
 					this.searchForm.custName = info.userName;
-				}
-			} else {
-				if(this.$store.state.userPosition == 'sj') {
-					this.searchForm.driverName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'xsnq') {
-					this.searchForm.makerName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'ywy') {
-					this.searchForm.busiManName = this.$store.state.userInfo.userName
 				}
 			}
 			this.getData();
@@ -181,10 +170,10 @@
 				let file = [];
 				if(arr.length != 0) {
 					arr.forEach(ele=>{
-						if(this.$judgeFiletype.isImageFn(ele)) {
-							list.push(this.$imgBaseUrl + ele)
+						if(this.$judgeFiletype.isImageFn(ele.filename)) {
+							list.push(this.$imgBaseUrl + ele.filename)
 						} else {
-							file.push(this.$imgBaseUrl + ele);
+							file.push(this.$imgBaseUrl + ele.filename);
 						}
 					})
 				}
@@ -219,21 +208,18 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/mallOrder/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					res.data.list.forEach((ele,i)=>{
-						this.tableList[i].orderImage = JSON.parse(ele.orderImage);
-					})
+				this.$request('/orderForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
 					console.log(this.tableList)
-					this.total = res.data.total;
+					this.total = res.pages.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
 				})
 			},
 			getMoreData() {
-				this.$request('/mallOrder/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					this.total = res.data.total;
+				this.$request('/orderForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					this.total = res.pages.total;
 				})
 			},
 			copy(info) {
@@ -308,7 +294,6 @@
 	.scrollView {
 		height: 100%;
 		width: 100%;
-		padding: 0 10px;
 		box-sizing: border-box;
 	}
 	/deep/ .u-search {

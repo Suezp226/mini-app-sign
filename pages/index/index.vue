@@ -33,7 +33,13 @@
 					<view class="liBox imgBox bgcolor3">
 						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">确认订单</view>
+					<view class="liBox">确认订货单</view>
+				</li>
+				<li @click="goNextPage('/pages/confirmStatement/confirmStatement')" >
+					<view class="liBox imgBox bgcolor7">
+						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">确认对账单</view>
 				</li>
 				<!-- 司机 -->
 				<li @click="goNextPage('/pages/startRunning/startRunning')" >
@@ -43,7 +49,7 @@
 					<view class="liBox">启运货物</view>
 				</li>
 				<!-- 客户  变更收货人 -->
-				<li @click="goNextPage('/pages/signIn/signIn')" v-if="['admin','kh','shr'].includes(userPosition)">
+				<li @click="goNextPage('/pages/signIn/signIn')">
 					<view class="liBox imgBox bgcolor5">
 						<image src="../../static/image/orderDone.png" mode="aspectFit"></image>
 					</view>
@@ -229,7 +235,10 @@
 					}
 					
 					.bgcolor6 {
-						background-color: #ab8fb8;
+						background-color: #7e5890;
+					}
+					.bgcolor7 {
+						background-color: #7e5890;
 					}
 				}
 			}

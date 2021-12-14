@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<!-- 只有客户能看到的 确认订单 -->
+		<!-- 只有客户能看到的 确认对账单 -->
 		<u-search :clearabled="true" input-align="left" v-model="searchForm.keyword" placeholder="请输入订单号"
 			@search="getData" @custom="getData" @clear="getData"></u-search>
 		<view style="flex: 1;overflow: hidden;" >
@@ -23,12 +23,12 @@
 							<view class="input">{{item.company}}</view>
 						</view>
 						<view class="form-item" >
-							<view class="title">订货人:</view>
-							<view class="input">{{item.bookName}}</view>
+							<view class="title">对账人:</view>
+							<view class="input">{{item.checkName}}</view>
 						</view>
 						<view class="form-item" >
 							<view class="title">手机号:</view>
-							<view class="input phoneCall" @click="phoneCall(item.bookPhone)">{{item.bookPhone}}</view>
+							<view class="input phoneCall" @click="phoneCall(item.checkPhone)">{{item.checkPhone}}</view>
 						</view>
 						<view class="form-item" >
 							<view class="title">时间:</view>
@@ -52,10 +52,10 @@
 			</scroll-view>
 			<u-modal v-model="showModal" ref="uModal" negative-top="400" show-cancel-button cancel-text="取消" :async-close="true" @confirm="goConfirm()" @cancel="showModal=false">
 				<view class="tipsContent" >
-					请仔细核对订单信息，我公司将严格按照订单规格数量生产并安排发货<br>
+					请仔细核对对账单内容，确认后将作为双方结算依据<br>
 					点击 <view class="boldFont">确认</view> 进行确认操作.
-					<input style="margin-top: 10px;" class="input" name="input"  v-model="input.bookName" placeholder="姓名" />
-					<input class="input" name="input"  v-model="input.bookIdNum" placeholder="身份证号" />
+					<input style="margin-top: 10px;" class="input" name="input"  v-model="input.checkName" placeholder="姓名" />
+					<input class="input" name="input"  v-model="input.checkIdNum" placeholder="身份证号" />
 				</view>
 			</u-modal>
 		</view>
@@ -83,8 +83,8 @@
 					keyword: '',
 				},
 				input: {
-					bookName: '',
-					bookIdNum: ''
+					checkName: '',
+					checkIdNum: ''
 				},
 				total: 0,
 				showLoading: false,
@@ -96,7 +96,7 @@
 		},
 		watch: {},
 		onLoad(options) {
-			// this.searchForm.bookName = this.$store.state.userInfo.name;
+			// this.searchForm.checkName = this.$store.state.userInfo.name;
 			this.getData();
 		},
 		methods: {
@@ -148,7 +148,7 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/orderForm', 'GET', this.searchForm).then(res => {
+				this.$request('/statementForm', 'GET', this.searchForm).then(res => {
 					this.tableList = res.list
 					console.log(this.tableList)
 					this.total = res.pages.total;
@@ -157,7 +157,7 @@
 				})
 			},
 			getMoreData() {
-				this.$request('/orderForm', 'GET', this.searchForm).then(res => {
+				this.$request('/statementForm', 'GET', this.searchForm).then(res => {
 					this.tableList = res.list
 					this.total = res.pages.total;
 				})
@@ -209,7 +209,7 @@
 					console.log('当前位置的纬度：' + res[1].latitude);
 					
 					// 校验流程
-					if(!this.input.bookName) {  //校验姓名
+					if(!this.input.checkName) {  //校验姓名
 						uni.showToast({
 							icon: 'none',
 							title: '请填写姓名'
@@ -218,7 +218,7 @@
 						return
 					}
 					
-					if(!this.input.bookIdNum && this.nowItem.bookIdNum) {  //校验姓名
+					if(!this.input.checkIdNum && this.nowItem.checkIdNum) {  //校验姓名
 						uni.showToast({
 							icon: 'none',
 							title: '请填写身份证号'
@@ -228,7 +228,7 @@
 					}
 					
 					// 校验输入的内容是否和订单一致
-					if(this.input.bookName != this.nowItem.bookName) {
+					if(this.input.checkName != this.nowItem.checkName) {
 						uni.showToast({
 							icon: 'none',
 							title: '姓名与订单不一致'
@@ -238,7 +238,7 @@
 					}
 					
 					// 校验输入的内容是否和订单一致
-					if(this.nowItem.bookIdNum && this.nowItem.bookIdNum != this.input.bookIdNum) {
+					if(this.nowItem.checkIdNum && this.nowItem.checkIdNum != this.input.checkIdNum) {
 						uni.showToast({
 							icon: 'none',
 							title: '身份证号与订单不一致'
@@ -248,14 +248,14 @@
 					}
 					
 					
-					if(this.nowItem.bookIdNum) {  // 身份证存在 走校验
+					if(this.nowItem.checkIdNum) {  // 身份证存在 走校验
 						uni.request({
 							url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
 							method: 'POST',
 							header: {},
 							data: {
-								"id_card_number": this.input.bookIdNum, 
-								"name": this.input.bookName
+								"id_card_number": this.input.checkIdNum, 
+								"name": this.input.checkName
 							},
 							dataType: 'json',
 							timeout: 300000,
@@ -268,7 +268,7 @@
 								})
 								let param = {...this.nowItem};
 								param.orderStat = '1';
-								this.$request('/orderForm/editOrder', 'POST', param).then(res => {
+								this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 									console.log(res);
 									uni.showToast({
 										icon: 'none',
@@ -288,11 +288,11 @@
 					}
 					
 					// 不存在身份证号校验输入的信息
-					if(this.input.bookName == this.nowItem.bookName) {
+					if(this.input.checkName == this.nowItem.checkName) {
 						console.log('校验通过')
 						let param = {...this.nowItem};
 						param.orderStat = '1';
-						this.$request('/orderForm/editOrder', 'POST', param).then(res => {
+						this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 							console.log(res);
 							this.$refs.uModal.clearLoading();
 							uni.showToast({

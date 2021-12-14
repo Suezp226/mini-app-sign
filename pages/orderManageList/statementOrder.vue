@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.acctStatCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.keyword" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -12,34 +12,34 @@
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-								{{item.acctStatCode}}
+								{{item.orderNo}}
 							</view>
-							<u-tag type="primary"  v-if="item.acctStatStat == '0'" text="正常" mode="dark" :closeable="false" />
-							<!-- <u-tag type="success" v-if="item.acctStatStat == '1'" text="已确认" mode="dark" :closeable="false" /> -->
-							<u-tag type="info" v-if="item.acctStatStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+							<u-tag type="primary"  v-if="item.orderStat == '0'" text="待确认" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.orderStat == '1'" text="已确认" mode="dark" :closeable="false" />
+							<u-tag type="info" v-if="item.orderStat == '9'" text="已销毁" mode="dark" :closeable="false" />
 						</view>
 						<view slot="body" class="body">
 							<view class="form-item" >
 								<view class="title">客户:</view>
-								<view class="input">{{item.custName}}</view>
+								<view class="input">{{item.company}}</view>
 							</view>
-							<!-- <view class="form-item" >
-								<view class="title">经办人:</view>
-								<view class="input">{{item.busiManName}}</view>
-							</view> -->
+							<view class="form-item" >
+								<view class="title">对账人:</view>
+								<view class="input">{{item.checkName}}</view>
+							</view>
 							<view class="form-item" >
 								<view class="title">手机号:</view>
-								<view class="input">{{item.custPhone}}</view>
+								<view class="input">{{item.checkPhone}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
+								<view class="input">{{new Date(item.makeTime*1).toLocaleString()}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
 								<view class="input">
-									<u-image @click="previewImg(item.acctStatCimage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.acctStatCimage).list" ></u-image>
-									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.acctStatCimage).file" ></u-image>
+									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
 								</view>
 							</view>
 						</view>
@@ -48,6 +48,7 @@
 					<view class="loadingWarp" v-if="showLoading">
 						<u-loading size="70" color="#3498db"></u-loading>
 					</view>
+					<view class="bottom-block" >.</view>
 				</scroll-view>
 			</swiper-item>
 		</swiper>
@@ -88,13 +89,11 @@
 					name:'shuijiao.png'
 				}],
 				searchForm: {
-					acctStatCode: "",
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "",  //销售内勤
-					acctStatStat: "",
-					offset: 0,
-					limit: 10,
+					orderNo: "",
+					orderStat: "",
+					page: 1, // 页数
+					pageNum: 10,
+					keyword: '',
 				},
 				total: 0,
 				showLoading: false,
@@ -103,7 +102,7 @@
 		},
 		watch:{
 			'swiperCurrent':function() {  //监听页面滚动
-				this.searchForm.acctStatCode = '';
+				this.searchForm.orderNo = '';
 				this.getData();
 			},
 		},
@@ -111,21 +110,8 @@
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
 				let info = JSON.parse(uni.getStorageSync('userInfo'));
-				if(['kh','shr'].includes(info.roleCode) ) {
-					this.searchForm.custName = info.userName;
-				}
 				// TODO 需要把 当前用户的身份信息带上
 				// this.searchForm.custName = ''
-			} else {
-				if(this.$store.state.userPosition == 'sj') {
-					this.searchForm.driverName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'xsnq') {
-					this.searchForm.makerName = this.$store.state.userInfo.userName
-				}
-				if(this.$store.state.userPosition == 'ywy') {
-					this.searchForm.busiManName = this.$store.state.userInfo.userName
-				}
 			}
 			this.getData();
 		},
@@ -134,11 +120,11 @@
 				this.current = tab;
 				this.swiperCurrent = tab;
 				if(tab == 0) {
-					this.searchForm.acctStatStat = '';
+					this.searchForm.orderStat = '';
 				} else if( tab ==2 ){
-					this.searchForm.acctStatStat = '9';
+					this.searchForm.orderStat = '9';
 				} else {
-					this.searchForm.acctStatStat = '0';
+					this.searchForm.orderStat = '0';
 				}
 			},
 			transition(e) {
@@ -151,21 +137,21 @@
 				this.swiperCurrent = current;
 				this.current = current;
 				if(current != 0) {
-					this.searchForm.acctStatStat = '9';
+					this.searchForm.orderStat = '9';
 				} else {
-					this.searchForm.acctStatStat = '';
+					this.searchForm.orderStat = '';
 				}
 			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
-				if(this.searchForm.limit >= this.total) {
+				if(this.searchForm.pageNum >= this.total) {
 					uni.showToast({
 						icon: 'none',
 						title: '已经没有更多了~'
 					})
 					return
 				}
-				this.searchForm.limit += 10;
+				this.searchForm.pageNum += 10;
 				this.getMoreData();
 			},
 			// scroll-view 下拉刷新
@@ -178,10 +164,10 @@
 				let file = [];
 				if(arr.length != 0) {
 					arr.forEach(ele=>{
-						if(this.$judgeFiletype.isImageFn(ele)) {
-							list.push(this.$imgBaseUrl + ele)
+						if(this.$judgeFiletype.isImageFn(ele.filename)) {
+							list.push(this.$imgBaseUrl + ele.filename)
 						} else {
-							file.push(this.$imgBaseUrl + ele);
+							file.push(this.$imgBaseUrl + ele.filename);
 						}
 					})
 				}
@@ -204,20 +190,18 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/mallAcctStat/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					res.data.list.forEach((ele,i)=>{
-						this.tableList[i].acctStatCimage = JSON.parse(ele.acctStatCimage);
-					})
-					this.total = res.data.total;
+				this.$request('/statementForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					console.log(this.tableList)
+					this.total = res.pages.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
 				})
 			},
 			getMoreData() {
-				this.$request('/mallAcctStat/query','POST',this.searchForm).then(res=>{
-					this.tableList = res.data.list
-					this.total = res.data.total;
+				this.$request('/statementForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					this.total = res.pages.total;
 				})
 			},
 			copy(info) {
@@ -292,7 +276,6 @@
 	.scrollView {
 		height: 100%;
 		width: 100%;
-		padding: 0 10px;
 		box-sizing: border-box;
 	}
 	/deep/ .u-search {

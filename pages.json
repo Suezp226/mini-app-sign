@@ -52,7 +52,14 @@
 		{
 			"path": "pages/confirmOrder/confirmOrder",
 			"style": {
-				"navigationBarTitleText": "确认订单",
+				"navigationBarTitleText": "确认订货单",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/confirmStatement/confirmStatement",
+			"style": {
+				"navigationBarTitleText": "确认对账单",
 				"disableScroll": true
 			}
 		},

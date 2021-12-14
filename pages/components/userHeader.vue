@@ -5,7 +5,7 @@
 				<u-image src="/static/image/user.png" mode="widthFix"></u-image>
 			</view>
 			<view class="rightBox">
-				<view class="name">{{userInfo.name}}</view>
+				<view class="name">{{userInfo.name?userInfo.name:'点击此处登入'}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
 			</view>
 		</view>

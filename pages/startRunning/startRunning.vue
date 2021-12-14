@@ -1,126 +1,278 @@
 <template>
 	<view class="content">
-		<!-- <navigator url="/pages/orderManageList/dispatchOrder" hover-class="navigator-hover">
-		    <button type="default">去历史发货单</button>
-		</navigator> -->
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入订单号"
-			@search="getData" @custom="getData" @clear="getData"></u-search>
-		<view style="flex: 1;overflow: hidden;">
-			<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger"
-				:refresher-threshold="65" refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh"
-				@scrolltolower="onreachBottom">
-				<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
-					<view slot="head" class="head">
-						<view class="headTips">
-							<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-							{{item.invoiceCode}}
+		<!-- 发货单查看 -->
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
+		</u-tabs>
+		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
+			@animationfinish="animationfinish">
+			<swiper-item v-for="(item, index) in tabsView" :key="index">
+				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
+					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
+						<view slot="head" class="head">
+							<view class="headTips">
+								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
+								{{item.invoiceCode}}
+							</view>
+							<u-tag type="warning" v-if="item.orderStat == '0'" text="待启运" mode="dark" :closeable="false" />
+							<u-tag 				  v-if="item.orderStat == '1'" text="运输中" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.orderStat == '2'" text="已签收" mode="dark" :closeable="false" />
+							<u-tag type="warning" v-if="item.orderStat == '3'" text="已签收(有异议)" mode="dark" :closeable="false" />
+							<u-tag type="success" v-if="item.orderStat == '4'" text="已签收(二次确认)" mode="dark" :closeable="false" />
+							<u-tag type="info"    v-if="item.orderStat == '9'" text="已销毁" mode="dark" :closeable="false" />
+
 						</view>
-						<u-tag type="warning" v-if="item.invoiceStat == '0'" text="待启运" mode="dark"
-							:closeable="false" />
-						<u-tag v-if="item.invoiceStat == '1'" text="运输中" mode="dark" :closeable="false" />
-						<u-tag type="info" v-if="item.invoiceStat == '2'" text="待签收" mode="dark" :closeable="false" />
-						<u-tag type="success" v-if="item.invoiceStat == '3'" text="已签收" mode="dark" :closeable="false" />
-						<u-tag type="info" v-if="item.invoiceStat == '9'" text="已销毁" mode="dark" :closeable="false" />
-					</view>
-					<view slot="body" class="body">
-						<view class="form-item">
-							<view class="title">客户:</view>
-							<view class="input">{{item.custName}}</view>
-						</view>
-						<view class="form-item" >
-							<view class="title">收货人:</view>
-							<view class="input">{{item.custHandler}}</view>
-						</view>
-						<view class="form-item" >
-							<view class="title">手机号:</view>
-							<view class="input phoneCall" @click="phoneCall(item.custPhone)">{{item.custPhone}}</view>
-						</view>
-						<view class="form-item">
-							<view class="title">时间:</view>
-							<view class="input">{{new Date(item.makerTime).toLocaleDateString()}}</view>
-						</view>
-						<view class="form-item">
-							<view class="title">货单:</view>
-							<view class="input">
-								<u-image @click="previewImg(item.invoiceImage)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).list" ></u-image>
-								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,index) in getFileList(item.invoiceImage).file" ></u-image>
-								<button type="primary" v-if="item.invoiceStat == '0'" @click="openStartModal(item)">确认启运</button>
+						<view slot="body" class="body">
+							<view class="form-item" >
+								<view class="title">客户:</view>
+								<view class="input">{{item.company}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">现场联系人:</view>
+								<view class="input">{{item.liveName}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.livePhone)">{{item.livePhone}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">时间:</view>
+								<view class="input">{{new Date(item.makeTime*1).toLocaleDateString()}}</view>
+							</view>
+							<view class="form-item" v-if="item.receiveName">
+								<view class="title">变更收货人:</view>
+								<view class="input">{{item.receiveName}}</view>
+							</view>
+							<view class="form-item" v-if="item.receivePhone">
+								<view class="title">变更手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">货单:</view>
+								<view class="input">
+									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
+									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
+									<!--  -->
+									<button type="primary" v-if="item.orderStat == '4'" @click="openSignModal(item)">确认签收</button>
+								</view>
 							</view>
 						</view>
+					</u-card>
+					<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
+					<view class="loadingWarp" v-if="showLoading">
+						<u-loading size="70" color="#3498db"></u-loading>
 					</view>
-				</u-card>
-				<u-empty text="暂无相关内容" mode="list" v-if="tableList.length == 0"></u-empty>
-				<view class="loadingWarp" v-if="showLoading">
-					<u-loading size="70" color="#3498db"></u-loading>
-				</view>
-			</scroll-view>
-		</view>
-		<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()"
-			@cancel="showModal=false">
-			<view class="tipsContent">
-				请仔细查看货单内容,<br>
-				点击 <view class="boldFont">确认</view> 进入人脸识别 启运货物.
+					<view class="bottom-block" >.</view>
+				</scroll-view>
+			</swiper-item>
+		</swiper>
+		
+		<!-- 二次签收弹层 -->
+		<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
+			<view class="tipsContent" >
+				货物签收确认，<br>
+				本人对上述货物的数量及金额确认无误，作为双方的结算依据。 <br>
+				点击 <view class="boldFont">确认</view> 进入人脸识别确认签收.
 			</view>
 		</u-modal>
-		<view class="loadCover" v-if="pageLoading">
-			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
-		</view>
-		<view class="loadCover" v-if="informLoading" >
-			<view style="color:#fff;">正在通知相关人员</view>
-			<u-loading mode="circle" color="#3498db" size="60"></u-loading>
-		</view>
+		
+		
 	</view>
 </template>
 
 <script>
 	export default {
+		name: 'DispatchOrder',
+		props:{
+			isComponent: {
+				type:Boolean,
+				default: false
+			}
+		},
 		data() {
 			return {
+				list: [{
+					name: '全部'
+				}, {
+					name: '待启运'
+				}, {
+					name: '已签收'
+				}],
+				tabsView: [{
+					name: '全部'
+				}, {
+					name: '待启运'
+				}, {
+					name: '已签收'
+				}],
+				current: 0,
+				swiperCurrent: 0,
 				refreshTrigger: false,
-				fileLists: [{
-					url: '../../static/image/orderImg.png',
-					extname: 'png',
-					name: 'shuijiao.png'
+				fileLists:[{
+					url:'../../static/image/orderImg.png',
+					extname:'png',
+					name:'shuijiao.png'
 				}],
 				searchForm: {
-					invoiceCode: "",
-					custName: "",
-					busiManName: "", //业务员
-					makerName: "", //销售内勤
-					driverName: "", // 司机
-					invoiceStat: "0",
-					offset: 0,
-					limit: 10,
+					orderNo: "",
+					orderStat: "",
+					keyword: "",
+					page: 1,
+            pageNum: 10,
 				},
 				total: 0,
 				showLoading: false,
 				tableList: [],
-				showModal: false,
+				// 二次签收
 				nowItem: {},
-				pageLoading: false,
-				informLoading: false
+				showModal: false,
+				haveMsg: 0,  // 无异议
+				confirmMsg: '', // 异议内容
 			}
 		},
-		watch: {},
-		onLoad(options) {
-			if(options.id) { // 人脸成功更改订单状态
-				this.pageLoading = true;
-				this.confirmSuccess(options);
+		watch:{
+			'swiperCurrent':function() {  //监听页面滚动
+				this.searchForm.invoiceCode = '';
+				this.getData();
+			},
+		},
+		onUnload() {  //监听页面卸载 如果是百度人脸过来的 返回直接跳转首页
+			let pages = getCurrentPages();
+			if(['pages/startRunning/startRunning'].includes(pages[pages.length-1].route)) {
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			}
-			this.searchForm.driverName = this.$store.state.userInfo.userName;
+		},
+		mounted() {
+			
+			if(this.$store.state.userPosition == 'shr') {
+				this.list = [ {
+					name: '已签收'
+				}];
+				this.tabsView = [ {
+					name: '已签收'
+				}];
+				this.searchForm.orderStat = 3;
+			}
+			
+			if(this.isComponent) {
+				this.tabsView = [{name: '全部'}];
+				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				if(['kh'].includes(info.roleCode) ) {
+					this.searchForm.custName = info.userName;
+				}
+				
+				if(['shr'].includes(info.roleCode) ) {
+					this.searchForm.receiveName = info.userName;
+				}
+				
+			} else {  //在非组件的情况下 按登录用户把查询信息带上
+			}
+			
 			this.getData();
 		},
 		methods: {
+			// 二次签收
+			openSignModal(item) {
+				this.nowItem = item;
+				console.log(this.nowItem.fileList)
+				this.showModal = true;
+			},
+			goConfirm() {
+				// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+				// https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=3EFOUalG1jlfCi3c3Y7XKdBi&client_secret=H9gc8A33fALYHgATu3RKSbSS4nhWnGQ3
+				
+				//  身份信息校验  https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+				
+				
+				// uni.request({
+				// 	url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
+				// 	method: 'POST',
+				// 	header: {},
+				// 	data: {
+				// 		"id_card_number": '35032219970226711X', 
+				// 		"name": "苏智鹏"
+				// 	},
+				// 	dataType: 'json',
+				// 	timeout: 300000,
+				// }).then(res=>{
+				// 	console.log(res.data,'校验回参')
+				// })
+			},
+			// 更改订单信息
+			doneSave(param) {
+				this.pageLoading = true;
+				this.$request('/dispatchForm/addOrder','POST', param).then(res=>{
+					console.log(res,'回参')
+					this.pageLoading = false;
+					if(res.code == 200) {
+						uni.showToast({
+							icon: 'success',
+							title: '货物签收成功！',
+						})
+						setTimeout(()=>{
+							uni.navigateTo({
+								url: '/pages/historyOrderList/historyOrderList?type=1'
+							})
+						},1500)
+					} else {
+						this.pageLoading = false;
+						uni.showToast({
+							icon: 'success',
+							title: '服务异常'
+						})
+					}
+				})
+				.catch(err=>{
+					this.pageLoading = false;
+					uni.showToast({
+						icon: 'success',
+						title: '服务异常'
+					})
+				})
+			},
+			changeTab(tab) {
+				this.current = tab;
+				this.swiperCurrent = tab;
+				if(tab == 1) {
+					this.searchForm.orderStat = tab - 1;
+				} else if(tab == 2){
+					this.searchForm.orderStat = tab + 1;
+				} else {
+					this.searchForm.orderStat = '';
+				}
+				
+			},
+			transition(e) {
+				let dx = e.detail.dx;
+			},
+			// 由于swiper的内部机制问题，快速切换swiper不会触发dx的连续变化，需要在结束时重置状态
+			// swiper滑动结束，分别设置tabs和swiper的状态
+			animationfinish(e) {
+				let current = e.detail.current;
+				this.swiperCurrent = current;
+				this.current = current;
+				if(current == 1 ) {
+					this.searchForm.orderStat = current - 1;
+				} else if( current == 2){
+					this.searchForm.orderStat = current + 1;
+				} else {
+					this.searchForm.orderStat = '';
+				}
+			},
 			// scroll-view到底部加载更多
 			onreachBottom() {
-				if (this.searchForm.limit >= this.total) {
+				if(this.searchForm.pageNum >= this.total) {
 					uni.showToast({
 						icon: 'none',
 						title: '已经没有更多了~'
 					})
 					return
 				}
-				this.searchForm.limit += 10;
+				this.searchForm.pageNum += 10;
 				this.getMoreData();
 			},
 			// scroll-view 下拉刷新
@@ -128,15 +280,21 @@
 				this.refreshTrigger = true;
 				this.getData();
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			getFileList(arr) {
 				let list = [];
 				let file = [];
 				if(arr.length != 0) {
 					arr.forEach(ele=>{
-						if(this.$judgeFiletype.isImageFn(ele)) {
-							list.push(this.$imgBaseUrl + ele)
+						if(this.$judgeFiletype.isImageFn(ele.filename)) {
+							list.push(this.$imgBaseUrl + ele.filename)
 						} else {
-							file.push(this.$imgBaseUrl + ele);
+							file.push(this.$imgBaseUrl + ele.filename);
 						}
 					})
 				}
@@ -144,12 +302,6 @@
 					list,
 					file
 				}
-			},
-			phoneCall(phone) {
-				console.log(phone);
-				uni.makePhoneCall({
-				    phoneNumber: phone //仅为示例
-				});
 			},
 			goFile(item) {
 				window.open(item);
@@ -162,104 +314,37 @@
 				});
 			},
 			getData() {
+				if(this.$store.state.userPosition == 'shr' && !this.$store.state.userInfo.userName) {
+					uni.showToast({
+						icon: 'none',
+						title: '无访问权限'
+					})
+					return
+				}
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
-					this.tableList = res.data.list;
-					res.data.list.forEach((ele,i)=>{
-						this.tableList[i].invoiceImage = JSON.parse(ele.invoiceImage);
-					})
-					this.total = res.data.total;
+				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					console.log(this.tableList)
+					this.total = res.pages.total;
 					this.refreshTrigger = false;
 					this.showLoading = false;
 				})
 			},
 			getMoreData() {
-				this.$request('/mallInvoice/query', 'POST', this.searchForm).then(res => {
-					this.tableList = res.data.list
-					this.total = res.data.total;
+				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+					this.tableList = res.list
+					this.total = res.pages.total;
 				})
 			},
 			copy(info) {
 				uni.setClipboardData({
-					data: info,
-					success: function() {
-						console.log('复制成功');
-					}
+				    data: info,
+				    success: function () {
+				        console.log('复制成功');
+				    }
 				});
-			},
-			openStartModal(item) {
-				console.log(item)
-				this.nowItem = item;
-				this.showModal = true;
-			},
-			goConfirm() {
-				let nowUrl = window.location.href;
-				let param = {...this.nowItem};
-				
-				this.$request('/face/getAuth','POST',{}).then(res=>{
-					console.log(res.data.access_token,JSON.parse(res.data.verify_token).result.verify_token,'回参')
-					let accToken = res.data.access_token;
-					let token = JSON.parse(res.data.verify_token).result.verify_token;
-					let local = window.location.host;
-					let successUrl = encodeURIComponent(`http://${local}/#/pages/startRunning/startRunning?id=${this.nowItem.miId}&name=${this.nowItem.driverName}&atoken=${accToken}&vtoken=${token}`);
-					let faillUrl = encodeURIComponent(`http://${local}/#/pages/startRunning/startRunning`);
-					window.location.href = `https://brain.baidu.com/face/print/?token=${token}&
-					successUrl=${successUrl}&
-					failedUrl=${faillUrl}`
-				})
-			},
-			confirmSuccess(options) {
-				
-				let param = {
-					miId: options.id,
-					invoiceStat: '1'
-				}
-				// 确认
-				this.$request('/baidu/rpc/2.0/brain/solution/faceprint/result/detail?access_token='+options.atoken,'POST',{"verify_token": options.vtoken})
-				.then(res=>{
-					console.log(res,'获取结果')
-					if(res.success && res.result.idcard_confirm.name == options.name) {
-						// 验证成功
-						this.pageLoading = false;
-						uni.showToast({
-							icon: 'success',
-							title: '人脸核验成功',
-						})
-						setTimeout(()=>{
-							this.informLoading = true;
-							this.$request('/mallInvoice/updateStat','POST',param).then(res=>{
-								console.log(res,'回参')
-								if(res.code == 200) {
-									this.informLoading = false;
-									uni.showToast({
-										icon: 'success',
-										title: '货物启运成功！',
-									})
-									setTimeout(()=>{
-										uni.navigateTo({
-											url: '/pages/orderManageList/dispatchOrder'
-										})
-									},1500)
-								} else {
-									this.informLoading = false;
-									uni.showToast({
-										icon: 'success',
-										title: '服务器异常'
-									})
-								}
-							})
-						},1000)
-					} else {
-						this.informLoading = false;
-						this.pageLoading = false;
-						uni.showToast({
-							icon: 'error',
-							title: '身份信息与订单不符',
-						})
-					}
-				})
 			}
 		}
 	}
@@ -284,7 +369,6 @@
 
 			.head {
 				display: flex;
-
 				.headTips {
 					flex: 1;
 					display: inline-block;
@@ -299,7 +383,8 @@
 
 				.title {
 					font-size: 15px;
-					width: 50px;
+					min-width: 50px;
+					margin-right: 2px;
 					color: #333;
 				}
 
@@ -307,28 +392,20 @@
 					font-size: 15px;
 					flex: 1;
 					position: relative;
-
 					image {
 						height: 70px;
 						width: 70px;
 					}
-
 					button {
 						position: absolute;
 						right: -13px;
 						bottom: -35px;
 						font-size: 14px;
 					}
-
-					.changePeople {
-						right: 80px;
-						background-color: #e74c3c;
-					}
 				}
 			}
 		}
-
-		.ucard:nth-last-child(1) {
+		.ucard:nth-last-child(1){
 			margin-bottom: 30px;
 		}
 	}
@@ -341,16 +418,13 @@
 	.scrollView {
 		height: 100%;
 		width: 100%;
-		padding: 0 10px;
 		box-sizing: border-box;
 	}
-
 	/deep/ .u-search {
 		flex: none;
 		padding: 10px 20px;
 		background-color: #fff;
 	}
-
 	.loadingWarp {
 		position: absolute;
 		top: 0;
@@ -362,7 +436,7 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
-		background-color: rgba(255, 255, 255, 0.1);
+		background-color: rgba(255,255,255,0.1);
 		transition: all 0.5s ease-in-out;
 	}
 </style>
