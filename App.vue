@@ -80,4 +80,13 @@
 		opacity: 0;
 		width: 100%;
 	}
+	.tipsContent {
+		.input {
+			border: 1rpx solid #848484;
+			font-size: 14px;
+			border-radius: 10rpx;
+			margin-bottom: 5px;
+			padding-left: 10px;
+		}
+	}
 </style>

@@ -69,14 +69,14 @@
 				list: [{
 					name: '全部'
 				}, {
-					name: '正常'
+					name: '待确认'
 				}, {
 					name: '已销毁'
 				}],
 				tabsView: [{
 					name: '全部'
 				}, {
-					name: '正常'
+					name: '待确认'
 				}, {
 					name: '已销毁'
 				}],

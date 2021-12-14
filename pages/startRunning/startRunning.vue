@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<!-- 发货单查看 -->
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderNo" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -9,11 +9,11 @@
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
 				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
-					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.orderNo">
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-								{{item.invoiceCode}}
+								{{item.orderNo}}
 							</view>
 							<u-tag type="warning" v-if="item.orderStat == '0'" text="待启运" mode="dark" :closeable="false" />
 							<u-tag 				  v-if="item.orderStat == '1'" text="运输中" mode="dark" :closeable="false" />
@@ -38,7 +38,7 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makeTime*1).toLocaleDateString()}}</view>
+								<view class="input">{{item.makeTime}}</view>
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
@@ -53,8 +53,7 @@
 								<view class="input">
 									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
 									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
-									<!--  -->
-									<button type="primary" v-if="item.orderStat == '4'" @click="openSignModal(item)">确认签收</button>
+									<button type="primary" v-if="item.orderStat == '0'" @click="openBootModal(item)">启运货物</button>
 								</view>
 							</view>
 						</view>
@@ -68,12 +67,34 @@
 			</swiper-item>
 		</swiper>
 		
-		<!-- 二次签收弹层 -->
-		<u-modal v-model="showModal" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
+		<!-- 启运弹层 -->
+		<u-modal v-model="showModal" :async-close="true" ref="uModal" negative-top="500" show-cancel-button cancel-text="取消" @confirm="goConfirm()" @cancel="showModal=false">
 			<view class="tipsContent" >
-				货物签收确认，<br>
-				本人对上述货物的数量及金额确认无误，作为双方的结算依据。 <br>
-				点击 <view class="boldFont">确认</view> 进入人脸识别确认签收.
+				请仔细核对订单信息 <br />
+				<view class="form-item" >
+					<view class="title">车号:</view>
+					<view class="inputText">{{nowItem.carNum}}</view>
+				</view>
+				<view class="form-item" >
+					<view class="title">运费:</view>
+					<view class="inputText">{{nowItem.deliveryFeeType=='0'?(nowItem.deliveryFee + '元'):'客户运费'}}</view>
+				</view>
+				<view class="form-item" >
+					<view class="title">目的地:</view>
+					<view class="inputText">{{nowItem.destination}}</view>
+				</view>
+				<view class="form-item" >
+					<view class="title">货物价值:</view>
+					<view class="inputText">{{nowItem.goodsPrice}}元</view>
+				</view>
+				<view class="form-item" style="display: block;" v-if="nowItem.deliveryIdNum">
+					<view>运载人身份证号:</view>
+					<view>{{nowItem.deliveryIdNum}}</view>
+				</view>
+				
+				点击 <view class="boldFont">确认</view> 进入启运操作.
+				<input style="margin-top: 10px;" class="input" name="input"  v-model="input.deliveryName" placeholder="姓名" />
+				<input class="input" name="input"  v-model="input.deliveryPhone" placeholder="手机号" />
 			</view>
 		</u-modal>
 		
@@ -119,43 +140,31 @@
 					orderStat: "",
 					keyword: "",
 					page: 1,
-            pageNum: 10,
+					pageNum: 10,
 				},
 				total: 0,
 				showLoading: false,
 				tableList: [],
 				// 二次签收
-				nowItem: {},
+				nowItem: {
+					
+				},
 				showModal: false,
 				haveMsg: 0,  // 无异议
 				confirmMsg: '', // 异议内容
+				input: {
+					deliveryName: '',
+					deliveryPhone: ''
+				},
 			}
 		},
 		watch:{
 			'swiperCurrent':function() {  //监听页面滚动
-				this.searchForm.invoiceCode = '';
+				this.searchForm.orderNo = '';
 				this.getData();
 			},
 		},
-		onUnload() {  //监听页面卸载 如果是百度人脸过来的 返回直接跳转首页
-			let pages = getCurrentPages();
-			if(['pages/startRunning/startRunning'].includes(pages[pages.length-1].route)) {
-				uni.switchTab({
-					url: '/pages/index/index'
-				})
-			}
-		},
 		mounted() {
-			
-			if(this.$store.state.userPosition == 'shr') {
-				this.list = [ {
-					name: '已签收'
-				}];
-				this.tabsView = [ {
-					name: '已签收'
-				}];
-				this.searchForm.orderStat = 3;
-			}
 			
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
@@ -175,49 +184,62 @@
 			this.getData();
 		},
 		methods: {
-			// 二次签收
-			openSignModal(item) {
+			// 打开启运
+			openBootModal(item) {
+				console.log(item)
 				this.nowItem = item;
-				console.log(this.nowItem.fileList)
 				this.showModal = true;
 			},
+			// 司机启运仅需要 姓名手机号核对完成就可以启运
 			goConfirm() {
-				// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
-				// https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=3EFOUalG1jlfCi3c3Y7XKdBi&client_secret=H9gc8A33fALYHgATu3RKSbSS4nhWnGQ3
+				this.$refs.uModal.clearLoading();  // 取消确认loading
+				let {deliveryName,deliveryPhone} = this.input;
+				if( !deliveryName || !deliveryPhone) {
+					uni.showToast({
+						icon: 'none',
+						title: '请输入校验信息'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				if(deliveryName != this.nowItem.deliveryName) {
+					uni.showToast({
+						icon: 'none',
+						title: '姓名与订单不一致'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				if(deliveryPhone != this.nowItem.deliveryPhone) {
+					uni.showToast({
+						icon: 'none',
+						title: '手机号与订单不一致'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
 				
-				//  身份信息校验  https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+				// 启运货物  更新状态
+				this.doneSave(this.nowItem);
 				
+				console.log('校验通过',this.nowItem)
 				
-				// uni.request({
-				// 	url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
-				// 	method: 'POST',
-				// 	header: {},
-				// 	data: {
-				// 		"id_card_number": '35032219970226711X', 
-				// 		"name": "苏智鹏"
-				// 	},
-				// 	dataType: 'json',
-				// 	timeout: 300000,
-				// }).then(res=>{
-				// 	console.log(res.data,'校验回参')
-				// })
 			},
 			// 更改订单信息
-			doneSave(param) {
+			doneSave(item) {
 				this.pageLoading = true;
-				this.$request('/dispatchForm/addOrder','POST', param).then(res=>{
+				let param = {...item};
+				param.orderStat = '1';  //变更为 运输中状态
+				this.$request('/dispatchForm/editOrder','POST', param).then(res=>{
 					console.log(res,'回参')
 					this.pageLoading = false;
 					if(res.code == 200) {
 						uni.showToast({
 							icon: 'success',
-							title: '货物签收成功！',
+							title: '货物启运成功！',
 						})
-						setTimeout(()=>{
-							uni.navigateTo({
-								url: '/pages/historyOrderList/historyOrderList?type=1'
-							})
-						},1500)
+						this.showModal = false;
+						this.getData();
 					} else {
 						this.pageLoading = false;
 						uni.showToast({
@@ -438,5 +460,36 @@
 		height: 100%;
 		background-color: rgba(255,255,255,0.1);
 		transition: all 0.5s ease-in-out;
+	}
+	
+	.tipsContent {
+		.form-item {
+			display: flex;
+			font-size: 15px;
+			margin-bottom: 2px;
+		
+			.title {
+				font-size: 15px;
+				min-width: 70px;
+				margin-right: 2px;
+				color: #333;
+			}
+		
+			.inputText {
+				font-size: 15px;
+				flex: 1;
+				position: relative;
+				image {
+					height: 70px;
+					width: 70px;
+				}
+				button {
+					position: absolute;
+					right: -13px;
+					bottom: -35px;
+					font-size: 14px;
+				}
+			}
+		}
 	}
 </style>

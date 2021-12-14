@@ -172,6 +172,8 @@
 			},
 			openConformModal(item) {
 				console.log(item);
+				this.input.checkIdNum = '';
+				this.input.checkName = '';
 				this.nowItem = item;
 				this.showModal = true;
 				this.$refs.uModal.clearLoading();
@@ -207,6 +209,7 @@
 					canGetLocation = true;
 					console.log('当前位置的经度：' + res[1].longitude);
 					console.log('当前位置的纬度：' + res[1].latitude);
+					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 					
 					// 校验流程
 					if(!this.input.checkName) {  //校验姓名
@@ -268,6 +271,7 @@
 								})
 								let param = {...this.nowItem};
 								param.orderStat = '1';
+								param.location = locationJson;
 								this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 									console.log(res);
 									uni.showToast({
@@ -292,6 +296,7 @@
 						console.log('校验通过')
 						let param = {...this.nowItem};
 						param.orderStat = '1';
+						param.location = locationJson;
 						this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 							console.log(res);
 							this.$refs.uModal.clearLoading();

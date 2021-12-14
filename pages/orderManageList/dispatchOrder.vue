@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<!-- 发货单查看 -->
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.invoiceCode" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderNo" placeholder="请输入单号" @search="getData"  @custom="getData" @clear="getData"></u-search>
 		<u-tabs ref="uTabs" v-if="!isComponent" class="utabs" :list="list" :is-scroll="false":current="current" @change="changeTab">
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
@@ -9,11 +9,11 @@
 			<swiper-item v-for="(item, index) in tabsView" :key="index">
 				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
-					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.orderNo">
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
-								{{item.invoiceCode}}
+								{{item.orderNo}}
 							</view>
 							<u-tag type="warning" v-if="item.orderStat == '0'" text="待启运" mode="dark" :closeable="false" />
 							<u-tag 				  v-if="item.orderStat == '1'" text="运输中" mode="dark" :closeable="false" />
@@ -38,7 +38,7 @@
 							</view>
 							<view class="form-item" >
 								<view class="title">时间:</view>
-								<view class="input">{{new Date(item.makeTime*1).toLocaleDateString()}}</view>
+								<view class="input">{{item.makeTime}}</view>
 							</view>
 							<view class="form-item" v-if="item.receiveName">
 								<view class="title">变更收货人:</view>
@@ -133,7 +133,7 @@
 		},
 		watch:{
 			'swiperCurrent':function() {  //监听页面滚动
-				this.searchForm.invoiceCode = '';
+				this.searchForm.orderNo = '';
 				this.getData();
 			},
 		},

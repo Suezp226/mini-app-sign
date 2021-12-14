@@ -127,7 +127,7 @@
 				}
 				
 				this.$request('/user/mobileLogin','POST',param).then(res=>{
-					console.log(res)
+					console.log(res);
 					if(res.code == 200) {
 						uni.setStorageSync('token', res.data.token)
 						uni.setStorageSync('userInfo',JSON.stringify(res.data.user));
