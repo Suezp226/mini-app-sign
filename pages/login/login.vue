@@ -162,6 +162,17 @@
 					return
 				}
 				
+				if (this.timer == null) {
+					setTimeout(() => {
+						clearInterval(this.timer);
+						this.timer = null;
+					}, 60000)
+					this.count = 60;
+					this.timer = setInterval(() => {
+						this.count--;
+					}, 1000)
+				}
+				
 				this.$request('/getCode','GET',{phone:this.input.phone}).then(res=>{
 					// 过审 自动获得码
 					if(this.input.phone == '13812345678' ) {
