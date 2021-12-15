@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<!-- 只有客户能看到的 确认订单 -->
-		<u-search :clearabled="true" input-align="left" v-model="searchForm.keyword" placeholder="请输入订单号"
+		<u-search :clearabled="true" input-align="left" v-model="searchForm.orderNo" placeholder="请输入订单号"
 			@search="getData" @custom="getData" @clear="getData"></u-search>
 		<view style="flex: 1;overflow: hidden;" >
 			<scroll-view scroll-y class="scrollView" :show-scrollbar="false" refresher-enabled :refresher-triggered="refreshTrigger"
@@ -23,16 +23,28 @@
 							<view class="input">{{item.company}}</view>
 						</view>
 						<view class="form-item" >
-							<view class="title">订货人:</view>
-							<view class="input">{{item.bookName}}</view>
+							<view class="title">业务员:</view>
+							<view class="input">{{item.ywyName}}</view>
 						</view>
 						<view class="form-item" >
 							<view class="title">手机号:</view>
-							<view class="input phoneCall" @click="phoneCall(item.bookPhone)">{{item.bookPhone}}</view>
+							<view class="input phoneCall" @click="phoneCall(item.ywyPhone)">{{item.ywyPhone}}</view>
 						</view>
 						<view class="form-item" >
-							<view class="title">时间:</view>
-							<view class="input">{{new Date(item.makeTime*1).toLocaleString()}}</view>
+							<view class="title">内勤:</view>
+							<view class="input">{{item.makerName}}</view>
+						</view>
+						<view class="form-item" >
+							<view class="title">手机号:</view>
+							<view class="input phoneCall" @click="phoneCall(item.makerPhone)">{{item.makerPhone}}</view>
+						</view>
+						<view class="form-item" >
+							<view class="title">制单时间:</view>
+							<view class="input">{{item.makeTime}}</view>
+						</view>
+						<view class="form-item" v-if="item.confirmTime">
+							<view class="title">确认时间:</view>
+							<view class="input">{{item.confirmTime}}</view>
 						</view>
 						<view class="form-item" >
 							<view class="title">货单:</view>
@@ -77,10 +89,12 @@
 				}],
 				searchForm: {
 					orderNo: "",
-					orderStat: "",
+					orderStat: "0",
 					page: 1, // 页数
 					pageNum: 10,
 					keyword: '',
+					ywyName: '',
+					makerName: '',
 				},
 				input: {
 					bookName: '',
@@ -91,12 +105,15 @@
 				tableList: [],
 				showModal: false,
 				nowItem: {},
-				pageLoading: false
+				pageLoading: false,
+				bindPhone: '',
 			}
 		},
 		watch: {},
 		onLoad(options) {
-			// this.searchForm.bookName = this.$store.state.userInfo.name;
+			let info = JSON.parse(uni.getStorageSync('userInfo'));
+			this.bindPhone = info.phone +'';
+			console.log(info,'用户信息')
 			this.getData();
 		},
 		methods: {
@@ -148,7 +165,9 @@
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/orderForm', 'GET', this.searchForm).then(res => {
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/orderForm', 'GET', param).then(res => {
 					this.tableList = res.list
 					console.log(this.tableList)
 					this.total = res.pages.total;
@@ -157,7 +176,9 @@
 				})
 			},
 			getMoreData() {
-				this.$request('/orderForm', 'GET', this.searchForm).then(res => {
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/orderForm', 'GET', param).then(res => {
 					this.tableList = res.list
 					this.total = res.pages.total;
 				})
@@ -382,7 +403,7 @@
 
 				.title {
 					font-size: 15px;
-					width: 50px;
+					width: 70px;
 					color: #333;
 				}
 

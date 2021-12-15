@@ -53,7 +53,7 @@
 				showModal: false,  // 隐私协议提示框
 				showPrivateContent: false , // 隐私协议提示内容 弹层
 				input: {
-					phone: '13295932921',
+					phone: '',
 					code: ''
 				}
 			}
@@ -153,11 +153,6 @@
 			},
 			getPhoneCheckNum() {
 				
-				if(this.input.phone == '13812345678') {
-					this.input.code = '123456';
-					return
-				}
-				
 				if(!this.isMobile(this.input.phone)) {
 					uni.showToast({
 						title: '请输入正确手机号',
@@ -168,8 +163,11 @@
 				}
 				
 				this.$request('/getCode','GET',{phone:this.input.phone}).then(res=>{
-					// 过审
-					this.input.code = res.checkCode;
+					// 过审 自动获得码
+					if(this.input.phone == '13812345678' ) {
+						this.input.code = res.checkCode;
+					}
+					
 					console.log(res)
 					if(res.code == 200) {
 						uni.showToast({

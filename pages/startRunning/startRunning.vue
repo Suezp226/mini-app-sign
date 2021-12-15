@@ -29,6 +29,18 @@
 								<view class="input">{{item.company}}</view>
 							</view>
 							<view class="form-item" >
+								<view class="title">目的地:</view>
+								<view class="input">{{item.destination}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">结算人:</view>
+								<view class="input">{{item.payName}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.payPhone)">{{item.payPhone}}</view>
+							</view>
+							<view class="form-item" >
 								<view class="title">现场联系人:</view>
 								<view class="input">{{item.liveName}}</view>
 							</view>
@@ -36,17 +48,21 @@
 								<view class="title">手机号:</view>
 								<view class="input phoneCall" @click="phoneCall(item.livePhone)">{{item.livePhone}}</view>
 							</view>
+							<view class="form-item" v-if="item.changeName">
+								<view class="title">变更收货人:</view>
+								<view class="input">{{item.changeName}}</view>
+							</view>
+							<view class="form-item" v-if="item.changePhone">
+								<view class="title">手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.changePhone)">{{item.changePhone}}</view>
+							</view>
 							<view class="form-item" >
-								<view class="title">时间:</view>
+								<view class="title">制单时间:</view>
 								<view class="input">{{item.makeTime}}</view>
 							</view>
-							<view class="form-item" v-if="item.receiveName">
-								<view class="title">变更收货人:</view>
-								<view class="input">{{item.receiveName}}</view>
-							</view>
-							<view class="form-item" v-if="item.receivePhone">
-								<view class="title">变更手机号:</view>
-								<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
+							<view class="form-item" v-if="item.bootUpTime">
+								<view class="title">启运时间:</view>
+								<view class="input">{{item.bootUpTime}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
@@ -137,10 +153,12 @@
 				}],
 				searchForm: {
 					orderNo: "",
-					orderStat: "",
+					orderStat: "0",
 					keyword: "",
 					page: 1,
 					pageNum: 10,
+					ywyName: '',
+					makerName: '',
 				},
 				total: 0,
 				showLoading: false,
@@ -156,6 +174,7 @@
 					deliveryName: '',
 					deliveryPhone: ''
 				},
+				bindPhone: '',
 			}
 		},
 		watch:{
@@ -168,17 +187,10 @@
 			
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
-				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
-				let info = JSON.parse(uni.getStorageSync('userInfo'));
-				if(['kh'].includes(info.roleCode) ) {
-					this.searchForm.custName = info.userName;
-				}
-				
-				if(['shr'].includes(info.roleCode) ) {
-					this.searchForm.receiveName = info.userName;
-				}
 				
 			} else {  //在非组件的情况下 按登录用户把查询信息带上
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				this.bindPhone = info.phone +'';
 			}
 			
 			this.getData();
@@ -243,7 +255,7 @@
 					} else {
 						this.pageLoading = false;
 						uni.showToast({
-							icon: 'success',
+							icon: 'none',
 							title: '服务异常'
 						})
 					}
@@ -251,7 +263,7 @@
 				.catch(err=>{
 					this.pageLoading = false;
 					uni.showToast({
-						icon: 'success',
+						icon: 'none',
 						title: '服务异常'
 					})
 				})
@@ -336,17 +348,12 @@
 				});
 			},
 			getData() {
-				if(this.$store.state.userPosition == 'shr' && !this.$store.state.userInfo.userName) {
-					uni.showToast({
-						icon: 'none',
-						title: '无访问权限'
-					})
-					return
-				}
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/dispatchForm','GET',param).then(res=>{
 					this.tableList = res.list
 					console.log(this.tableList)
 					this.total = res.pages.total;
@@ -355,7 +362,9 @@
 				})
 			},
 			getMoreData() {
-				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/dispatchForm','GET',param).then(res=>{
 					this.tableList = res.list
 					this.total = res.pages.total;
 				})
@@ -405,7 +414,7 @@
 
 				.title {
 					font-size: 15px;
-					min-width: 50px;
+					min-width: 70px;
 					margin-right: 2px;
 					color: #333;
 				}

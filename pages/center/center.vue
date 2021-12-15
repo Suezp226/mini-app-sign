@@ -5,8 +5,8 @@
 			<ul>
 				<!-- 
 				 -->
-				<li @click="goAll" >
-					<view class="liBox">
+				<li @click="goAll" v-if="['ywy','xsnq'].includes(userType)">
+					<view class="liBox" >
 						<image src="../../static/image/history.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">全部订单</view>
@@ -98,10 +98,13 @@
 				],
 				// u-radio-group的v-model绑定的值如果设置为某个radio的name，就会被默认选中
 				value: 'orange',
+				userType: '',  //用户类型  主要用于判断 工作人员
 			}
 		},
 		onLoad(options) {
 			console.log('接受传参', options)
+			let info = JSON.parse(uni.getStorageSync('userInfo'));
+			this.userType = info.userType;
 		},
 		methods: {
 			logout() {

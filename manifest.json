@@ -57,7 +57,11 @@
             "minified" : true
         },
         "usingComponents" : true,
-        "permission" : {}
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "为确保签收的安全可靠性，请允许使用当前位置信息"
+            }
+        }
     },
     "mp-alipay" : {
         "usingComponents" : true

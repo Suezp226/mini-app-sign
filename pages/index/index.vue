@@ -73,11 +73,11 @@
 			UserHeader
 		},
 		computed: {
-			userPosition: {
+			userInfo: {
 				get: function() {
-					return this.$store.state.userPosition
+					return this.$store.state.userInfo
 				},
-
+				
 				set: function(e) {
 					console.log(e)
 				}
@@ -105,6 +105,19 @@
 				
 			},
 			goNextPage(url) {
+				if(!this.userInfo.phone) {
+					uni.showToast({
+						icon: 'none',
+						title: '请先登录'
+					})
+					
+					setTimeout(()=>{
+						uni.navigateTo({
+							url: '/pages/login/login'
+						});
+					},1000)
+					return
+				}
 				console.log('执行跳转')
 				uni.getSystemInfo({
 					success: function(res) {

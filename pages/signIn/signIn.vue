@@ -36,17 +36,33 @@
 								<view class="title">手机号:</view>
 								<view class="input phoneCall" @click="phoneCall(item.livePhone)">{{item.livePhone}}</view>
 							</view>
+							<view class="form-item">
+								<view class="title">司机:</view>
+								<view class="input">{{item.deliveryName}}</view>
+							</view>
 							<view class="form-item" >
-								<view class="title">时间:</view>
-								<view class="input">{{item.makeTime}}</view>
+								<view class="title">手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.deliveryPhone)">{{item.deliveryPhone}}</view>
 							</view>
-							<view class="form-item" v-if="item.receiveName">
+							<view class="form-item">
+								<view class="title">业务员:</view>
+								<view class="input">{{item.ywyName}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">手机号:</view>
+								<view class="input phoneCall" @click="phoneCall(item.ywyPhone)">{{item.ywyPhone}}</view>
+							</view>
+							<view class="form-item" v-if="item.changeName">
 								<view class="title">变更收货人:</view>
-								<view class="input">{{item.receiveName}}</view>
+								<view class="input">{{item.changeName}}</view>
 							</view>
-							<view class="form-item" v-if="item.receivePhone">
+							<view class="form-item" v-if="item.changePhone">
 								<view class="title">变更手机号:</view>
-								<view class="input phoneCall" @click="phoneCall(item.receivePhone)">{{item.receivePhone}}</view>
+								<view class="input phoneCall" @click="phoneCall(item.changePhone)">{{item.changePhone}}</view>
+							</view>
+							<view class="form-item" >
+								<view class="title">制单时间:</view>
+								<view class="input">{{item.makeTime}}</view>
 							</view>
 							<view class="form-item" >
 								<view class="title">货单:</view>
@@ -58,10 +74,13 @@
 							</view>
 							<view class="form-item" >
 								<view class="button-box">
-									<button type="default" class="blue" v-if="item.orderStat == '1'" @click="openChangeModal(item)">变更收货人</button>
-									<button type="primary" class="orange" v-if="item.orderStat == '1'" @click="openSignModal(item,'1')">有异议签收</button>
-									<button type="primary" v-if="item.orderStat == '1'" @click="openSignModal(item,'0')">无异议签收</button>
-									<button type="primary" class="orange" v-if="item.orderStat == '3'" @click="openSignModal(item,'0')">二次签收</button>
+									<button type="default" class="blue" v-if="item.orderStat == '1' && userInfo.phone == item.payPhone" @click="openChangeModal(item)">变更收货人</button>
+									<!-- 不存在变更人 或者  变更手机号与登录一致 -->
+									<template v-if="!item.changePhone ||  (item.changePhone && userInfo.phone == item.changePhone) " >
+										<button type="primary" class="orange" v-if="item.orderStat == '1'" @click="openSignModal(item,'1')">有异议签收</button>
+										<button type="primary" v-if="item.orderStat == '1'" @click="openSignModal(item,'0')">无异议签收</button>
+										<button type="primary" class="orange" v-if="item.orderStat == '3'" @click="openSignModal(item,'0')">二次签收</button>
+									</template>
 								</view>
 							</view>
 						</view>
@@ -148,6 +167,8 @@
 					keyword: "",
 					page: 1,
 					pageNum: 10,
+					ywyName: '',
+					makerName: '',
 				},
 				total: 0,
 				showLoading: false,
@@ -166,7 +187,9 @@
 					changeName: '',
 					changePhone: '',
 					changeIdNum: '',
-				}
+				},
+				bindPhone: '',
+				userInfo: null
 			}
 		},
 		watch:{
@@ -180,16 +203,11 @@
 			if(this.isComponent) {
 				this.tabsView = [{name: '全部'}];
 				// 组件情况分为： 1、客户查看历史订单   2、员工查看全部订单
-				let info = JSON.parse(uni.getStorageSync('userInfo'));
-				if(['kh'].includes(info.roleCode) ) {
-					this.searchForm.custName = info.userName;
-				}
-				
-				if(['shr'].includes(info.roleCode) ) {
-					this.searchForm.receiveName = info.userName;
-				}
 				
 			} else {  //在非组件的情况下 按登录用户把查询信息带上
+				let info = JSON.parse(uni.getStorageSync('userInfo'));
+				this.userInfo = info;
+				this.bindPhone = info.phone +'';
 			}
 			
 			this.getData();
@@ -244,7 +262,7 @@
 					} else {
 						this.pageLoading = false;
 						uni.showToast({
-							icon: 'success',
+							icon: 'none',
 							title: '服务异常'
 						})
 					}
@@ -253,7 +271,7 @@
 					this.$refs.uModal2.clearLoading(); 
 					this.pageLoading = false;
 					uni.showToast({
-						icon: 'success',
+						icon: 'none',
 						title: '服务异常'
 					})
 				})
@@ -307,7 +325,7 @@
 						return
 					}
 					
-					if(!this.input.payIdNum && this.nowItem.payIdNum) {  //校验姓名
+					if(!this.input.payIdNum && this.nowItem.payIdNum) {  //校验身份证号
 						uni.showToast({
 							icon: 'none',
 							title: '请填写身份证号'
@@ -316,8 +334,9 @@
 						return
 					}
 					
+					
 					// 校验输入的内容是否和订单一致
-					if(this.input.payName != this.nowItem.payName) {
+					if(this.input.payName != this.nowItem.payName && this.input.payName != this.nowItem.changeName) {
 						uni.showToast({
 							icon: 'none',
 							title: '姓名与订单不一致'
@@ -327,7 +346,7 @@
 					}
 					
 					// 校验输入的内容是否和订单一致
-					if(this.nowItem.payIdNum && this.nowItem.payIdNum != this.input.payIdNum) {
+					if(this.nowItem.payIdNum && this.nowItem.payIdNum != this.input.payIdNum && this.input.payIdNum != this.nowItem.changeIdNum) {
 						uni.showToast({
 							icon: 'none',
 							title: '身份证号与订单不一致'
@@ -336,6 +355,8 @@
 						return
 					}
 					
+					
+					console.log('通过校验')
 					
 					if(this.nowItem.payIdNum) {  // 身份证存在 走校验
 					// TODO 必须先获取 因为只有30天有效
@@ -390,6 +411,10 @@
 									if(this.signType == '1') {
 										this.nowItem.problem = this.input.problem;
 									}
+									if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
+										this.doneSave(this.nowItem,'4');
+										return
+									}
 									this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
 								} else {
 									uni.showToast({
@@ -419,6 +444,13 @@
 			},
 			// 更改订单信息
 			doneSave(item,stat) {
+				
+				let changePeople = false;  //标记是否为 变更的收货人
+				if(this.userInfo && item.changePhone && this.userInfo.phone == item.changePhone) {
+					changePeople = true;
+					console.log('当前为代收操作')
+				}
+				
 				this.pageLoading = true;
 				let param = {...item};
 				param.orderStat = stat;  //变更为 运输中状态
@@ -437,7 +469,7 @@
 					} else {
 						this.pageLoading = false;
 						uni.showToast({
-							icon: 'success',
+							icon: 'none',
 							title: '服务异常'
 						})
 					}
@@ -446,7 +478,7 @@
 					this.$refs.uModal.clearLoading();
 					this.pageLoading = false;
 					uni.showToast({
-						icon: 'success',
+						icon: 'none',
 						title: '服务异常'
 					})
 				})
@@ -531,17 +563,12 @@
 				});
 			},
 			getData() {
-				if(this.$store.state.userPosition == 'shr' && !this.$store.state.userInfo.userName) {
-					uni.showToast({
-						icon: 'none',
-						title: '无访问权限'
-					})
-					return
-				}
 				console.log(this.current);
 				this.showLoading = true;
 				this.tableList = [];
-				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/dispatchForm','GET',param).then(res=>{
 					this.tableList = res.list
 					console.log(this.tableList)
 					this.total = res.pages.total;
@@ -550,7 +577,9 @@
 				})
 			},
 			getMoreData() {
-				this.$request('/dispatchForm','GET',this.searchForm).then(res=>{
+				let param = {...this.searchForm};
+				param.keyword = param.keyword + this.bindPhone;
+				this.$request('/dispatchForm','GET',param).then(res=>{
 					this.tableList = res.list
 					this.total = res.pages.total;
 				})
@@ -600,7 +629,7 @@
 
 				.title {
 					font-size: 15px;
-					min-width: 50px;
+					min-width: 70px;
 					margin-right: 2px;
 					color: #333;
 				}
@@ -617,6 +646,7 @@
 				.button-box {
 					display: flex;
 					justify-content: flex-end;
+					width: 100%;
 					button {
 						font-size: 14px;
 						margin-left: 10px;

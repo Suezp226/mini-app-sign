@@ -4,8 +4,12 @@
 			<view class="leftBox">
 				<u-image src="/static/image/user.png" mode="widthFix"></u-image>
 			</view>
-			<view class="rightBox">
-				<view class="name">{{userInfo.name?userInfo.name:'点击此处登入'}}</view>
+			<view class="rightBox" v-if="userInfo.phone" >
+				<view class="name">{{userInfo.name?userInfo.name:'Unknow'}}</view>
+				<view class="phone">{{userInfo.phone}}</view>
+			</view>
+			<view class="rightBox" v-else>
+				<view class="name">{{userInfo.name?userInfo.name:'点击此处登录'}}</view>
 				<view class="phone">{{userInfo.phone}}</view>
 			</view>
 		</view>
@@ -110,7 +114,7 @@
 				})
 			},
 			goLogin() {
-				if( this.userInfo.userName !== '点击登录'){
+				if( this.userInfo.phone){
 					return
 				}
 				uni.navigateTo({
