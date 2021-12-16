@@ -4,7 +4,7 @@
 		<view class="buttonBox">
 			<ul>
 				<!-- 工作人员相关 -->
-				<li @click="goNextPage('/pages/orderManageList/orderList')" >
+				<!-- <li @click="goNextPage('/pages/orderManageList/orderList')" >
 					<view class="liBox imgBox bgcolor1">
 						<image src="../../static/image/order.png" mode="aspectFit"></image>
 					</view>
@@ -15,31 +15,37 @@
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">发货单</view>
-				</li>
+				</li> -->
 				<!-- <li @click="goNextPage('/pages/orderManageList/dispatchOrder')" >
 					<view class="liBox imgBox bgcolor2">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">历史签收</view>
 				</li> -->
-				<li @click="goNextPage('/pages/orderManageList/statementOrder')" >
+				<!-- <li @click="goNextPage('/pages/orderManageList/statementOrder')" >
 					<view class="liBox imgBox bgcolor6">
 						<image src="../../static/image/statement.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">对账单</view>
-				</li>
+				</li> -->
 				<!-- 客户 -->
 				<li @click="goNextPage('/pages/confirmOrder/confirmOrder')" >
 					<view class="liBox imgBox bgcolor3">
-						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
+						<image src="../../static/image/order.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">确认订货单</view>
+					<view class="liBox">订货单</view>
 				</li>
 				<li @click="goNextPage('/pages/confirmStatement/confirmStatement')" >
 					<view class="liBox imgBox bgcolor7">
-						<image src="../../static/image/confirm.png" mode="aspectFit"></image>
+						<image src="../../static/image/statement.png" mode="aspectFit"></image>
 					</view>
-					<view class="liBox">确认对账单</view>
+					<view class="liBox">对账单</view>
+				</li>
+				<li @click="goNextPage('/pages/signIn/signIn')">
+					<view class="liBox imgBox bgcolor5">
+						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">发货单</view>
 				</li>
 				<!-- 司机 -->
 				<li @click="goNextPage('/pages/startRunning/startRunning')" >
@@ -49,12 +55,6 @@
 					<view class="liBox">启运货物</view>
 				</li>
 				<!-- 客户  变更收货人 -->
-				<li @click="goNextPage('/pages/signIn/signIn')">
-					<view class="liBox imgBox bgcolor5">
-						<image src="../../static/image/orderDone.png" mode="aspectFit"></image>
-					</view>
-					<view class="liBox">货物签收</view>
-				</li>
 				<!-- <li>3</li>
 				<li>4</li>
 				<li>5</li>

@@ -76,7 +76,7 @@
 								<view class="button-box">
 									<button type="default" class="blue" v-if="item.orderStat == '1' && userInfo.phone == item.payPhone" @click="openChangeModal(item)">变更收货人</button>
 									<!-- 不存在变更人 或者  变更手机号与登录一致 -->
-									<template v-if="!item.changePhone ||  (item.changePhone && userInfo.phone == item.changePhone) " >
+									<template v-if="(!item.changePhone && item.payPhone == bindPhone) ||  (item.changePhone && bindPhone == item.changePhone) " >
 										<button type="primary" class="orange" v-if="item.orderStat == '1'" @click="openSignModal(item,'1')">有异议签收</button>
 										<button type="primary" v-if="item.orderStat == '1'" @click="openSignModal(item,'0')">无异议签收</button>
 										<button type="primary" class="orange" v-if="item.orderStat == '3'" @click="openSignModal(item,'0')">二次签收</button>
@@ -144,14 +144,14 @@
 				}, {
 					name: '待启运'
 				}, {
-					name: '已签收'
+					name: '运输中'
 				}],
 				tabsView: [{
 					name: '全部'
 				}, {
 					name: '待启运'
 				}, {
-					name: '已签收'
+					name: '运输中'
 				}],
 				current: 0,
 				swiperCurrent: 0,
@@ -296,26 +296,33 @@
 				    }
 				});
 				
-				uni.getLocation({
-				    type: 'wgs84',
-				}).then((res)=>{
-					console.log(res[0],res[1])
-					if(res[0]) {
-						console.log('无权限获取')
+				let changePeople = false;  //标记是否为 变更的收货人
+				if(this.userInfo && this.nowItem.changePhone && this.userInfo.phone == this.nowItem.changePhone) {
+					changePeople = true;
+					console.log('当前为代收操作')
+				}
+				
+				// 校验流程
+				if(changePeople) { // 变更的收货人校验  变更后的人 必须填 姓名身份证号
+					if(!this.input.payName) {  //校验姓名
 						uni.showToast({
 							icon: 'none',
-							title: '请允许获取当前位置信息,点击 ··· 设置中允许获取。'
+							title: '请填写姓名'
 						})
 						this.$refs.uModal.clearLoading();
 						return
 					}
-					canGetLocation = true;
-					console.log('当前位置的经度：' + res[1].longitude);
-					console.log('当前位置的纬度：' + res[1].latitude);
+					if(!this.input.payIdNum ) {  //校验身份证号
+						uni.showToast({
+							icon: 'none',
+							title: '请填写身份证号'
+						})
+						this.$refs.uModal.clearLoading();
+						return
+					}
 					
-					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 					
-					// 校验流程
+				} else {  // 正常客户签收的校验
 					if(!this.input.payName) {  //校验姓名
 						uni.showToast({
 							icon: 'none',
@@ -355,10 +362,30 @@
 						return
 					}
 					
+				}
+				
+				console.log('通过判空校验')
+				
+				uni.getLocation({
+				    type: 'wgs84',
+				}).then((res)=>{
+					console.log(res[0],res[1])
+					if(res[0]) {
+						console.log('无权限获取')
+						uni.showToast({
+							icon: 'none',
+							title: '请允许获取当前位置信息,点击 ··· 设置中允许获取。'
+						})
+						this.$refs.uModal.clearLoading();
+						return
+					}
+					canGetLocation = true;
+					console.log('当前位置的经度：' + res[1].longitude);
+					console.log('当前位置的纬度：' + res[1].latitude);
 					
-					console.log('通过校验')
+					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 					
-					if(this.nowItem.payIdNum) {  // 身份证存在 走校验
+					if(this.nowItem.payIdNum || changePeople) {  // 身份证存在 走校验
 					// TODO 必须先获取 因为只有30天有效
 					// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
 					// 
@@ -407,7 +434,8 @@
 										title: '校验成功'
 									})
 									this.nowItem.signType = this.signType;
-									this.nowItem.location = locationJson;
+									this.nowItem.Slocation = locationJson;
+									console.log(this.nowItem.Slocation,'设置了位置信息')
 									if(this.signType == '1') {
 										this.nowItem.problem = this.input.problem;
 									}
@@ -434,6 +462,7 @@
 						if(this.signType == '1') {
 							this.nowItem.problem = this.input.problem;
 						}
+						this.nowItem.Slocation = locationJson;  // 签收位置信息
 						this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
 					}
 					
@@ -445,15 +474,9 @@
 			// 更改订单信息
 			doneSave(item,stat) {
 				
-				let changePeople = false;  //标记是否为 变更的收货人
-				if(this.userInfo && item.changePhone && this.userInfo.phone == item.changePhone) {
-					changePeople = true;
-					console.log('当前为代收操作')
-				}
-				
 				this.pageLoading = true;
 				let param = {...item};
-				param.orderStat = stat;  //变更为 运输中状态
+				param.orderStat = stat;  //变更状态
 				console.log(param,'签收传参')
 				this.$request('/dispatchForm/editOrder','POST', param).then(res=>{
 					console.log(res,'回参')
@@ -486,12 +509,10 @@
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
-				if(tab == 1) {
-					this.searchForm.orderStat = tab - 1;
-				} else if(tab == 2){
-					this.searchForm.orderStat = tab + 1;
-				} else {
+				if(this.current == 0) {
 					this.searchForm.orderStat = '';
+				} else {
+					this.searchForm.orderStat = this.current - 1;
 				}
 				
 			},
@@ -504,12 +525,11 @@
 				let current = e.detail.current;
 				this.swiperCurrent = current;
 				this.current = current;
-				if(current == 1 ) {
-					this.searchForm.orderStat = current - 1;
-				} else if( current == 2){
-					this.searchForm.orderStat = current + 1;
-				} else {
+				console.log(e.detail.current,'tab')
+				if(current == 0) {
 					this.searchForm.orderStat = '';
+				} else {
+					this.searchForm.orderStat = current - 1;
 				}
 			},
 			// scroll-view到底部加载更多

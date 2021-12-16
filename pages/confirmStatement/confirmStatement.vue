@@ -48,7 +48,7 @@
 						</view>
 						<view class="form-item" >
 							<view class="title">制单时间:</view>
-							<view class="input">{item.makeTime}}</view>
+							<view class="input">{{item.makeTime}}</view>
 						</view>
 						<view class="form-item" v-if="item.confirmTime">
 							<view class="title">确认时间:</view>
@@ -59,7 +59,7 @@
 							<view class="input">
 								<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
 								<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
-								<button type="primary" v-if="item.orderStat == '0'" @click="openConformModal(item)">确认订单</button>
+								<button type="primary" v-if="item.orderStat == '0'" @click="openConformModal(item)">确认</button>
 							</view>
 						</view>
 					</view>
@@ -97,7 +97,7 @@
 				}],
 				searchForm: {
 					orderNo: "",
-					orderStat: "0",
+					orderStat: "",
 					page: 1, // 页数
 					pageNum: 10,
 					keyword: '',
@@ -210,6 +210,47 @@
 			goConfirm() {
 				console.log(this.nowItem)
 				
+				// 校验流程
+				if(!this.input.checkName) {  //校验姓名
+					uni.showToast({
+						icon: 'none',
+						title: '请填写姓名'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				
+				if(!this.input.checkIdNum && this.nowItem.checkIdNum) {  //校验姓名
+					uni.showToast({
+						icon: 'none',
+						title: '请填写身份证号'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				
+				// 校验输入的内容是否和订单一致
+				if(this.input.checkName != this.nowItem.checkName) {
+					uni.showToast({
+						icon: 'none',
+						title: '姓名与订单不一致'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				
+				// 校验输入的内容是否和订单一致
+				if(this.nowItem.checkIdNum && this.nowItem.checkIdNum != this.input.checkIdNum) {
+					uni.showToast({
+						icon: 'none',
+						title: '身份证号与订单不一致'
+					})
+					this.$refs.uModal.clearLoading();
+					return
+				}
+				
+				console.log('通过判空校验')
+				
 				let canGetLocation = false;  //判断是否能获取地址
 				
 				uni.getSystemInfo({
@@ -240,44 +281,6 @@
 					console.log('当前位置的纬度：' + res[1].latitude);
 					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 					
-					// 校验流程
-					if(!this.input.checkName) {  //校验姓名
-						uni.showToast({
-							icon: 'none',
-							title: '请填写姓名'
-						})
-						this.$refs.uModal.clearLoading();
-						return
-					}
-					
-					if(!this.input.checkIdNum && this.nowItem.checkIdNum) {  //校验姓名
-						uni.showToast({
-							icon: 'none',
-							title: '请填写身份证号'
-						})
-						this.$refs.uModal.clearLoading();
-						return
-					}
-					
-					// 校验输入的内容是否和订单一致
-					if(this.input.checkName != this.nowItem.checkName) {
-						uni.showToast({
-							icon: 'none',
-							title: '姓名与订单不一致'
-						})
-						this.$refs.uModal.clearLoading();
-						return
-					}
-					
-					// 校验输入的内容是否和订单一致
-					if(this.nowItem.checkIdNum && this.nowItem.checkIdNum != this.input.checkIdNum) {
-						uni.showToast({
-							icon: 'none',
-							title: '身份证号与订单不一致'
-						})
-						this.$refs.uModal.clearLoading();
-						return
-					}
 					
 					
 					if(this.nowItem.checkIdNum) {  // 身份证存在 走校验

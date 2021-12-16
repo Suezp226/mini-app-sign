@@ -69,7 +69,7 @@
 								<view class="input">
 									<u-image @click="previewImg(item.fileList)" width="60px" height="60px" :src="src" class="file-box" v-for="(src,ind) in getFileList(item.fileList).list" ></u-image>
 									<u-image @click="goFile(src)" width="60px" height="60px" :src="'/static/image/'+ $judgeFiletype.isFileFn(src) +'Icon.png'" class="file-box" v-for="(src,i) in getFileList(item.fileList).file" ></u-image>
-									<button type="primary" v-if="item.orderStat == '0'" @click="openBootModal(item)">启运货物</button>
+									<button type="primary" v-if="item.orderStat == '0' && item.deliveryPhone == bindPhone" @click="openBootModal(item)">启运</button>
 								</view>
 							</view>
 						</view>
@@ -134,14 +134,14 @@
 				}, {
 					name: '待启运'
 				}, {
-					name: '已签收'
+					name: '运输中'
 				}],
 				tabsView: [{
 					name: '全部'
 				}, {
 					name: '待启运'
 				}, {
-					name: '已签收'
+					name: '运输中'
 				}],
 				current: 0,
 				swiperCurrent: 0,
@@ -271,12 +271,10 @@
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
-				if(tab == 1) {
-					this.searchForm.orderStat = tab - 1;
-				} else if(tab == 2){
-					this.searchForm.orderStat = tab + 1;
-				} else {
+				if(this.current == 0) {
 					this.searchForm.orderStat = '';
+				} else {
+					this.searchForm.orderStat = this.current - 1;
 				}
 				
 			},
@@ -289,12 +287,10 @@
 				let current = e.detail.current;
 				this.swiperCurrent = current;
 				this.current = current;
-				if(current == 1 ) {
-					this.searchForm.orderStat = current - 1;
-				} else if( current == 2){
-					this.searchForm.orderStat = current + 1;
-				} else {
+				if(current == 0) {
 					this.searchForm.orderStat = '';
+				} else {
+					this.searchForm.orderStat = current - 1;
 				}
 			},
 			// scroll-view到底部加载更多
