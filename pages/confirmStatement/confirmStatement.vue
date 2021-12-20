@@ -115,6 +115,7 @@
 				nowItem: {},
 				pageLoading: false,
 				bindPhone: '',
+				deviceInfo: {}
 			}
 		},
 		watch: {},
@@ -123,6 +124,20 @@
 			this.bindPhone = info.phone +'';
 			console.log(info,'用户信息')
 			this.getData();
+			try {
+				const res = uni.getSystemInfoSync();
+				let {model,brand,version,platform} = res;
+				this.deviceInfo = {
+					model,brand,version,platform
+				}
+				console.log(res,'手机信息')
+				console.log(res.model,'型号');
+				console.log(res.brand,'品牌');
+				console.log(res.version,'系统版本');
+				console.log(res.platform,'客户端平台');
+			} catch (e) {
+				console.log(e,'获取失败')
+			}
 		},
 		methods: {
 			// scroll-view到底部加载更多
@@ -259,16 +274,6 @@
 				
 				let canGetLocation = false;  //判断是否能获取地址
 				
-				uni.getSystemInfo({
-				    success: function (res) {
-						console.log(res,'手机信息')
-				        console.log(res.model,'型号');
-				        console.log(res.brand,'品牌');
-				        console.log(res.version,'系统版本');
-				        console.log(res.platform,'客户端平台');
-				    }
-				});
-				
 				uni.getLocation({
 				    type: 'wgs84',
 				}).then((res)=>{
@@ -310,6 +315,7 @@
 								let param = {...this.nowItem};
 								param.orderStat = '1';
 								param.location = locationJson;
+								param.deviceInfo = JSON.stringify(this.deviceInfo);
 								this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 									console.log(res);
 									uni.showToast({
@@ -335,6 +341,7 @@
 						let param = {...this.nowItem};
 						param.orderStat = '1';
 						param.location = locationJson;
+						param.deviceInfo = JSON.stringify(this.deviceInfo);
 						this.$request('/statementForm/editOrder', 'POST', param).then(res => {
 							console.log(res);
 							this.$refs.uModal.clearLoading();

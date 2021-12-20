@@ -171,6 +171,7 @@
 					deliveryPhone: ''
 				},
 				bindPhone: '',
+				deviceInfo: {}
 			}
 		},
 		watch:{
@@ -190,6 +191,20 @@
 			}
 			
 			this.getData();
+			try {
+				const res = uni.getSystemInfoSync();
+				let {model,brand,version,platform} = res;
+				this.deviceInfo = {
+					model,brand,version,platform
+				}
+				console.log(res,'手机信息')
+				console.log(res.model,'型号');
+				console.log(res.brand,'品牌');
+				console.log(res.version,'系统版本');
+				console.log(res.platform,'客户端平台');
+			} catch (e) {
+				console.log(e,'获取失败')
+			}
 		},
 		methods: {
 			// 打开启运
@@ -202,6 +217,7 @@
 			goConfirm() {
 				this.$refs.uModal.clearLoading();  // 取消确认loading
 				let {deliveryName,deliveryPhone} = this.input;
+				let canGetLocation = false;  //判断是否能获取地址
 				if( !deliveryName || !deliveryPhone) {
 					uni.showToast({
 						icon: 'none',
@@ -227,9 +243,31 @@
 					return
 				}
 				
-				// 启运货物  更新状态
-				this.doneSave(this.nowItem);
-				
+				uni.getLocation({
+				    type: 'wgs84',
+				}).then((res)=>{
+					console.log(res[0],res[1])
+					if(res[0]) {
+						console.log('无权限获取')
+						uni.showToast({
+							icon: 'none',
+							title: '请允许获取当前位置信息,点击 ··· 设置中允许获取。'
+						})
+						this.$refs.uModal.clearLoading();
+						return
+					}
+					canGetLocation = true;
+					console.log('当前位置的经度：' + res[1].longitude);
+					console.log('当前位置的纬度：' + res[1].latitude);
+					
+					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
+					// 启运货物  更新状态
+					this.nowItem.Blocation = locationJson;
+					this.nowItem.BdeviceInfo = JSON.stringify(this.deviceInfo);
+					this.doneSave(this.nowItem);
+					
+					
+				})			
 				console.log('校验通过',this.nowItem)
 				
 			},

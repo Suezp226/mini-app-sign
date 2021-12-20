@@ -189,7 +189,8 @@
 					changeIdNum: '',
 				},
 				bindPhone: '',
-				userInfo: null
+				userInfo: null,
+				deviceInfo: {}
 			}
 		},
 		watch:{
@@ -211,6 +212,23 @@
 			}
 			
 			this.getData();
+			
+			try {
+				const res = uni.getSystemInfoSync();
+				let {model,brand,version,platform} = res;
+				this.deviceInfo = {
+					model,brand,version,platform
+				}
+				console.log(res,'手机信息')
+				console.log(res.model,'型号');
+				console.log(res.brand,'品牌');
+				console.log(res.version,'系统版本');
+				console.log(res.platform,'客户端平台');
+			} catch (e) {
+				console.log(e,'获取失败')
+			}
+			
+			
 		},
 		methods: {
 			// 打开签收框
@@ -282,7 +300,7 @@
 			},
 			// 确认签收  signType
 			goConfirm() {
-				this.$refs.uModal.clearLoading();  // 取消确认loading
+				// this.$refs.uModal.clearLoading();  // 取消确认loading
 				
 				let canGetLocation = false;  //判断是否能获取地址
 				
@@ -435,6 +453,7 @@
 									})
 									this.nowItem.signType = this.signType;
 									this.nowItem.Slocation = locationJson;
+									this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
 									console.log(this.nowItem.Slocation,'设置了位置信息')
 									if(this.signType == '1') {
 										this.nowItem.problem = this.input.problem;
@@ -462,6 +481,7 @@
 						if(this.signType == '1') {
 							this.nowItem.problem = this.input.problem;
 						}
+						this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
 						this.nowItem.Slocation = locationJson;  // 签收位置信息
 						this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
 					}
@@ -593,8 +613,7 @@
 					let list = [];
 					res.list.forEach(ele=>{
 						console.log(ele.deliveryPhone,this.bindPhone,'手机号对比')
-						if(['0','1'].includes(ele.orderStat) && ele.deliveryPhone == this.bindPhone || 
-							(!['0','1'].includes(ele.orderStat) && ele.deliveryPhone != this.bindPhone)) {  // 如果是司机 完成状态 不让查看
+						if(ele.deliveryPhone == this.bindPhone && ['0','1'].includes(ele.orderStat) || ele.deliveryPhone != this.bindPhone ) {  // 如果是司机 完成状态 不让查看
 							list.push(ele);
 						}
 					})
