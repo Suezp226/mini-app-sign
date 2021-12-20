@@ -153,6 +153,12 @@
 			transition(e) {
 				let dx = e.detail.dx;
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			// 由于swiper的内部机制问题，快速切换swiper不会触发dx的连续变化，需要在结束时重置状态
 			// swiper滑动结束，分别设置tabs和swiper的状态
 			animationfinish(e) {

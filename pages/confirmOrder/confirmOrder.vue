@@ -137,6 +137,12 @@
 				this.searchForm.pageNum += 10;
 				this.getMoreData();
 			},
+			phoneCall(phone) {
+				console.log(phone);
+				uni.makePhoneCall({
+				    phoneNumber: phone //仅为示例
+				});
+			},
 			// scroll-view 下拉刷新
 			refresherrefresh() {
 				this.refreshTrigger = true;
