@@ -589,9 +589,18 @@
 				let param = {...this.searchForm};
 				param.keyword = param.keyword + this.bindPhone;
 				this.$request('/dispatchForm','GET',param).then(res=>{
-					this.tableList = res.list
-					console.log(this.tableList)
-					this.total = res.pages.total;
+					
+					let list = [];
+					res.list.forEach(ele=>{
+						console.log(ele.deliveryPhone,this.bindPhone,'手机号对比')
+						if(['0','1'].includes(ele.orderStat) && ele.deliveryPhone == this.bindPhone || 
+							(!['0','1'].includes(ele.orderStat) && ele.deliveryPhone != this.bindPhone)) {  // 如果是司机 完成状态 不让查看
+							list.push(ele);
+						}
+					})
+					
+					this.tableList = list
+					this.total = list.length;
 					this.refreshTrigger = false;
 					this.showLoading = false;
 				})

@@ -6,6 +6,14 @@ const goLogin = function() {
 
 
 const request = async function(url, method, data, header) {
+	
+	// token 时效判断
+	let expirationTime = uni.getStorageSync('expirationTime');
+	if(!expirationTime || new Date().getTime() > expirationTime) {  // token时效  24小时
+		uni.removeStorageSync('token');
+		uni.removeStorageSync('expirationTime');
+	}
+	
 	let token = '';
 	token = uni.getStorageSync('token');
 	
@@ -13,12 +21,12 @@ const request = async function(url, method, data, header) {
 		goLogin();
 		setTimeout(()=>{
 			uni.showToast({
-				title: '请先登入!',
+				title: '请登入!',
 				icon: 'none',
 				duration: 2000
 			})
 		},100)
-		return Promise.reject({msg:'请先登入~'});
+		return Promise.reject({msg:'请登入~'});
 	}
 	
 	return new Promise((resolve, reject) => {

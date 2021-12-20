@@ -64,6 +64,7 @@
 				this.$store.commit('putUserInfo', JSON.stringify({userName: '点击登录',userPhone: '',roleName: '暂无'}));
 				uni.removeStorageSync('userInfo');
 				uni.removeStorageSync('token');
+				uni.removeStorageSync('expirationTime');
 			}
 		},
 		onUnload() {
@@ -130,6 +131,9 @@
 					console.log(res);
 					if(res.code == 200) {
 						uni.setStorageSync('token', res.data.token)
+						let expiration = new Date().getTime() + 24 * 60 * 60 * 1000;  // 24小时
+						// let expiration = new Date().getTime() + 60 * 1000;	// 60秒
+						uni.setStorageSync('expirationTime', expiration);
 						uni.setStorageSync('userInfo',JSON.stringify(res.data.user));
 						this.$store.commit('putUserInfo',JSON.parse(uni.getStorageSync('userInfo')));
 						this.$store.commit('changePosition', res.data.user.userType);

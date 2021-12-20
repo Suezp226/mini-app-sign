@@ -130,15 +130,11 @@
 		data() {
 			return {
 				list: [{
-					name: '全部'
-				}, {
 					name: '待启运'
 				}, {
 					name: '运输中'
 				}],
-				tabsView: [{
-					name: '全部'
-				}, {
+				tabsView: [ {
 					name: '待启运'
 				}, {
 					name: '运输中'
@@ -271,11 +267,7 @@
 			changeTab(tab) {
 				this.current = tab;
 				this.swiperCurrent = tab;
-				if(this.current == 0) {
-					this.searchForm.orderStat = '';
-				} else {
-					this.searchForm.orderStat = this.current - 1;
-				}
+				this.searchForm.orderStat = this.current;
 				
 			},
 			transition(e) {
@@ -287,11 +279,7 @@
 				let current = e.detail.current;
 				this.swiperCurrent = current;
 				this.current = current;
-				if(current == 0) {
-					this.searchForm.orderStat = '';
-				} else {
-					this.searchForm.orderStat = current - 1;
-				}
+				this.searchForm.orderStat = this.current;
 			},
 			// scroll-view到底部加载更多
 			onreachBottom() {

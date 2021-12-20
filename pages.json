@@ -80,14 +80,14 @@
 		{
 			"path": "pages/signIn/signIn",
 			"style": {
-				"navigationBarTitleText": "货物签收",
+				"navigationBarTitleText": "发货单",
 				"disableScroll": true
 			}
 		},
 		{
 			"path": "pages/startRunning/startRunning",
 			"style": {
-				"navigationBarTitleText": "发货单",
+				"navigationBarTitleText": "启运货物",
 				"disableScroll": true
 			}
 		},
