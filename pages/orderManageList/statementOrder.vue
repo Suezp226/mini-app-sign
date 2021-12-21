@@ -5,10 +5,10 @@
 		</u-tabs>
 		<swiper class="swiper" :current="swiperCurrent" @transition="transition"
 			@animationfinish="animationfinish">
-			<swiper-item v-for="(item, index) in tabsView" :key="index">
+			<swiper-item v-for="(page, index) in tabsView" :key="index">
 				<scroll-view scroll-y class="scrollView" refresher-enabled :refresher-triggered="refreshTrigger" :refresher-threshold="70"
 					refresher-background="#f5f7fb" @refresherrefresh="refresherrefresh" @scrolltolower="onreachBottom">
-					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.moId">
+					<u-card margin="10px 5px 15px 5px" class="ucard" v-for="item in tableList" :key="item.orderNo">
 						<view slot="head" class="head">
 							<view class="headTips">
 								<u-icon name="car" color="rgb(77, 193, 177)" size="30" style="margin-right: 10px;"></u-icon>
