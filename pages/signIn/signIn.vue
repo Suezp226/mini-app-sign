@@ -380,6 +380,15 @@
 						return
 					}
 					
+					if(this.signType == '1' && !this.input.problem.trim()) {  // 有异议签收必填异议
+						uni.showToast({
+							icon: 'none',
+							title: '请填写异议内容'
+						})
+						this.$refs.uModal.clearLoading();
+						return
+					}
+					
 				}
 				
 				console.log('通过判空校验')
