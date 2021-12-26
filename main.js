@@ -8,6 +8,11 @@ import Vuex from 'vuex'
 import store from './store'
 import apiService from 'static/js/apiService.js'
 import judgeFile from 'static/js/judgeFiletype.js'
+const QQMapWX = require('static/js/qqmap-wx-jssdk.js');
+
+let qqmapsdk = new QQMapWX({
+    key: 'WELBZ-OD5KU-LJKVC-45VGP-24PCF-75FKJ'
+});
 
 Vue.use(Vuex)
 Vue.use(uView);
@@ -18,6 +23,7 @@ Vue.prototype.$request = apiService
 // Vue.prototype.$imgBaseUrl = 'http://suezp.cn:1113'
 Vue.prototype.$imgBaseUrl = 'http://shwq.web.xqzbk.top/api/'
 Vue.prototype.$judgeFiletype = judgeFile
+Vue.prototype.$qqmapsdk = qqmapsdk;
 
 
 if(uni.getStorageSync('userInfo')){

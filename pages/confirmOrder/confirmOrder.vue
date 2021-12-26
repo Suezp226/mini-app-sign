@@ -134,6 +134,30 @@
 			} catch (e) {
 				console.log(e,'获取失败')
 			}
+			
+			// this.$qqmapsdk.reverseGeocoder({
+			//   //位置坐标，默认获取当前位置，非必须参数
+			// 	location: {
+			// 	  latitude: '30.166668',
+			// 	  longitude: '120.220459'
+			// 	},
+			//     success: (res)=> {//成功后的回调
+			// 		console.log(res,'解析成功');
+			// 		let json = res.result.address
+			// 		param.location = json;
+			// 	  },
+			// 	  fail: function(error) {
+			// 		console.error(error);
+			// 		uni.showToast({
+			// 			icon: 'none',
+			// 			title: '地址解析失败'
+			// 		})
+			// 	  },
+			// 	  complete: function(res) {
+			// 		console.log(res);
+			// 	  }
+			// })
+			
 		},
 		methods: {
 			// scroll-view到底部加载更多
@@ -288,46 +312,69 @@
 					console.log('当前位置的经度：' + res[1].longitude);
 					console.log('当前位置的纬度：' + res[1].latitude);
 					
-					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
-									
+					let locationJson = {lat:res[1].latitude,lon:res[1].longitude}
 					
-					if(this.nowItem.bookIdNum) {  // 不需要校验了 和 后台数据对比之后就行
-					
-						let param = {...this.nowItem};
-						param.orderStat = '1';
-						param.location = locationJson;
-						param.deviceInfo = JSON.stringify(this.deviceInfo);
-						this.$request('/orderForm/editOrder', 'POST', param).then(res => {
-							console.log(res);
-							uni.showToast({
-								icon: 'none',
-								title: '确认成功'
-							})
-							this.showModal = false;
-							this.getData();
-						})
-						return
-					}
-					
-					// 不存在身份证号校验输入的信息
-					if(this.input.bookName == this.nowItem.bookName) {
-						console.log('校验通过')
-						let param = {...this.nowItem};
-						param.location = locationJson;
-						param.deviceInfo = JSON.stringify(this.deviceInfo);
-						param.orderStat = '1';
-						this.$request('/orderForm/editOrder', 'POST', param).then(res => {
-							console.log(res);
-							this.$refs.uModal.clearLoading();
-							uni.showToast({
-								icon: 'none',
-								title: '确认成功'
-							})
-							this.showModal = false;
-							this.getData();
+					// 解析地址
+					this.$qqmapsdk.reverseGeocoder({
+					  //位置坐标，默认获取当前位置，非必须参数
+						location: {
+						  latitude: res[1].latitude,
+						  longitude: res[1].longitude
+						},
+					    success: (res)=> {//成功后的回调
+							console.log(res,'解析成功');
+							let json = res.result.address
+							if(this.nowItem.bookIdNum) {  // 不需要校验了 和 后台数据对比之后就行
+								
+								let param = {...this.nowItem};
+								param.orderStat = '1';
+								param.deviceInfo = JSON.stringify(this.deviceInfo);
+								param.location = json;
+								
+								this.$request('/orderForm/editOrder', 'POST', param).then(res => {
+									console.log(res);
+									uni.showToast({
+										icon: 'none',
+										title: '确认成功'
+									})
+									this.showModal = false;
+									this.getData();
+								})
+								return
+							}
 							
-						})
-					}
+							// 不存在身份证号校验输入的信息
+							if(this.input.bookName == this.nowItem.bookName) {
+								console.log('校验通过')
+								let param = {...this.nowItem};
+								
+								param.location = json;
+								param.deviceInfo = JSON.stringify(this.deviceInfo);
+								param.orderStat = '1';
+								this.$request('/orderForm/editOrder', 'POST', param).then(res => {
+									console.log(res);
+									this.$refs.uModal.clearLoading();
+									uni.showToast({
+										icon: 'none',
+										title: '确认成功'
+									})
+									this.showModal = false;
+									this.getData();
+									
+								})
+							}
+						  },
+						  fail: function(error) {
+							console.error(error);
+							uni.showToast({
+								icon: 'none',
+								title: '地址解析失败'
+							})
+						  },
+						  complete: function(res) {
+							console.log(res);
+						  }
+					})
 					
 				})
 				

@@ -419,141 +419,163 @@
 					console.log('当前位置的经度：' + res[1].longitude);
 					console.log('当前位置的纬度：' + res[1].latitude);
 					
-					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
+					let locationJson = {lat:res[1].latitude,lon:res[1].longitude}
 					
-					
-					//  是变更人签收 一定要走校验 并且将身份证保存在后台客户信息中  必须填写身份证号
-					if(changePeople) {
-						// TODO 必须先获取 因为只有30天有效
-						// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
-						// 
-						if( !this.input.payIdNum ) {
-							uni.showToast({
-								icon: 'none',
-								title: '请输入身份证号'
-							})
-							this.$refs.uModal.clearLoading();
-							return
-						}
-						
-						if(this.input.payName != this.nowItem.changeName) {
-							uni.showToast({
-								icon: 'none',
-								title: '姓名与订单不一致'
-							})
-							this.$refs.uModal.clearLoading();
-							return
-						}
-						
-						
-						let accessToken = null;
-						uni.request({
-							url: 'https://aip.baidubce.com/oauth/2.0/token',
-							method: 'GET',
-							header: {},
-							data: {
-								"grant_type": 'client_credentials', 
-								"client_id": 'tImTfCkl7UmYhU6Wv4Zzghv4',
-								"client_secret": 'aNEyU626GgYt8vc2Aip2TGEy4eKE8GC9'
-							},
-							dataType: 'json',
-							timeout: 300000,
-						}).then(access=>{
-							console.log(access)
-							if(access[1]) {
-								console.log('获取成功',console.log(access))
-								accessToken = access[1].data.access_token;
-							}
-							if(!accessToken) {
-								uni.showToast({
-									icon: 'none',
-									title: 'AccessToken 获取失败'
-								})
-								this.$refs.uModal.clearLoading();
-								return
-							}
-							console.log('获取accesstoken',accessToken)
-							uni.request({
-								url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token='+accessToken,
-								method: 'POST',
-								header: {},
-								data: {
-									"id_card_number": this.input.payIdNum, 
-									"name": this.input.payName
-								},
-								dataType: 'json',
-								timeout: 300000,
-							}).then(res=>{
-								this.$refs.uModal.clearLoading();
-								if(res[1].data.error_code == 0) {
+					// 解析地址
+					this.$qqmapsdk.reverseGeocoder({
+					  //位置坐标，默认获取当前位置，非必须参数
+						location: {
+						  latitude: res[1].latitude,
+						  longitude: res[1].longitude
+						},
+					    success: (res)=> {//成功后的回调
+							console.log(res,'解析成功');
+							let json = res.result.address
+							//  是变更人签收 一定要走校验 并且将身份证保存在后台客户信息中  必须填写身份证号
+							if(changePeople) {
+								// TODO 必须先获取 因为只有30天有效
+								// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+								// 
+								if( !this.input.payIdNum ) {
 									uni.showToast({
 										icon: 'none',
-										title: '校验成功'
+										title: '请输入身份证号'
 									})
-									this.nowItem.signType = this.signType;
-									this.nowItem.Slocation = locationJson;
-									this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
-									
-									// 保存下用户身份证号
-									let addPa = {
-										phone: this.nowItem.changePhone,
-										idNum: this.input.payIdNum
-									}
-									this.$request('/user/addUserIdNum','POST', addPa).then(res=>{
-										console.log(res,'添加身份证号回参')
+									this.$refs.uModal.clearLoading();
+									return
+								}
+								
+								if(this.input.payName != this.nowItem.changeName) {
+									uni.showToast({
+										icon: 'none',
+										title: '姓名与订单不一致'
 									})
-									
-									console.log(this.nowItem.Slocation,'设置了位置信息')
-									if(this.signType == '1') {
-										this.nowItem.problem = this.input.problem;
+									this.$refs.uModal.clearLoading();
+									return
+								}
+								
+								
+								let accessToken = null;
+								uni.request({
+									url: 'https://aip.baidubce.com/oauth/2.0/token',
+									method: 'GET',
+									header: {},
+									data: {
+										"grant_type": 'client_credentials', 
+										"client_id": 'tImTfCkl7UmYhU6Wv4Zzghv4',
+										"client_secret": 'aNEyU626GgYt8vc2Aip2TGEy4eKE8GC9'
+									},
+									dataType: 'json',
+									timeout: 300000,
+								}).then(access=>{
+									console.log(access)
+									if(access[1]) {
+										console.log('获取成功',console.log(access))
+										accessToken = access[1].data.access_token;
 									}
-									if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
-										this.doneSave(this.nowItem,'4');
+									if(!accessToken) {
+										uni.showToast({
+											icon: 'none',
+											title: 'AccessToken 获取失败'
+										})
+										this.$refs.uModal.clearLoading();
 										return
 									}
-									this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
-								} else {
-									uni.showToast({
-										icon: 'none',
-										title: '身份信息校验失败'
+									console.log('获取accesstoken',accessToken)
+									uni.request({
+										url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token='+accessToken,
+										method: 'POST',
+										header: {},
+										data: {
+											"id_card_number": this.input.payIdNum, 
+											"name": this.input.payName
+										},
+										dataType: 'json',
+										timeout: 300000,
+									}).then(res=>{
+										this.$refs.uModal.clearLoading();
+										if(res[1].data.error_code == 0) {
+											uni.showToast({
+												icon: 'none',
+												title: '校验成功'
+											})
+											this.nowItem.signType = this.signType;
+											this.nowItem.Slocation = json;
+											this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
+											
+											// 保存下用户身份证号
+											let addPa = {
+												phone: this.nowItem.changePhone,
+												idNum: this.input.payIdNum
+											}
+											this.$request('/user/addUserIdNum','POST', addPa).then(res=>{
+												console.log(res,'添加身份证号回参')
+											})
+											
+											console.log(this.nowItem.Slocation,'设置了位置信息')
+											if(this.signType == '1') {
+												this.nowItem.problem = this.input.problem;
+											}
+											if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
+												this.doneSave(this.nowItem,'4');
+												return
+											}
+											this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
+										} else {
+											uni.showToast({
+												icon: 'none',
+												title: '身份信息校验失败'
+											})
+										}
 									})
+								})
+								
+								return
+							}
+							
+							
+							if(this.nowItem.payIdNum) {  // 除了 变更收货人收获 本人收获不需要走身份校验
+							
+								this.nowItem.signType = this.signType;
+								this.nowItem.Slocation = json;
+								this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
+								console.log(this.nowItem.Slocation,'设置了位置信息')
+								if(this.signType == '1') {
+									this.nowItem.problem = this.input.problem;
 								}
+								if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
+									this.doneSave(this.nowItem,'4');
+									return
+								}
+								this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
+								return
+							}
+							
+							// 不存在身份证号校验输入的信息
+							if(this.input.payName == this.nowItem.payName) {
+								console.log('校验通过')
+								this.nowItem.signType = this.signType;
+								if(this.signType == '1') {
+									this.nowItem.problem = this.input.problem;
+								}
+								this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
+								this.nowItem.Slocation = json;  // 签收位置信息
+								this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
+							}
+							
+						  },
+						  fail: function(error) {
+							console.error(error);
+							uni.showToast({
+								icon: 'none',
+								title: '地址解析失败'
 							})
-						})
-						
-						return
-					}
-					
-					
-					if(this.nowItem.payIdNum) {  // 除了 变更收货人收获 本人收获不需要走身份校验
-					
-						this.nowItem.signType = this.signType;
-						this.nowItem.Slocation = locationJson;
-						this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
-						console.log(this.nowItem.Slocation,'设置了位置信息')
-						if(this.signType == '1') {
-							this.nowItem.problem = this.input.problem;
-						}
-						if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
-							this.doneSave(this.nowItem,'4');
-							return
-						}
-						this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
-						return
-					}
-					
-					// 不存在身份证号校验输入的信息
-					if(this.input.payName == this.nowItem.payName) {
-						console.log('校验通过')
-						this.nowItem.signType = this.signType;
-						if(this.signType == '1') {
-							this.nowItem.problem = this.input.problem;
-						}
-						this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
-						this.nowItem.Slocation = locationJson;  // 签收位置信息
-						this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
-					}
-					
+						  },
+						  complete: function(res) {
+							console.log(res);
+						  }
+					})
+											
 				})
 
 				console.log('校验通过',this.nowItem)

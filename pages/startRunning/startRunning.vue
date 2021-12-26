@@ -260,13 +260,36 @@
 					console.log('当前位置的经度：' + res[1].longitude);
 					console.log('当前位置的纬度：' + res[1].latitude);
 					
-					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
-					// 启运货物  更新状态
-					this.nowItem.Blocation = locationJson;
-					this.nowItem.BdeviceInfo = JSON.stringify(this.deviceInfo);
-					this.doneSave(this.nowItem);
+					let locationJson = {lat:res[1].latitude,lon:res[1].longitude}
 					
-					
+					// 解析地址
+					this.$qqmapsdk.reverseGeocoder({
+					  //位置坐标，默认获取当前位置，非必须参数
+						location: {
+						  latitude: res[1].latitude,
+						  longitude: res[1].longitude
+						},
+					    success: (res)=> {//成功后的回调
+							console.log(res,'解析成功');
+							let json = res.result.address
+							// 启运货物  更新状态
+							this.nowItem.Blocation = json;
+							this.nowItem.BdeviceInfo = JSON.stringify(this.deviceInfo);
+							this.doneSave(this.nowItem);
+							
+						  },
+						  fail: function(error) {
+							console.error(error);
+							uni.showToast({
+								icon: 'none',
+								title: '地址解析失败'
+							})
+						  },
+						  complete: function(res) {
+							console.log(res);
+						  }
+					})
+										
 				})			
 				console.log('校验通过',this.nowItem)
 				
