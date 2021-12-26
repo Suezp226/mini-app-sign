@@ -291,73 +291,20 @@
 					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 									
 					
-					if(this.nowItem.bookIdNum) {  // 身份证存在 走校验
-					// TODO 必须先获取 因为只有30天有效
-					// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
-					// 
-						let accessToken = null;
-						uni.request({
-							url: 'https://aip.baidubce.com/oauth/2.0/token',
-							method: 'GET',
-							header: {},
-							data: {
-								"grant_type": 'client_credentials', 
-								"client_id": 'tImTfCkl7UmYhU6Wv4Zzghv4',
-								"client_secret": 'aNEyU626GgYt8vc2Aip2TGEy4eKE8GC9'
-							},
-							dataType: 'json',
-							timeout: 300000,
-						}).then(access=>{
-							console.log(access)
-							if(access[1]) {
-								console.log('获取成功',console.log(access))
-								accessToken = access[1].data.access_token;
-							}
-							if(!accessToken) {
-								uni.showToast({
-									icon: 'none',
-									title: 'AccessToken 获取失败'
-								})
-								return
-							}
-							console.log('获取accesstoken',accessToken)
-							uni.request({
-								url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token='+accessToken,
-								method: 'POST',
-								header: {},
-								data: {
-									"id_card_number": this.input.bookIdNum, 
-									"name": this.input.bookName
-								},
-								dataType: 'json',
-								timeout: 300000,
-							}).then(res=>{
-								this.$refs.uModal.clearLoading();
-								if(res[1].data.error_code == 0) {
-									uni.showToast({
-										icon: 'none',
-										title: '校验成功'
-									})
-									let param = {...this.nowItem};
-									param.orderStat = '1';
-									param.location = locationJson;
-									param.deviceInfo = JSON.stringify(this.deviceInfo);
-									this.$request('/orderForm/editOrder', 'POST', param).then(res => {
-										console.log(res);
-										uni.showToast({
-											icon: 'none',
-											title: '确认成功'
-										})
-										this.showModal = false;
-										this.getData();
-									})
-								} else {
-									uni.showToast({
-										icon: 'none',
-										title: '身份信息校验失败'
-									})
-								}
+					if(this.nowItem.bookIdNum) {  // 不需要校验了 和 后台数据对比之后就行
+					
+						let param = {...this.nowItem};
+						param.orderStat = '1';
+						param.location = locationJson;
+						param.deviceInfo = JSON.stringify(this.deviceInfo);
+						this.$request('/orderForm/editOrder', 'POST', param).then(res => {
+							console.log(res);
+							uni.showToast({
+								icon: 'none',
+								title: '确认成功'
 							})
+							this.showModal = false;
+							this.getData();
 						})
 						return
 					}

@@ -295,42 +295,19 @@
 					
 					
 					if(this.nowItem.checkIdNum) {  // 身份证存在 走校验
-						uni.request({
-							url: 'https://aip.baidubce.com/rest/2.0/face/v3/person/idmatch?access_token=24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674',
-							method: 'POST',
-							header: {},
-							data: {
-								"id_card_number": this.input.checkIdNum, 
-								"name": this.input.checkName
-							},
-							dataType: 'json',
-							timeout: 300000,
-						}).then(res=>{
-							this.$refs.uModal.clearLoading();
-							if(res[1].data.error_code == 0) {
-								uni.showToast({
-									icon: 'none',
-									title: '校验成功'
-								})
-								let param = {...this.nowItem};
-								param.orderStat = '1';
-								param.location = locationJson;
-								param.deviceInfo = JSON.stringify(this.deviceInfo);
-								this.$request('/statementForm/editOrder', 'POST', param).then(res => {
-									console.log(res);
-									uni.showToast({
-										icon: 'none',
-										title: '确认成功'
-									})
-									this.showModal = false;
-									this.getData();
-								})
-							} else {
-								uni.showToast({
-									icon: 'none',
-									title: '身份信息校验失败'
-								})
-							}
+					
+						let param = {...this.nowItem};
+						param.orderStat = '1';
+						param.location = locationJson;
+						param.deviceInfo = JSON.stringify(this.deviceInfo);
+						this.$request('/statementForm/editOrder', 'POST', param).then(res => {
+							console.log(res);
+							uni.showToast({
+								icon: 'none',
+								title: '确认成功'
+							})
+							this.showModal = false;
+							this.getData();
 						})
 						return
 					}

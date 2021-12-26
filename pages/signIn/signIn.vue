@@ -120,7 +120,7 @@
 				点击 <view class="boldFont">确认</view> 进入变更操作.
 				<input style="margin-top: 10px;" class="input" name="input"  v-model="changeInput.changeName" placeholder="姓名" />
 				<input style="margin-top: 10px;" class="input" name="input"  v-model="changeInput.changePhone" placeholder="手机号" />
-				<input class="input" name="input"  v-model="changeInput.changeIdNum" placeholder="身份证" />
+				<!-- <input class="input" name="input"  v-model="changeInput.changeIdNum" placeholder="身份证" /> -->
 			</view>
 		</u-modal>
 		
@@ -252,7 +252,7 @@
 			changeConfirm() {
 				let {changeName,changePhone,changeIdNum} = this.changeInput;
 				
-				if(!changeName || !changePhone || !changeIdNum) {
+				if(!changeName || !changePhone) {
 					uni.showToast({
 						icon: 'none',
 						title: '请输入完整信息'
@@ -264,7 +264,7 @@
 				let param = {...this.nowItem};
 				param.changeName = changeName;
 				param.changePhone = changePhone;
-				param.changeIdNum = changeIdNum;
+				// param.changeIdNum = changeIdNum;
 				
 				this.$request('/dispatchForm/editOrder','POST', param).then(res=>{
 					console.log(res,'回参')
@@ -334,6 +334,15 @@
 						uni.showToast({
 							icon: 'none',
 							title: '请填写身份证号'
+						})
+						this.$refs.uModal.clearLoading();
+						return
+					}
+					
+					if(this.input.payName != this.nowItem.changeName) {
+						uni.showToast({
+							icon: 'none',
+							title: '姓名与订单不一致'
 						})
 						this.$refs.uModal.clearLoading();
 						return
@@ -412,10 +421,31 @@
 					
 					let locationJson = JSON.stringify({lat:res[1].longitude,lon:res[1].latitude})
 					
-					if(this.nowItem.payIdNum || changePeople) {  // 身份证存在 走校验
-					// TODO 必须先获取 因为只有30天有效
-					// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
-					// 
+					
+					//  是变更人签收 一定要走校验 并且将身份证保存在后台客户信息中  必须填写身份证号
+					if(changePeople) {
+						// TODO 必须先获取 因为只有30天有效
+						// 获取 身份校验 accesstoken    30天有效  24.a527eb57a17d291d97e752b1d06f89c1.2592000.1641892949.282335-25332674
+						// 
+						if( !this.input.payIdNum ) {
+							uni.showToast({
+								icon: 'none',
+								title: '请输入身份证号'
+							})
+							this.$refs.uModal.clearLoading();
+							return
+						}
+						
+						if(this.input.payName != this.nowItem.changeName) {
+							uni.showToast({
+								icon: 'none',
+								title: '姓名与订单不一致'
+							})
+							this.$refs.uModal.clearLoading();
+							return
+						}
+						
+						
 						let accessToken = null;
 						uni.request({
 							url: 'https://aip.baidubce.com/oauth/2.0/token',
@@ -463,6 +493,16 @@
 									this.nowItem.signType = this.signType;
 									this.nowItem.Slocation = locationJson;
 									this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
+									
+									// 保存下用户身份证号
+									let addPa = {
+										phone: this.nowItem.changePhone,
+										idNum: this.input.payIdNum
+									}
+									this.$request('/user/addUserIdNum','POST', addPa).then(res=>{
+										console.log(res,'添加身份证号回参')
+									})
+									
 									console.log(this.nowItem.Slocation,'设置了位置信息')
 									if(this.signType == '1') {
 										this.nowItem.problem = this.input.problem;
@@ -480,6 +520,25 @@
 								}
 							})
 						})
+						
+						return
+					}
+					
+					
+					if(this.nowItem.payIdNum) {  // 除了 变更收货人收获 本人收获不需要走身份校验
+					
+						this.nowItem.signType = this.signType;
+						this.nowItem.Slocation = locationJson;
+						this.nowItem.SdeviceInfo = JSON.stringify(this.deviceInfo);
+						console.log(this.nowItem.Slocation,'设置了位置信息')
+						if(this.signType == '1') {
+							this.nowItem.problem = this.input.problem;
+						}
+						if(this.signType == '0' && this.nowItem.orderStat == '3') {  // 标记为有异议签收的二次确认签收
+							this.doneSave(this.nowItem,'4');
+							return
+						}
+						this.doneSave(this.nowItem,this.signType=='0'?'2':'3');
 						return
 					}
 					
