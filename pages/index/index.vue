@@ -35,18 +35,19 @@
 					</view>
 					<view class="liBox">订货单</view>
 				</li>
-				<li @click="goNextPage('/pages/confirmStatement/confirmStatement')" >
-					<view class="liBox imgBox bgcolor7">
-						<image src="../../static/image/statement.png" mode="aspectFit"></image>
-					</view>
-					<view class="liBox">对账单</view>
-				</li>
 				<li @click="goNextPage('/pages/signIn/signIn')">
 					<view class="liBox imgBox bgcolor5">
 						<image src="../../static/image/sendOrder.png" mode="aspectFit"></image>
 					</view>
 					<view class="liBox">发货单</view>
 				</li>
+				<li @click="goNextPage('/pages/confirmStatement/confirmStatement')" >
+					<view class="liBox imgBox bgcolor7">
+						<image src="../../static/image/statement.png" mode="aspectFit"></image>
+					</view>
+					<view class="liBox">对账单</view>
+				</li>
+				
 				<!-- 司机 -->
 				<li @click="goNextPage('/pages/startRunning/startRunning')" >
 					<view class="liBox imgBox bgcolor4">

@@ -271,7 +271,7 @@
 				}
 				
 				// 校验输入的内容是否和订单一致
-				if(this.input.bookName != this.nowItem.bookName) {
+				if(this.input.bookName.trim() != this.nowItem.bookName.trim()) {
 					uni.showToast({
 						icon: 'none',
 						title: '姓名与订单不一致'
@@ -281,7 +281,7 @@
 				}
 				
 				// 校验输入的内容是否和订单一致
-				if(this.nowItem.bookIdNum && this.nowItem.bookIdNum != this.input.bookIdNum) {
+				if(this.nowItem.bookIdNum && this.nowItem.bookIdNum.trim() != this.input.bookIdNum.trim()) {
 					uni.showToast({
 						icon: 'none',
 						title: '身份证号与订单不一致'

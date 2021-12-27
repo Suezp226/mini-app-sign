@@ -226,18 +226,18 @@
 					this.$refs.uModal.clearLoading();
 					return
 				}
-				if(deliveryName != this.nowItem.deliveryName) {
+				if(deliveryName.trim() != this.nowItem.deliveryName.trim()) {
 					uni.showToast({
 						icon: 'none',
-						title: '姓名与订单不一致'
+						title: '身份信息不一致'
 					})
 					this.$refs.uModal.clearLoading();
 					return
 				}
-				if(deliveryPhone != this.nowItem.deliveryPhone) {
+				if(deliveryPhone.trim() != this.nowItem.deliveryPhone.trim()) {
 					uni.showToast({
 						icon: 'none',
-						title: '手机号与订单不一致'
+						title: '身份信息不一致'
 					})
 					this.$refs.uModal.clearLoading();
 					return

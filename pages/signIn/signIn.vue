@@ -76,10 +76,13 @@
 								<view class="button-box">
 									<button type="default" class="blue" v-if="item.orderStat == '1' && userInfo.phone == item.payPhone" @click="openChangeModal(item)">变更收货人</button>
 									<!-- 不存在变更人 或者  变更手机号与登录一致 -->
+									<!-- 只能本人进行二次签收 -->
 									<template v-if="(!item.changePhone && item.payPhone == bindPhone) ||  (item.changePhone && bindPhone == item.changePhone) " >
 										<button type="primary" class="orange" v-if="item.orderStat == '1'" @click="openSignModal(item,'1')">有异议签收</button>
 										<button type="primary" v-if="item.orderStat == '1'" @click="openSignModal(item,'0')">无异议签收</button>
-										<button type="primary" class="orange" v-if="item.orderStat == '3'" @click="openSignModal(item,'0')">二次签收</button>
+									</template>
+									<template v-if="bindPhone ==  item.payPhone && item.orderStat == '3'" >
+										<button type="primary" class="orange" @click="openSignModal(item,'0')">二次签收</button>
 									</template>
 								</view>
 							</view>
@@ -339,7 +342,7 @@
 						return
 					}
 					
-					if(this.input.payName != this.nowItem.changeName) {
+					if(this.input.payName.trim() != this.nowItem.changeName.trim()) {
 						uni.showToast({
 							icon: 'none',
 							title: '姓名与订单不一致'
@@ -370,7 +373,7 @@
 					
 					
 					// 校验输入的内容是否和订单一致
-					if(this.input.payName != this.nowItem.payName && this.input.payName != this.nowItem.changeName) {
+					if(this.input.payName.trim() != this.nowItem.payName.trim() && this.input.payName.trim() != this.nowItem.changeName.trim()) {
 						uni.showToast({
 							icon: 'none',
 							title: '姓名与订单不一致'
@@ -380,7 +383,7 @@
 					}
 					
 					// 校验输入的内容是否和订单一致
-					if(this.nowItem.payIdNum && this.nowItem.payIdNum != this.input.payIdNum && this.input.payIdNum != this.nowItem.changeIdNum) {
+					if(this.nowItem.payIdNum && this.nowItem.payIdNum.trim() != this.input.payIdNum.trim() && this.input.payIdNum.trim() != this.nowItem.changeIdNum.trim()) {
 						uni.showToast({
 							icon: 'none',
 							title: '身份证号与订单不一致'
@@ -445,7 +448,7 @@
 									return
 								}
 								
-								if(this.input.payName != this.nowItem.changeName) {
+								if(this.input.payName.trim() != this.nowItem.changeName.trim()) {
 									uni.showToast({
 										icon: 'none',
 										title: '姓名与订单不一致'
